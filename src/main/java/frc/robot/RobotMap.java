@@ -10,4 +10,9 @@ public class RobotMap{
         public static final int kRightSlaveA = 2;
         public static final int kRightSlaveB = 3;
     }
+
+    public static class ElevatorMap{
+        public static final int kMaster = 0;
+        public static final int kSlave = 0;
+    }
 }
