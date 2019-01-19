@@ -16,9 +16,6 @@ import frc.util.talon.TalonSRXFactory;
 
 public class Drivetrain extends Subsystem implements ILoggable{
 
-    private static final int kPIDidx = 0;
-    private static final int kCTRETimeout = 0; //no error reporting
-
     //Singleton:
     private static Drivetrain instance;
     public static Drivetrain getInstance(){
@@ -58,27 +55,27 @@ public class Drivetrain extends Subsystem implements ILoggable{
 
         mGyro = new PigeonIMU(0);
 
-        mLeftMaster.configOpenloopRamp(0.01, kCTRETimeout);
-        mRightMaster.configOpenloopRamp(0.01, kCTRETimeout);
+        mLeftMaster.configOpenloopRamp(0.01, Constants.kCTREtimeout);
+        mRightMaster.configOpenloopRamp(0.01, Constants.kCTREtimeout);
 
-        mLeftMaster.configVoltageCompSaturation(12, kCTRETimeout);
-        mRightMaster.configVoltageCompSaturation(12, kCTRETimeout);
+        mLeftMaster.configVoltageCompSaturation(12, Constants.kCTREtimeout);
+        mRightMaster.configVoltageCompSaturation(12, Constants.kCTREtimeout);
 
         mLeftMaster.enableVoltageCompensation(true);
         mRightMaster.enableVoltageCompensation(true);
 
-        mLeftMaster.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, kPIDidx, kCTRETimeout);
-        mRightMaster.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, kPIDidx,kCTRETimeout);
+        mLeftMaster.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, Constants.kCTREpidIDX, Constants.kCTREtimeout);
+        mRightMaster.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, Constants.kCTREpidIDX, Constants.kCTREtimeout);
 
-        mLeftMaster.config_kP(0, kP, kCTRETimeout);
-        mLeftMaster.config_kI(0, kI, kCTRETimeout);
-        mLeftMaster.config_kD(0, kD, kCTRETimeout);
-        mLeftMaster.config_kF(0, kF, kCTRETimeout);
+        mLeftMaster.config_kP(0, kP, Constants.kCTREtimeout);
+        mLeftMaster.config_kI(0, kI, Constants.kCTREtimeout);
+        mLeftMaster.config_kD(0, kD, Constants.kCTREtimeout);
+        mLeftMaster.config_kF(0, kF, Constants.kCTREtimeout);
 
-        mRightMaster.config_kP(0, kP, kCTRETimeout);
-        mRightMaster.config_kI(0, kI, kCTRETimeout);
-        mRightMaster.config_kD(0, kP, kCTRETimeout);
-        mRightMaster.config_kF(0, kF, kCTRETimeout);
+        mRightMaster.config_kP(0, kP, Constants.kCTREtimeout);
+        mRightMaster.config_kI(0, kI, Constants.kCTREtimeout);
+        mRightMaster.config_kD(0, kP, Constants.kCTREtimeout);
+        mRightMaster.config_kF(0, kF, Constants.kCTREtimeout);
 
         mLeftMaster.setSensorPhase(true);
         mRightMaster.setSensorPhase(true);
@@ -130,8 +127,8 @@ public class Drivetrain extends Subsystem implements ILoggable{
      * <p> Zeroes all sensors (encoders + gyro) and odometery information </p>
      */
     public void zeroSensor(){
-        mLeftZeroOffset = mLeftMaster.getSelectedSensorPosition(kPIDidx);
-        mRightZeroOffset = mRightMaster.getSelectedSensorPosition(kPIDidx);
+        mLeftZeroOffset = mLeftMaster.getSelectedSensorPosition(Constants.kCTREpidIDX);
+        mRightZeroOffset = mRightMaster.getSelectedSensorPosition(Constants.kCTREpidIDX);
         mGyroOffset = mGyro.getFusedHeading();
     }
 
@@ -148,28 +145,28 @@ public class Drivetrain extends Subsystem implements ILoggable{
      * @return Left Sensor Position in Feet
      */
     public double getLeftSensorPosition(){
-        return Constants.kTicks2Feet * (mLeftMaster.getSelectedSensorPosition(kPIDidx) - mLeftZeroOffset);
+        return Constants.kTicks2Feet * (mLeftMaster.getSelectedSensorPosition(Constants.kCTREpidIDX) - mLeftZeroOffset);
     }
 
     /**
      * @return Right Sensor Position in Feet
      */
     public double getRightSensorPosition(){
-        return Constants.kTicks2Feet * (mRightMaster.getSelectedSensorPosition(kPIDidx) - mRightZeroOffset);
+        return Constants.kTicks2Feet * (mRightMaster.getSelectedSensorPosition(Constants.kCTREpidIDX) - mRightZeroOffset);
     }
 
     /**
      * @return Left Sensor Velocity in Feet per Second
      */
     public double getLeftSensorVelocity(){
-        return Constants.kNativeU2FPS * mLeftMaster.getSelectedSensorVelocity(kPIDidx);
+        return Constants.kNativeU2FPS * mLeftMaster.getSelectedSensorVelocity(Constants.kCTREpidIDX);
     }
 
     /**
      * @return Left Sensor Velocity in Feet per Second
      */
     public double getRightSensorVelocity(){
-        return Constants.kNativeU2FPS * mRightMaster.getSelectedSensorVelocity(kPIDidx);
+        return Constants.kNativeU2FPS * mRightMaster.getSelectedSensorVelocity(Constants.kCTREpidIDX);
     }
 
     @Override

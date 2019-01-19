@@ -1,6 +1,10 @@
 package frc.robot;
 
 public class Constants{
+    
+    public static final int kCTREpidIDX = 0;
+    public static final int kCTREtimeout = 0;
+
     public static final double kFeet2Ticks= 3833;
     public static final double kTicks2Feet= 1/kFeet2Ticks;
     
