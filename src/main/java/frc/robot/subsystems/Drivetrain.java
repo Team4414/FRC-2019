@@ -7,11 +7,9 @@ import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import com.ctre.phoenix.sensors.PigeonIMU;
 
-import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.command.Subsystem;
 import frc.robot.Constants;
 import frc.robot.RobotMap;
-import frc.util.kinematics.pos.RobotPos;
 import frc.util.logging.ILoggable;
 import frc.util.logging.Loggable;
 import frc.util.talon.TalonSRXFactory;
