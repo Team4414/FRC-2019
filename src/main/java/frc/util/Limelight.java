@@ -71,6 +71,10 @@ public class Limelight{
         }
     }
 
+    public static void setUSBCam(boolean isPrimary){
+        set ("stream", (isPrimary) ? 2 : 0);
+    }
+
     private static double get(String varName){
         return NetworkTableInstance.getDefault().getTable("limelight").getEntry(varName).getDouble(0);
     }
