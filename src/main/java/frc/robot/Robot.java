@@ -1,7 +1,10 @@
 package frc.robot;
 
+import java.util.LinkedHashMap;
+
 import edu.wpi.first.wpilibj.TimedRobot;
 import frc.robot.subsystems.Drivetrain;
+import frc.robot.tuners.VisionTune;
 import frc.util.CheesyDriveHelper;
 import frc.util.Limelight;
 import frc.util.Limelight.CAM_MODE;
@@ -10,10 +13,12 @@ import frc.util.Limelight.LED_STATE;
 public class Robot extends TimedRobot {
 
   private CheesyDriveHelper drive;
+  private LinkedHashMap<Double, Double> mAreaLookupTable;
 
   @Override
   public void robotInit() {
     drive = new CheesyDriveHelper();
+    mAreaLookupTable = new LinkedHashMap<>();
   }
 
   @Override
@@ -65,10 +70,19 @@ public class Robot extends TimedRobot {
     );
   }
 
+  boolean mCollected = false;
+
   @Override
   public void testInit() {
-    Limelight.setLED(LED_STATE.ON);
-    Limelight.setCamMode(CAM_MODE.VISION);
+    mCollected = false;
+    Drivetrain.getInstance().zeroSensor();
+  }
+
+  @Override
+  public void testPeriodic() {
+    if (!mCollected){
+      mCollected = VisionTune.getInstance().areaAutoTune(mAreaLookupTable, 0.5, 6);
+    }
   }
 
   @Override
