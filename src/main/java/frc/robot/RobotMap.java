@@ -17,4 +17,8 @@ public class RobotMap{
 
         public static final int kSwitch = 0;
     }
+
+    public static class ClimberMap{
+        public static final int kClimber = 0;
+    }
 }

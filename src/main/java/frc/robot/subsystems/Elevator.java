@@ -28,7 +28,7 @@ public class Elevator extends Subsystem implements ILoggable {
     private TalonSRX mMaster;
     private VictorSPX mSlave;
     
-    private DigitalInput kSwitch; //TODO: Figure out how to monitor this.
+    private DigitalInput kSwitch; //TODO: Figure out how to monitor this
 
     public static enum Setpoint{
         HAND_CLR,
