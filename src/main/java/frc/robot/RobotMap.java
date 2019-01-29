@@ -14,5 +14,7 @@ public class RobotMap{
     public static class ElevatorMap{
         public static final int kMaster = 0;
         public static final int kSlave = 0;
+
+        public static final int kSwitch = 0;
     }
 }
