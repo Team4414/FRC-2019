@@ -28,7 +28,7 @@ public class Elevator extends Subsystem implements ILoggable {
     private TalonSRX mMaster;
     private VictorSPX mSlave;
     
-    private DigitalInput kSwitch;
+    private DigitalInput kSwitch; //TODO: Figure out how to monitor this.
 
     public static enum Setpoint{
         HAND_CLR,
@@ -66,10 +66,10 @@ public class Elevator extends Subsystem implements ILoggable {
 
         mMaster.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative);
 
-        mMaster.config_kP(Constants.kCTREpidIDX, 1);
-        mMaster.config_kI(Constants.kCTREpidIDX, 0);
-        mMaster.config_kD(Constants.kCTREpidIDX, 0);
-        mMaster.config_kF(Constants.kCTREpidIDX, 0);
+        mMaster.config_kP(Constants.kCTREpidIDX, kP);
+        mMaster.config_kI(Constants.kCTREpidIDX, kI);
+        mMaster.config_kD(Constants.kCTREpidIDX, kD);
+        mMaster.config_kF(Constants.kCTREpidIDX, kF);
 
         mMaster.configMotionAcceleration(kMMacceleration);
         mMaster.configMotionCruiseVelocity(kMMvelocity);
