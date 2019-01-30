@@ -43,6 +43,10 @@ public class Limelight{
         return get("ta");
     }
 
+    public static double tHor(){
+        return get("thor");
+    }
+
     public static void setLED(LED_STATE state){
         switch(state){
             case MANUAL:
