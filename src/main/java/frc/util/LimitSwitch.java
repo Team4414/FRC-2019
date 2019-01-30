@@ -1,4 +1,4 @@
-package frc.robot;
+package frc.util;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.buttons.Trigger;
