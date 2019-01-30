@@ -10,7 +10,8 @@ import frc.util.logging.Loggable;
 
 public class Climber extends Subsystem implements ILoggable {
 
-    private static final double kClimbSpeed = 0;
+    private static final double kClimbPower = 0;
+    private static final double kRetractPower = 0;
 
     private final TalonSRX climber;
     
@@ -30,7 +31,11 @@ public class Climber extends Subsystem implements ILoggable {
     }
 
     public void climb (boolean climb){
-        climber.set(ControlMode.PercentOutput, (climb) ? kClimbSpeed : 0);
+        climber.set(ControlMode.PercentOutput, (climb) ? Math.abs(kClimbPower) : 0);
+    }
+
+    public void retract (boolean retract){
+        climber.set(ControlMode.PercentOutput, (retract) ? -Math.abs(kRetractPower) : 0);
     }
     
     @Override

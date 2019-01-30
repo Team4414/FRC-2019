@@ -4,15 +4,16 @@ import java.util.LinkedHashMap;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.command.Subsystem;
 import frc.robot.Constants;
+import frc.robot.LimitSwitch;
 import frc.robot.RobotMap;
+import frc.robot.LimitSwitch.Travel;
 import frc.util.logging.ILoggable;
 import frc.util.logging.Loggable;
+import frc.util.talon.LimitableSRX;
 import frc.util.talon.TalonSRXFactory;
 
 public class Elevator extends Subsystem implements ILoggable {
@@ -25,10 +26,10 @@ public class Elevator extends Subsystem implements ILoggable {
     private static final int kMMacceleration = 0;
     private static final int kMMvelocity = 0;
     
-    private TalonSRX mMaster;
+    private LimitableSRX mMaster;
     private VictorSPX mSlave;
-    
-    private DigitalInput kSwitch; //TODO: Figure out how to monitor this
+
+    private LimitSwitch mLowLimit;
 
     public static enum Setpoint{
         HAND_CLR,
@@ -59,10 +60,10 @@ public class Elevator extends Subsystem implements ILoggable {
         heightSetpoints.put(Setpoint.FINGER_CLR, 0);
 
 
-        mMaster = TalonSRXFactory.createDefaultTalon(RobotMap.ElevatorMap.kMaster);
+        mMaster = new LimitableSRX(TalonSRXFactory.createDefaultTalon(RobotMap.ElevatorMap.kMaster));
         mSlave = TalonSRXFactory.createPermanentSlaveVictor(RobotMap.ElevatorMap.kSlave, mMaster);
 
-        kSwitch = new DigitalInput(RobotMap.ElevatorMap.kSwitch);
+        mLowLimit = new LimitSwitch(RobotMap.ElevatorMap.kSwitch, Travel.BACKWARD, mMaster);
 
         mMaster.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative);
 
