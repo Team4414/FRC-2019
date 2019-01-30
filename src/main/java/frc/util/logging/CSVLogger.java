@@ -2,7 +2,15 @@ package frc.util.logging;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.PrintWriter;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+
+import com.sun.tools.javac.jvm.Target;
+
+import frc.robot.TargetEntry;
 
 /**
  * CSVLogger Class.
@@ -66,6 +74,25 @@ public class CSVLogger {
         return writeStringToFile(fileName, outputString.toString());
     }
 
+    public static boolean logCSV(String fileName, ArrayList<TargetEntry> list){
+        
+        StringBuilder outputString = new StringBuilder();
+
+        for (int i = 0; i < list.size(); i++){
+            outputString.append(list.get(i).toString());
+        }
+
+        System.out.println(list.size());
+
+        return writeStringToFile(fileName, outputString.toString());
+    }
+
+    public static ArrayList<TargetEntry> fromCSV(String fileName, int lineLength){
+        String contents = readStringfromFile(fileName);
+
+
+    }
+
     /**
      * Flip Array Method.
      *
@@ -116,6 +143,19 @@ public class CSVLogger {
         fileWriter.close();
 
         return true;
+    }
+
+    private static String readStringfromFile(String fileName){
+        FileReader reader;
+        String content = "";
+
+        try {
+            content = new String(Files.readAllBytes(Paths.get(FILE_PATH + fileName + ".csv")));
+        } catch (FileNotFoundException e){
+            System.err.println("!!!!! FILE NOT FOUND EXCEPTION FOR \"" + FILE_PATH + fileName + "\" !!!!!");
+        }
+
+        return content;
     }
 
 
