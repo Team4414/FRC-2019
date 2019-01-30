@@ -1,6 +1,8 @@
 package frc.robot;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+
 
 import edu.wpi.first.wpilibj.TimedRobot;
 import frc.robot.subsystems.Drivetrain;
@@ -9,16 +11,17 @@ import frc.util.CheesyDriveHelper;
 import frc.util.Limelight;
 import frc.util.Limelight.CAM_MODE;
 import frc.util.Limelight.LED_STATE;
+import frc.util.logging.CSVLogger;
 
 public class Robot extends TimedRobot {
 
   private CheesyDriveHelper drive;
-  private LinkedHashMap<Double, Double> mAreaLookupTable;
+  private ArrayList<TargetEntry> mAreaLookupTable;
 
   @Override
   public void robotInit() {
     drive = new CheesyDriveHelper();
-    mAreaLookupTable = new LinkedHashMap<>();
+    mAreaLookupTable = new ArrayList<TargetEntry>();
   }
 
   @Override
@@ -81,7 +84,7 @@ public class Robot extends TimedRobot {
   @Override
   public void testPeriodic() {
     if (!mCollected){
-      mCollected = VisionTune.getInstance().areaAutoTune(mAreaLookupTable, 0.5, 6);
+      mCollected = VisionTune.getInstance().areaAutoTune(0.5, 6);
     }
   }
 

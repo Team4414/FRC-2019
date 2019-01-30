@@ -20,5 +20,8 @@ public class RobotMap{
 
     public static class ClimberMap{
         public static final int kClimber = 0;
+
+        public static final int kSwitchUp = 0;
+        public static final int kSwitchDown = 0;
     }
 }

@@ -8,9 +8,9 @@ import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 
 import edu.wpi.first.wpilibj.command.Subsystem;
 import frc.robot.Constants;
-import frc.robot.LimitSwitch;
 import frc.robot.RobotMap;
-import frc.robot.LimitSwitch.Travel;
+import frc.util.LimitSwitch;
+import frc.util.LimitSwitch.Travel;
 import frc.util.logging.ILoggable;
 import frc.util.logging.Loggable;
 import frc.util.talon.LimitableSRX;
@@ -29,6 +29,7 @@ public class Elevator extends Subsystem implements ILoggable {
     private LimitableSRX mMaster;
     private VictorSPX mSlave;
 
+    @SuppressWarnings("unused")
     private LimitSwitch mLowLimit;
 
     public static enum Setpoint{
