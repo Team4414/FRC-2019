@@ -1,8 +1,6 @@
-package frc.robot.tuners;
+package frc.robot.vision;
 
 import java.util.ArrayList;
-
-import frc.robot.TargetEntry;
 import frc.robot.subsystems.Drivetrain;
 import frc.util.Limelight;
 import frc.util.Limelight.CAM_MODE;

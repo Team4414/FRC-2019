@@ -1,12 +1,12 @@
 package frc.robot;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 
 
 import edu.wpi.first.wpilibj.TimedRobot;
 import frc.robot.subsystems.Drivetrain;
-import frc.robot.tuners.VisionTune;
+import frc.robot.vision.TargetEntry;
+import frc.robot.vision.VisionTune;
 import frc.util.CheesyDriveHelper;
 import frc.util.Limelight;
 import frc.util.Limelight.CAM_MODE;
@@ -18,15 +18,20 @@ public class Robot extends TimedRobot {
   private CheesyDriveHelper drive;
   private ArrayList<TargetEntry> mAreaLookupTable;
 
+  private final String kVisionTableLocation = "visionTable";
+
   @Override
   public void robotInit() {
     drive = new CheesyDriveHelper();
-    mAreaLookupTable = new ArrayList<TargetEntry>();
+
+    for (String data: CSVLogger.fromCSV(kVisionTableLocation)){
+      mAreaLookupTable.add(new TargetEntry(data));
+    }
   }
 
   @Override
   public void robotPeriodic() {
-
+    
   }
 
   @Override

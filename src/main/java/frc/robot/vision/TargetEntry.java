@@ -1,4 +1,4 @@
-package frc.robot;
+package frc.robot.vision;
 
 import java.util.ArrayList;
 import java.util.Scanner;
