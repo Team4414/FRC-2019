@@ -3,14 +3,12 @@ package frc.util.logging;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-
-import com.sun.tools.javac.jvm.Target;
-
-import frc.robot.TargetEntry;
+import java.util.Scanner;
 
 /**
  * CSVLogger Class.
@@ -74,7 +72,18 @@ public class CSVLogger {
         return writeStringToFile(fileName, outputString.toString());
     }
 
-    public static boolean logCSV(String fileName, ArrayList<TargetEntry> list){
+    /**
+     * Log CSV Method.
+     * 
+     * <P> Publishes an array list of Objects to the filesystem by calling their toString methods </P>
+     * 
+     * @param fileName The name of output file as a String.
+     *                 **Note: Omit the '.csv' extension from this parameter!**
+     *                 **Note: Optionally, a relative path can be provided for subdirectories**
+     * @param list The {@link ArrayList} to be published. 
+     * @return True if operation is successful. False if operation has failed.
+     */
+    public static boolean logCSV(String fileName, ArrayList<Object> list){
         
         StringBuilder outputString = new StringBuilder();
 
@@ -87,10 +96,35 @@ public class CSVLogger {
         return writeStringToFile(fileName, outputString.toString());
     }
 
-    public static ArrayList<TargetEntry> fromCSV(String fileName, int lineLength){
-        String contents = readStringfromFile(fileName);
 
+    /**
+     * From CSV Method
+     * 
+     * <P> Returns an array list of Strings that represent the rows of a provided .csv file </P>
+     * 
+     * @param fileName The name of output file as a String.
+     *                 **Note: Omit the '.csv' extension from this parameter!**
+     *                 **Note: Optionally, a relative path can be provided for subdirectories**
+     * @return An Array List of row content from the provided file.
+     */
+    public static ArrayList<String> fromCSV(String fileName){
 
+        ArrayList<String> records = new ArrayList<>();
+        Scanner scanner;
+
+        try {
+            scanner = new Scanner(new File(FILE_PATH + fileName + ".csv"));
+        } catch (FileNotFoundException e){
+            System.err.println("!!!!! FILE NOT FOUND EXCEPTION FOR \"" + FILE_PATH + fileName + "\" !!!!!");
+            return new ArrayList<>();
+        }
+
+        while (scanner.hasNextLine()){
+            records.add(scanner.nextLine());
+        }
+
+        scanner.close();
+        return records;
     }
 
     /**
@@ -145,13 +179,22 @@ public class CSVLogger {
         return true;
     }
 
+    /**
+     * Read String from File method.
+     * 
+     * <P> Reads a file from the filesystem into a String </P>
+     * 
+     * @param fileName The name of output file.
+     *                 **Note: Omit the '.csv' extension from this parameter!**
+     *                 **Note: Optionally, a relative path can be provided for subdirectories**
+     * @return The contents of this file as a String.
+     */
     private static String readStringfromFile(String fileName){
-        FileReader reader;
         String content = "";
 
         try {
             content = new String(Files.readAllBytes(Paths.get(FILE_PATH + fileName + ".csv")));
-        } catch (FileNotFoundException e){
+        } catch (IOException e){
             System.err.println("!!!!! FILE NOT FOUND EXCEPTION FOR \"" + FILE_PATH + fileName + "\" !!!!!");
         }
 

@@ -13,7 +13,7 @@ public class VisionTune{
 
     private double mLastDistance;
     private boolean mStarted;
-    private ArrayList<TargetEntry> mEntries;
+    private ArrayList<Object> mEntries;
 
     private static VisionTune instance;
     public static VisionTune getInstance(){
