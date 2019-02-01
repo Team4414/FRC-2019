@@ -3,6 +3,8 @@ package frc.robot.vision;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import frc.util.Limelight.CAM;
+
 public class TargetEntry{
     private final double mDistance;
     private final double mTheta;
@@ -56,7 +58,7 @@ public class TargetEntry{
     }
 
 
-    public static TargetEntry interpolate(ArrayList<TargetEntry> data, double tHeight, boolean isBallSide){
+    public static TargetEntry interpolate(ArrayList<TargetEntry> data, double tHeight, CAM camUsed){
         TargetEntry lowBound = data.get(0);
         TargetEntry highBound = data.get(0);
 
@@ -81,6 +83,7 @@ public class TargetEntry{
             }
         }
 
+        boolean isBallSide = (camUsed == CAM.BALL_SIDE) ? true : false;
 
         return interpolate(highBound, lowBound, tHeight, isBallSide);
     }
