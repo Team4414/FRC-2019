@@ -1,6 +1,8 @@
 package frc.robot.vision;
 
 import java.util.ArrayList;
+
+import frc.robot.Robot;
 import frc.robot.subsystems.Drivetrain;
 import frc.util.Limelight;
 import frc.util.Limelight.CAM;
@@ -14,7 +16,8 @@ public class VisionTune{
     private boolean mStarted;
     private ArrayList<Object> mEntries;
 
-    private static final Limelight mTuneCam = Limelight.getInstance(CAM.PANEL_SIDE);
+    // Which camera to use for the tuning procedure
+    private static final Limelight mTuneCam = Robot.limePanel;
 
     private static VisionTune instance;
     public static VisionTune getInstance(){
@@ -35,7 +38,7 @@ public class VisionTune{
     public boolean areaAutoTune(double samplingIntervalFeet, double maxDistance){
 
         if (!mStarted){
-            mTuneCamsetCamMode(CAM_MODE.VISION);
+            mTuneCam.setCamMode(CAM_MODE.VISION);
             mTuneCam.setLED(LED_STATE.ON);
             System.out.println("########## Starting Vision Tune ##########");
             mStarted = true;
@@ -54,7 +57,7 @@ public class VisionTune{
 
         if (mDist >= (mLastDistance + samplingIntervalFeet)){
             mLastDistance += samplingIntervalFeet;
-            System.out.println("##### Point Added: " + mLastDistance + "\t" + mTuneCam.tHor() + " #####");
+            System.out.println("##### Point Added: " + mLastDistance + "\t" + mTuneCam.tHeight() + " #####");
             mEntries.add(new TargetEntry(mDist, mTuneCam.tX(), mTuneCam.tHeight()));
         }
 
@@ -62,6 +65,7 @@ public class VisionTune{
     }
 
     private double dist(){
+        //distance given by encoders
         return (0.5 * (Drivetrain.getInstance().getRightSensorPosition() + Drivetrain.getInstance().getLeftSensorPosition()));
     }
     

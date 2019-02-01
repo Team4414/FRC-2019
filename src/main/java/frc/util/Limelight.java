@@ -29,29 +29,18 @@ public class Limelight{
         BALL_SIDE, PANEL_SIDE;
     };
 
-
-    //---------- Static Constructor Shenanigans ----------
     private static final String kBallCamName = "limeball";
     private static final String kPanelCamName = "limepanel";
 
-    private static Limelight ballCam;
-    private static Limelight panelCam;
-
-    public static Limelight getInstance(CAM side){
-        if (side == CAM.BALL_SIDE){
-            if (ballCam == null)
-                ballCam = new Limelight(kBallCamName);
-            return ballCam;
-        }
-
-        if (panelCam == null)
-            panelCam = new Limelight(kPanelCamName);
-        return panelCam;
-    }
-    //---------------------------------------------------
-
     private final String mTableName;
 
+    public Limelight(CAM type){
+        if (type == CAM.BALL_SIDE){
+           mTableName = kBallCamName;
+        } else {
+            mTableName = kPanelCamName;
+        }
+    }
     public Limelight(String tableName){
         mTableName = tableName;
     }  
