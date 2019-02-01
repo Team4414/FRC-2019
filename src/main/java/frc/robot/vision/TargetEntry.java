@@ -56,7 +56,7 @@ public class TargetEntry{
     }
 
 
-    public static TargetEntry interpolate(ArrayList<TargetEntry> data, double dist, boolean isBallSide){
+    public static TargetEntry interpolate(ArrayList<TargetEntry> data, double tHeight, boolean isBallSide){
         TargetEntry lowBound = data.get(0);
         TargetEntry highBound = data.get(0);
 
@@ -66,7 +66,7 @@ public class TargetEntry{
 
         for (TargetEntry curr: data){
 
-            err = dist - curr.dist();
+            err = tHeight - curr.height();
 
             if ((err > 0) & (err < distLow)){
                 //if the error is positive (sample is less than target)
@@ -82,19 +82,19 @@ public class TargetEntry{
         }
 
 
-        return interpolate(highBound, lowBound, dist, isBallSide);
+        return interpolate(highBound, lowBound, tHeight, isBallSide);
     }
 
-    private static TargetEntry interpolate(TargetEntry high, TargetEntry low, double dist, boolean isBallSide){
+    private static TargetEntry interpolate(TargetEntry high, TargetEntry low, double tHeight, boolean isBallSide){
         //HighDist - LowDist
         //------------------ * (HighValue + LowValue)
         //  dist - LowDist
 
-        double pos = ((high.dist() - low.dist()) / (dist - low.dist()));
+        double pos = ((high.height() - low.height()) / (tHeight - low.height()));
         double theta = ((isBallSide) ? -1 : 1) * (high.theta() + low.theta()) * pos;
 
         return new TargetEntry(
-            dist,
+            pos * (high.dist() + low.dist()),
             theta,
             pos * (high.height() + low.height())
         );
