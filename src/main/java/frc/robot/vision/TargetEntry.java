@@ -56,7 +56,7 @@ public class TargetEntry{
     }
 
 
-    public static TargetEntry interpolate(ArrayList<TargetEntry> data, double dist){
+    public static TargetEntry interpolate(ArrayList<TargetEntry> data, double dist, boolean isBallSide){
         TargetEntry lowBound = data.get(0);
         TargetEntry highBound = data.get(0);
 
@@ -82,19 +82,20 @@ public class TargetEntry{
         }
 
 
-        return interpolate(highBound, lowBound, dist);
+        return interpolate(highBound, lowBound, dist, isBallSide);
     }
 
-    private static TargetEntry interpolate(TargetEntry high, TargetEntry low, double dist){
+    private static TargetEntry interpolate(TargetEntry high, TargetEntry low, double dist, boolean isBallSide){
         //HighDist - LowDist
         //------------------ * (HighValue + LowValue)
         //  dist - LowDist
 
         double pos = ((high.dist() - low.dist()) / (dist - low.dist()));
+        double theta = ((isBallSide) ? -1 : 1) * (high.theta() + low.theta()) * pos;
 
         return new TargetEntry(
             dist,
-            pos * (high.theta() + low.theta()),
+            theta,
             pos * (high.height() + low.height())
         );
     }

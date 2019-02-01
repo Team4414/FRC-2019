@@ -9,6 +9,7 @@ import frc.robot.vision.TargetEntry;
 import frc.robot.vision.VisionTune;
 import frc.util.CheesyDriveHelper;
 import frc.util.Limelight;
+import frc.util.Limelight.CAM;
 import frc.util.Limelight.CAM_MODE;
 import frc.util.Limelight.LED_STATE;
 import frc.util.logging.CSVLogger;
@@ -16,54 +17,35 @@ import frc.util.logging.CSVLogger;
 public class Robot extends TimedRobot {
 
   private CheesyDriveHelper drive;
-  private ArrayList<TargetEntry> mAreaLookupTable;
+  private ArrayList<TargetEntry> mVisionLookupTable;
 
   private final String kVisionTableLocation = "visionTable";
 
   @Override
   public void robotInit() {
     drive = new CheesyDriveHelper();
+    mVisionLookupTable = new ArrayList<>();
 
     for (String data: CSVLogger.fromCSV(kVisionTableLocation)){
-      mAreaLookupTable.add(new TargetEntry(data));
+      mVisionLookupTable.add(new TargetEntry(data));
     }
   }
 
   @Override
   public void robotPeriodic() {
-    
   }
 
   @Override
   public void autonomousInit() {
-    Limelight.setCamMode(CAM_MODE.VISION);
-    Limelight.setLED(LED_STATE.ON);
   }
-
-  double[] visionOffset;
-  double throttleCommand;
-  double targetArea = 0.4;
 
   @Override
   public void autonomousPeriodic() {
-
-    throttleCommand = ((targetArea - Limelight.tArea()) * -3);
-
-
-    if (Limelight.hasTarget()){
-      Drivetrain.getInstance().setRawSpeed(
-        throttleCommand + Limelight.tX() * 0.05,
-        throttleCommand - Limelight.tX() * 0.05
-      );
-    }else{
-      Drivetrain.getInstance().setRawSpeed(0, 0);
-    }
-
   }
 
   @Override
   public void teleopInit() {
-    Limelight.setUSBCam(true);
+    Limelight.getInstance(CAM.PANEL_SIDE).setUSBCam(true);
   }
 
   @Override
@@ -95,8 +77,8 @@ public class Robot extends TimedRobot {
 
   @Override
   public void disabledInit() {
-    Limelight.setLED(LED_STATE.OFF);
-    Limelight.setCamMode(CAM_MODE.DRIVER);
-    Limelight.setUSBCam(false);
+    Limelight.getInstance(CAM.PANEL_SIDE).setLED(LED_STATE.OFF);
+    Limelight.getInstance(CAM.BALL_SIDE).setLED(LED_STATE.OFF);
+    Limelight.getInstance(CAM.PANEL_SIDE).setUSBCam(fals); 
   }
 }
