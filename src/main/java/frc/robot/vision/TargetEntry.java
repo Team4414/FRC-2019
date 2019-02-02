@@ -10,6 +10,8 @@ public class TargetEntry{
     private final double mTheta;
     private final double mHeight;
 
+    public static final TargetEntry BLANK_DATA = new TargetEntry(0, 0, 0);
+
     public TargetEntry (double distance, double theta, double height){
         mDistance = distance;
         mTheta = theta;

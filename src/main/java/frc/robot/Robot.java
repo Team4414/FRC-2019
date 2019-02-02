@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import edu.wpi.first.wpilibj.TimedRobot;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.vision.TargetEntry;
+import frc.robot.vision.VisionHelper;
 import frc.robot.vision.VisionTune;
 import frc.util.CheesyDriveHelper;
 import frc.util.Limelight;
@@ -21,7 +22,7 @@ public class Robot extends TimedRobot {
   public static Limelight limePanel = new Limelight(CAM.PANEL_SIDE);
   public static Limelight limeBall  = new Limelight(CAM.BALL_SIDE);
 
-  private ArrayList<TargetEntry> mVisionLookupTable;
+  public static ArrayList<TargetEntry> visionTable;
   private final String kVisionTableLocation = "visionTable";
   //------------------------------------
 
@@ -29,10 +30,10 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit() {
     drive = new CheesyDriveHelper();
-    mVisionLookupTable = new ArrayList<>();
+    visionTable = new ArrayList<>();
 
     for (String data: CSVLogger.fromCSV(kVisionTableLocation)){
-      mVisionLookupTable.add(new TargetEntry(data));
+      visionTable.add(new TargetEntry(data));
     }
   }
 
@@ -53,12 +54,17 @@ public class Robot extends TimedRobot {
     limePanel.setUSBCam(true);
   }
 
+  private double turnSignal = 0;
+
   @Override
   public void teleopPeriodic() {
+
+    turnSignal = VisionHelper.turnCorrection() + OI.getInstance().getLeft();
+    
     Drivetrain.getInstance().setRawSpeed(
       drive.cheesyDrive(
         OI.getInstance().getForward(), 
-        OI.getInstance().getLeft(),
+        turnSignal,
         OI.getInstance().getQuickTurn(), 
         false
       )

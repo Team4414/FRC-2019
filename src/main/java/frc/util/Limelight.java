@@ -33,6 +33,8 @@ public class Limelight{
     private static final String kPanelCamName = "limepanel";
 
     private final String mTableName;
+    
+    private static CAM side;
 
     public Limelight(CAM type){
         if (type == CAM.BALL_SIDE){
@@ -40,6 +42,7 @@ public class Limelight{
         } else {
             mTableName = kPanelCamName;
         }
+        side = type;
     }
     public Limelight(String tableName){
         mTableName = tableName;
@@ -115,6 +118,10 @@ public class Limelight{
 
     public void setUSBCam(boolean isPrimary){
         set ("stream", (isPrimary) ? 2 : 0);
+    }
+
+    public CAM getCamSide(){
+        return side;
     }
 
     private double get(String varName){

@@ -24,6 +24,7 @@ public class OI{
     private static final int kThrottleAxis = 1;
 
     private static final int[] kQuickTurnButtonIDs = new int[]{6};
+    private static final int kVisionButtonID = 0;
 
 
     private Joystick throttleNub;
@@ -54,5 +55,9 @@ public class OI{
                 return true;
          }
         return false;
+    }
+
+    public boolean getVision(){
+        return turnNub.getRawButton(kVisionButtonID);
     }
 }
