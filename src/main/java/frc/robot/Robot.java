@@ -23,7 +23,7 @@ public class Robot extends TimedRobot {
   public static Limelight limeBall  = new Limelight(CAM.BALL_SIDE);
 
   public static ArrayList<TargetEntry> visionTable;
-  private final String kVisionTableLocation = "visionTable";
+  private final String kVisionTableLocation = "/U/visionlookup.csv";
   //------------------------------------
 
 
@@ -60,15 +60,17 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() {
 
     turnSignal = VisionHelper.turnCorrection() + OI.getInstance().getLeft();
+
+    System.out.println(turnSignal);
     
-    Drivetrain.getInstance().setRawSpeed(
-      drive.cheesyDrive(
-        OI.getInstance().getForward(), 
-        turnSignal,
-        OI.getInstance().getQuickTurn(), 
-        false
-      )
-    );
+    // Drivetrain.getInstance().setRawSpeed(
+    //   drive.cheesyDrive(
+    //     OI.getInstance().getForward(), 
+    //     turnSignal,
+    //     OI.getInstance().getQuickTurn(), 
+    //     false
+    //   )
+    // );
   }
 
   boolean mCollected = false;

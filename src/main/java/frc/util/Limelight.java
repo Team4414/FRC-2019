@@ -29,8 +29,8 @@ public class Limelight{
         BALL_SIDE, PANEL_SIDE;
     };
 
-    private static final String kBallCamName = "limeball";
-    private static final String kPanelCamName = "limepanel";
+    private static final String kBallCamName = "limelight-ball";
+    private static final String kPanelCamName = "limelight-panel";
 
     private final String mTableName;
     
