@@ -78,14 +78,14 @@ public class TalonSRXFactory {
     public static TalonSRX createPermanentSlaveTalon(int id, int master_id) {
         final TalonSRX talon = createTalon(id, kSlaveConfiguration);
         talon.set(ControlMode.Follower, master_id);
+        
         return talon;
     }
 
     public static VictorSPX createPermanentSlaveVictor(int id, IMotorController master){
-        final VictorSPX victor = new VictorSPX(id);
-        victor.clearStickyFaults(kTimeoutMs);
-
+        final VictorSPX victor = createVictor(id, kSlaveConfiguration);
         victor.follow(master);
+
         return victor;
     }
     
@@ -160,5 +160,67 @@ public class TalonSRXFactory {
         talon.setControlFramePeriod(ControlFrame.Control_3_General, config.CONTROL_FRAME_PERIOD_MS);
 
         return talon;
+    }
+
+    public static VictorSPX createVictor(int id){
+        return createVictor(id, kDefaultConfiguration);
+    }
+
+    public static VictorSPX createVictor(int id, Configuration config){
+        VictorSPX victor = new VictorSPX(id);
+
+        victor.set(ControlMode.PercentOutput, 0.0);
+
+        victor.changeMotionControlFramePeriod(config.MOTION_CONTROL_FRAME_PERIOD_MS);
+        victor.clearMotionProfileHasUnderrun(kTimeoutMs);
+        victor.clearMotionProfileTrajectories();
+
+        victor.clearStickyFaults(kTimeoutMs);
+
+        victor.configForwardLimitSwitchSource(LimitSwitchSource.FeedbackConnector,
+                LimitSwitchNormal.NormallyOpen, kTimeoutMs);
+        victor.overrideLimitSwitchesEnable(config.ENABLE_LIMIT_SWITCH);
+
+        // Turn off re-zeroing by default.
+        victor.configSetParameter(
+                ParamEnum.eClearPositionOnLimitF, 0, 0, 0, kTimeoutMs);
+        victor.configSetParameter(
+                ParamEnum.eClearPositionOnLimitR, 0, 0, 0, kTimeoutMs);
+
+        victor.configNominalOutputForward(0, kTimeoutMs);
+        victor.configNominalOutputReverse(0, kTimeoutMs);
+        victor.configNeutralDeadband(config.NEUTRAL_DEADBAND, kTimeoutMs);
+
+        victor.configPeakOutputForward(1.0, kTimeoutMs);
+        victor.configPeakOutputReverse(-1.0, kTimeoutMs);
+
+        victor.setNeutralMode(config.NEUTRAL_MODE);
+
+        victor.configForwardSoftLimitThreshold(config.FORWARD_SOFT_LIMIT, kTimeoutMs);
+        victor.configForwardSoftLimitEnable(config.ENABLE_SOFT_LIMIT, kTimeoutMs);
+
+        victor.configReverseSoftLimitThreshold(config.REVERSE_SOFT_LIMIT, kTimeoutMs);
+        victor.configReverseSoftLimitEnable(config.ENABLE_SOFT_LIMIT, kTimeoutMs);
+        victor.overrideSoftLimitsEnable(config.ENABLE_SOFT_LIMIT);
+
+        victor.setInverted(config.INVERTED);
+        victor.setSensorPhase(config.SENSOR_PHASE);
+
+        victor.selectProfileSlot(0, 0);
+
+        victor.configVelocityMeasurementPeriod(config.VELOCITY_MEASUREMENT_PERIOD, kTimeoutMs);
+        victor.configVelocityMeasurementWindow(config.VELOCITY_MEASUREMENT_ROLLING_AVERAGE_WINDOW,
+                kTimeoutMs);
+
+        victor.configOpenloopRamp(config.OPEN_LOOP_RAMP_RATE, kTimeoutMs);
+        victor.configClosedloopRamp(config.CLOSED_LOOP_RAMP_RATE, kTimeoutMs);
+
+        victor.configVoltageCompSaturation(0.0, kTimeoutMs);
+        victor.configVoltageMeasurementFilter(32, kTimeoutMs);
+        victor.enableVoltageCompensation(false);
+
+        victor.setControlFramePeriod(ControlFrame.Control_3_General, config.CONTROL_FRAME_PERIOD_MS);
+
+        return victor;
     }
 }
