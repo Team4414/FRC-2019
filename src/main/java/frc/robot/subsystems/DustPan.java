@@ -8,23 +8,23 @@ import edu.wpi.first.wpilibj.command.Subsystem;
 import frc.robot.RobotMap;
 import frc.util.talon.CTREFactory;
 
-public class Intake extends Subsystem{
+public class DustPan extends Subsystem{
 
     private static final double kIntakePwr = 1;
 
     private Solenoid mPiston;
     private VictorSPX mIntake;
 
-    private static Intake instance;
-    public static Intake getInstance(){
+    private static DustPan instance;
+    public static DustPan getInstance(){
         if (instance == null)
-            instance = new Intake();
+            instance = new DustPan();
         return instance;
     }
 
-    private Intake(){
-        mPiston = new Solenoid(RobotMap.IntakeMap.kPiston);
-        mIntake = CTREFactory.createVictor(RobotMap.IntakeMap.kIntake);
+    private DustPan(){
+        mPiston = new Solenoid(RobotMap.DustpanMap.kPiston);
+        mIntake = CTREFactory.createVictor(RobotMap.DustpanMap.kIntake);
     }
 
     public void deploy (boolean deploy){
