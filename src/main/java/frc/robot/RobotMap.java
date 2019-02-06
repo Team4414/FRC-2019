@@ -24,4 +24,21 @@ public class RobotMap{
         public static final int kSwitchUp = 0;
         public static final int kSwitchDown = 0;
     }
+
+    public static class IntakeMap{
+        public static final int kIntake = 0;
+        public static final int kPiston = 0;
+    }
+
+    public static class DustpanMap{
+        public static final int kIntake = 0;
+        public static final int kPiston = 0;
+    }
+
+    public static class FingerMap{
+        public static final int kFinger = 0;
+        public static final int kArm = 0;
+
+        public static final int kSwitch = 0;
+    }
 }
