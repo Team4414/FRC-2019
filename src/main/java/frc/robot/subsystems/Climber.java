@@ -9,7 +9,7 @@ import frc.util.LimitSwitch.Travel;
 import frc.util.logging.ILoggable;
 import frc.util.logging.Loggable;
 import frc.util.talon.LimitableSRX;
-import frc.util.talon.TalonSRXFactory;
+import frc.util.talon.CTREFactory;
 
 public class Climber extends Subsystem implements ILoggable {
 
@@ -29,7 +29,7 @@ public class Climber extends Subsystem implements ILoggable {
         return instance;
     }
     private Climber(){
-        mClimber = new LimitableSRX(TalonSRXFactory.createDefaultTalon(RobotMap.ClimberMap.kClimber));
+        mClimber = new LimitableSRX(CTREFactory.createDefaultTalon(RobotMap.ClimberMap.kClimber));
 
         mTopSwitch = new LimitSwitch(RobotMap.ClimberMap.kSwitchUp, Travel.FORWARD, mClimber);
         mLowSwitch = new LimitSwitch(RobotMap.ClimberMap.kSwitchDown, Travel.BACKWARD, mClimber);

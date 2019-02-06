@@ -14,7 +14,7 @@ import frc.robot.RobotMap;
 import frc.util.kinematics.pos.RobotPos;
 import frc.util.logging.ILoggable;
 import frc.util.logging.Loggable;
-import frc.util.talon.TalonSRXFactory;
+import frc.util.talon.CTREFactory;
 
 public class Drivetrain extends Subsystem implements ILoggable{
 
@@ -53,13 +53,13 @@ public class Drivetrain extends Subsystem implements ILoggable{
 
 
     private Drivetrain(){
-        mLeftMaster = TalonSRXFactory.createDefaultTalon(RobotMap.DrivetrainMap.kLeftMaster);
-        mLeftSlaveA = TalonSRXFactory.createPermanentSlaveVictor(RobotMap.DrivetrainMap.kLeftSlaveA, mLeftMaster);
-        mLeftSlaveB = TalonSRXFactory.createPermanentSlaveVictor(RobotMap.DrivetrainMap.kLeftSlaveB, mLeftMaster);
+        mLeftMaster = CTREFactory.createDefaultTalon(RobotMap.DrivetrainMap.kLeftMaster);
+        mLeftSlaveA = CTREFactory.createPermanentSlaveVictor(RobotMap.DrivetrainMap.kLeftSlaveA, mLeftMaster);
+        mLeftSlaveB = CTREFactory.createPermanentSlaveVictor(RobotMap.DrivetrainMap.kLeftSlaveB, mLeftMaster);
 
-        mRightMaster = TalonSRXFactory.createDefaultTalon(RobotMap.DrivetrainMap.kRightMaster);
-        mRightSlaveA = TalonSRXFactory.createPermanentSlaveVictor(RobotMap.DrivetrainMap.kRightSlaveA, mRightMaster);
-        mRightSlaveB = TalonSRXFactory.createPermanentSlaveVictor(RobotMap.DrivetrainMap.kRightSlaveB, mRightMaster);
+        mRightMaster = CTREFactory.createDefaultTalon(RobotMap.DrivetrainMap.kRightMaster);
+        mRightSlaveA = CTREFactory.createPermanentSlaveVictor(RobotMap.DrivetrainMap.kRightSlaveA, mRightMaster);
+        mRightSlaveB = CTREFactory.createPermanentSlaveVictor(RobotMap.DrivetrainMap.kRightSlaveB, mRightMaster);
 
         mGyro = new PigeonIMU(0);
 

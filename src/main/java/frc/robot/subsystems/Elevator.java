@@ -14,7 +14,7 @@ import frc.util.LimitSwitch.Travel;
 import frc.util.logging.ILoggable;
 import frc.util.logging.Loggable;
 import frc.util.talon.LimitableSRX;
-import frc.util.talon.TalonSRXFactory;
+import frc.util.talon.CTREFactory;
 
 public class Elevator extends Subsystem implements ILoggable {
 
@@ -61,8 +61,8 @@ public class Elevator extends Subsystem implements ILoggable {
         heightSetpoints.put(Setpoint.FINGER_CLR, 0);
 
 
-        mMaster = new LimitableSRX(TalonSRXFactory.createDefaultTalon(RobotMap.ElevatorMap.kMaster));
-        mSlave = TalonSRXFactory.createPermanentSlaveVictor(RobotMap.ElevatorMap.kSlave, mMaster);
+        mMaster = new LimitableSRX(CTREFactory.createDefaultTalon(RobotMap.ElevatorMap.kMaster));
+        mSlave = CTREFactory.createPermanentSlaveVictor(RobotMap.ElevatorMap.kSlave, mMaster);
 
         mLowLimit = new LimitSwitch(RobotMap.ElevatorMap.kSwitch, Travel.BACKWARD, mMaster);
 

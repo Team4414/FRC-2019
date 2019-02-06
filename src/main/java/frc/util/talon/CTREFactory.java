@@ -22,7 +22,7 @@ import com.ctre.phoenix.motorcontrol.can.VictorSPX;
  * 
  * @author Team 254
  */
-public class TalonSRXFactory {
+public class CTREFactory {
 
     private final static int kTimeoutMs = 100;
 
