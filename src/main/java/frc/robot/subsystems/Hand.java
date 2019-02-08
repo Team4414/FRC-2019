@@ -1,7 +1,5 @@
 package frc.robot.subsystems;
 
-import java.util.LinkedHashMap;
-
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 
@@ -11,7 +9,7 @@ import frc.util.talon.CTREFactory;
 
 public class Hand extends Subsystem{
 
-    public static enum HandState{
+    public static enum State{
         OFF,
         HOLDING,
         INTAKING,
@@ -23,7 +21,7 @@ public class Hand extends Subsystem{
     private static final double kDropPwr = -1;
 
     private VictorSPX mHolder;
-    private HandState mCurrentState;
+    private State mCurrentState;
 
     private static Hand instance;
     public static Hand getInstance(){
@@ -34,10 +32,10 @@ public class Hand extends Subsystem{
 
     private Hand(){
         mHolder = CTREFactory.createVictor(RobotMap.DustpanMap.kIntake);
-        mCurrentState = HandState.OFF;
+        mCurrentState = State.OFF;
     }
 
-    public void set(HandState state){
+    public void set(State state){
         switch (state){
             case OFF:
                 setRaw(0);
@@ -57,6 +55,10 @@ public class Hand extends Subsystem{
 
     public void setRaw(double pwr){
         mHolder.set(ControlMode.PercentOutput, pwr);
+    }
+
+    public State getHandState(){
+        return mCurrentState;
     }
 
     @Override
