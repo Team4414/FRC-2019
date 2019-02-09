@@ -59,7 +59,7 @@ public class Elevator extends Subsystem implements ILoggable {
         heightSetpoints.put(Setpoint.FUEL_HIGH,  0);
         heightSetpoints.put(Setpoint.HAND_CLR,   0);
         heightSetpoints.put(Setpoint.FINGER_CLR, 0);
-        
+
 
         mMaster = new LimitableSRX(CTREFactory.createDefaultTalon(RobotMap.ElevatorMap.kMaster));
         mSlave = CTREFactory.createPermanentSlaveVictor(RobotMap.ElevatorMap.kSlave, mMaster);
@@ -94,6 +94,10 @@ public class Elevator extends Subsystem implements ILoggable {
 
     public void setPosition(Setpoint setpoint){
         setPosition(heightSetpoints.get(setpoint));
+    }
+
+    public static double getSetpoint(Setpoint point){
+        return heightSetpoints.get(point);
     }
 
     @Override

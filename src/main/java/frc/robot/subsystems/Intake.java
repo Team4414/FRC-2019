@@ -10,12 +10,12 @@ import frc.util.talon.CTREFactory;
 
 public class Intake extends Subsystem{
 
-    public static enum BoomState{
+    public static enum BallBoomState{
         RETRACTED,
         EXTENDED
     }
 
-    public static enum IntakeState{
+    public static enum WheelState{
         ON,
         OFF
     }
@@ -25,8 +25,8 @@ public class Intake extends Subsystem{
     private Solenoid mPiston;
     private VictorSPX mIntake;
 
-    private IntakeState mIntakeState;
-    private BoomState mBoomState;
+    private WheelState mIntakeState;
+    private BallBoomState mBoomState;
 
     private static Intake instance;
     public static Intake getInstance(){
@@ -39,22 +39,22 @@ public class Intake extends Subsystem{
         mPiston = new Solenoid(RobotMap.IntakeMap.kPiston);
         mIntake = CTREFactory.createVictor(RobotMap.IntakeMap.kIntake);
 
-        mIntakeState = IntakeState.OFF;
-        mBoomState = BoomState.RETRACTED;
+        mIntakeState = WheelState.OFF;
+        mBoomState = BallBoomState.RETRACTED;
     }
 
     public void deploy (boolean deploy){
         mPiston.set(deploy);
-        mBoomState = (deploy) ? BoomState.EXTENDED : BoomState.RETRACTED;
+        mBoomState = (deploy) ? BallBoomState.EXTENDED : BallBoomState.RETRACTED;
     }
 
     public void intake (boolean run){
         setRaw( (run) ? kIntakePwr : 0 );
-        mIntakeState = (run) ? IntakeState.ON : IntakeState.OFF; 
+        mIntakeState = (run) ? WheelState.ON : WheelState.OFF; 
     }
 
-    public IntakeState getIntakeState(){ return mIntakeState; }
-    public BoomState   getBoomState()  { return mBoomState;   }
+    public WheelState  getIntakeState(){  return mIntakeState; }
+    public BallBoomState getBoomState()  { return mBoomState;   }
 
     public void setRaw(double pwr){
         mIntake.set(ControlMode.PercentOutput, pwr);

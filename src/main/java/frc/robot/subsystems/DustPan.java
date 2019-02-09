@@ -10,7 +10,9 @@ import frc.util.talon.CTREFactory;
 
 public class DustPan extends Subsystem{
 
-    public static enum BoomState{
+    private static boolean mExtend = true;
+
+    public static enum PanelBoomState{
         EXTENDED,
         RETRACTED
     }
@@ -25,7 +27,7 @@ public class DustPan extends Subsystem{
     private Solenoid mPiston;
     private VictorSPX mIntake;
 
-    private BoomState mBoomState;
+    private PanelBoomState mBoomState;
     private IntakeState mIntakeState;
 
     private static DustPan instance;
@@ -39,13 +41,15 @@ public class DustPan extends Subsystem{
         mPiston = new Solenoid(RobotMap.DustpanMap.kPiston);
         mIntake = CTREFactory.createVictor(RobotMap.DustpanMap.kIntake);
 
-        mBoomState = BoomState.RETRACTED;
+        mBoomState = PanelBoomState.RETRACTED;
         mIntakeState = IntakeState.OFF;
     }
 
     public void deploy (boolean deploy){
-        mPiston.set(deploy);
-        mBoomState = (deploy) ? BoomState.EXTENDED : BoomState.RETRACTED;
+        if (!mExtend){
+            deploy = false;
+        }
+        mBoomState = (deploy) ? PanelBoomState.EXTENDED : PanelBoomState.RETRACTED;
     }
 
     public void intake (boolean run){
@@ -54,7 +58,7 @@ public class DustPan extends Subsystem{
     }
 
     public IntakeState getIntakeState(){ return mIntakeState; }
-    public BoomState getBoomState(){ return mBoomState; }
+    public PanelBoomState getBoomState(){ return mBoomState; }
 
     public void setRaw(double pwr){
         mIntake.set(ControlMode.PercentOutput, pwr);
