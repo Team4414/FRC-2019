@@ -9,21 +9,30 @@ public class LimitSwitch extends Trigger{
     private final DigitalInput mSwitch;
     private final LimitableSRX mController;
     private final Travel mTravelType;
+    private final boolean mInverted;
 
     public static enum Travel{
         FORWARD,
         BACKWARD,
     };
 
+    public LimitSwitch(int port, Travel type, boolean inverted, LimitableSRX controller){
+        mSwitch = new DigitalInput(port);
+        mController = controller;
+        mTravelType = type;
+        mInverted = inverted;
+    }
+
     public LimitSwitch(int port, Travel type, LimitableSRX controller){
         mSwitch = new DigitalInput(port);
         mController = controller;
         mTravelType = type;
+        mInverted = false;
     }
 
     @Override
     public boolean get(){
-        if (mSwitch.get()){
+        if (getSwitch()){
             if (mTravelType == Travel.FORWARD){
                 mController.limitForwardTravel(true);
             }
@@ -36,7 +45,15 @@ public class LimitSwitch extends Trigger{
             mController.limitReverseTravel(false);
         }
 
-        return mSwitch.get();
+        return getSwitch();
+    }
+
+    private boolean getSwitch(){
+        if (mInverted){
+            return !mSwitch.get();
+        }else{
+            return mSwitch.get();
+        }
     }
 
 }

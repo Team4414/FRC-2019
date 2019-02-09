@@ -2,6 +2,8 @@ package frc.robot;
 
 import java.util.ArrayList;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
+
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
@@ -11,10 +13,14 @@ import frc.robot.vision.TargetEntry;
 import frc.robot.vision.VisionTune;
 import frc.util.CheesyDriveHelper;
 import frc.util.Limelight;
+import frc.util.LimitSwitch;
 import frc.util.Limelight.CAM;
 import frc.util.Limelight.CAM_MODE;
 import frc.util.Limelight.LED_STATE;
+import frc.util.LimitSwitch.Travel;
 import frc.util.logging.CSVLogger;
+import frc.util.talon.CTREFactory;
+import frc.util.talon.LimitableSRX;
 
 public class Robot extends TimedRobot {
 
@@ -62,6 +68,9 @@ public class Robot extends TimedRobot {
 
   private double turnSignal = 0;
 
+  private LimitableSRX limitTest = new LimitableSRX(CTREFactory.createDefaultTalon(RobotMap.DrivetrainMap.kRightMaster));
+  private LimitSwitch limitSwitch = new LimitSwitch(0, Travel.FORWARD, true, limitTest);
+
   @Override
   public void teleopPeriodic() {
 
@@ -78,14 +87,17 @@ public class Robot extends TimedRobot {
     // SmartDashboard.putNumber("DIST", VisionHelper.turnCorrection());
     // limePanel.tHeight();
     
-    Drivetrain.getInstance().setRawSpeed(
-      drive.cheesyDrive(
-        OI.getInstance().getForward(), 
-        OI.getInstance().getLeft(),
-        OI.getInstance().getQuickTurn(), 
-        false
-      )
-    );
+    // Drivetrain.getInstance().setRawSpeed(
+    //   drive.cheesyDrive(
+    //     OI.getInstance().getForward(), 
+    //     OI.getInstance().getLeft(),
+    //     OI.getInstance().getQuickTurn(), 
+    //     false
+    //   )
+    // );
+
+    limitTest.set(ControlMode.PercentOutput, -0.5);
+    System.out.println(limitSwitch.get());
 
     // Drivetrain.getInstance().setRawSpeed(0.5, 0.5);
   }
