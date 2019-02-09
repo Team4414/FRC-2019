@@ -165,6 +165,45 @@ public class Limelight{
         return heightRoller.getAverage();
    }
 
+   public double getWHratio(){
+        if (!hasTarget())
+            return 0;
+        Double[] xData = getArray("tcornx");
+        Double[] yData = getArray("tcorny");
+
+        if (xData.length < 4 || yData.length < 4){
+            return 0;
+        }
+
+        ArrayList<Integer> rightPair = new ArrayList<>();
+        ArrayList<Integer> leftPair = new ArrayList<>();
+
+        int cnt;
+        for (int i = 0; i < xData.length; i++){
+            cnt = 0;
+            for (int j = 0; j < xData.length; j++){
+                if (xData[i] > xData[j]){
+                    cnt++;
+                }
+            }
+            if (cnt >= 2){
+                rightPair.add(i);
+            } else{
+                leftPair.add(i);
+            }
+        }
+
+        int sign;
+
+        if (Math.abs(yData[rightPair.get(0)] - yData[rightPair.get(1)]) > Math.abs(yData[leftPair.get(0)] - yData[leftPair.get(1)])){
+            sign = 1;
+        }else{
+            sign = -1;
+        }
+
+        return sign * (get("thor") / get("tvert") - 2.2);
+   }
+
     public void setLED(LED_STATE state){
         switch(state){
             case MANUAL:

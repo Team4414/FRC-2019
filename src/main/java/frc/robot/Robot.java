@@ -7,6 +7,7 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Finger;
 import frc.robot.vision.TargetEntry;
@@ -44,7 +45,7 @@ public class Robot extends TimedRobot {
       System.out.println(data);
     }
     
-    Drivetrain.getInstance().zeroSensor();
+    // Drivetrain.getInstance().zeroSensor();
   }
 
   @Override
@@ -85,6 +86,7 @@ public class Robot extends TimedRobot {
     // SmartDashboard.putNumber("SKEW", limePanel.getSkew());
     // SmartDashboard.putNumber("THEIGHT", limePanel.tHeight());
     // SmartDashboard.putNumber("DIST", VisionHelper.turnCorrection());
+    // SmartDashboard.putNumber("WHRation", limePanel.getWHratio());
     // limePanel.tHeight();
     
     // Drivetrain.getInstance().setRawSpeed(
@@ -96,8 +98,15 @@ public class Robot extends TimedRobot {
     //   )
     // );
 
-    limitTest.set(ControlMode.PercentOutput, -0.5);
-    System.out.println(limitSwitch.get());
+    // if (Timer.getFPGATimestamp() % 20 > 10){
+    //   Finger.getInstance().setFinger(true);
+    // }else{
+    //   Finger.getInstance().setFinger(false);
+    // }
+    // limePanel.setLED(LED_STATE.ON);
+
+    // limitTest.set(ControlMode.PercentOutput, -0.5);
+    // System.out.println(limitSwitch.get());
 
     // Drivetrain.getInstance().setRawSpeed(0.5, 0.5);
   }
