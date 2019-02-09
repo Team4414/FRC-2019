@@ -116,6 +116,7 @@ public class CSVLogger {
             scanner = new Scanner(new File(FILE_PATH + fileName + ".csv"));
         } catch (FileNotFoundException e){
             System.err.println("!!!!! FILE NOT FOUND EXCEPTION FOR \"" + FILE_PATH + fileName + "\" !!!!!");
+            System.err.println(e);
             return new ArrayList<>();
         }
 

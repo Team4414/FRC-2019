@@ -13,7 +13,7 @@ public class VisionHelper{
     private static final double kOutPoint = 1;
 
     private static final double kTrackingGain = 0.05;
-    private static final double kSkewGain = 1;
+    private static final double kSkewGain = 0.5;
     //-------------------------------
 
     private static double mTracking = 0;
@@ -32,11 +32,16 @@ public class VisionHelper{
         
         updateEntry();
 
-        mTracking = mActiveCam.tX() * (kTrackingGain * getScaler(mEntry.dist()));
+        mTracking = (mActiveCam.tX() - mEntry.theta()) * (kTrackingGain * getScaler(mEntry.dist()));
+
+        // System.out.println(getScaler(mEntry.dist()));
+        // System.out.println(mEntry.dist());
 
         mSkew = mActiveCam.getSkew() * kSkewGain;
 
         return (mTracking + mSkew);
+
+        // return mActiveCam.tX();
     }
 
     private static double getScaler(double dist){
@@ -44,12 +49,13 @@ public class VisionHelper{
         //----------------------------
         //        (out - in)
 
-        return 
-            Math.max(0, 
-            Math.min(1, 
-                (((kOutPoint - kInPoint) - (dist - kInPoint)) / (kOutPoint - kInPoint))
-            )
-            );
+        // return 
+        //     Math.max(0, 
+        //     Math.min(1, 
+        //         (((kOutPoint - kInPoint) - (dist - kInPoint)) / (kOutPoint - kInPoint))
+        //     )
+        //     );
+        return 1;
     }
     private static void updateEntry(){
         mEntry = TargetEntry.interpolate(Robot.visionTable, mActiveCam.tHeight(), mActiveCam.getCamSide());

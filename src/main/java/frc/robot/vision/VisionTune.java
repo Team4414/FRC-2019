@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import frc.robot.Robot;
 import frc.robot.subsystems.Drivetrain;
 import frc.util.Limelight;
-import frc.util.Limelight.CAM;
 import frc.util.Limelight.CAM_MODE;
 import frc.util.Limelight.LED_STATE;
 import frc.util.logging.CSVLogger;
@@ -42,6 +41,7 @@ public class VisionTune{
             mTuneCam.setLED(LED_STATE.ON);
             System.out.println("########## Starting Vision Tune ##########");
             mStarted = true;
+            Drivetrain.getInstance().zeroSensor();
         }
 
         double mDist = dist();

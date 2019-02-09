@@ -1,5 +1,7 @@
 package frc.util;
 
+import java.util.ArrayList;
+
 import edu.wpi.first.networktables.NetworkTableInstance;
 
 /**
@@ -31,10 +33,15 @@ public class Limelight{
 
     private static final String kBallCamName = "limelight-ball";
     private static final String kPanelCamName = "limelight-panel";
+    
+    private static final int kRollingSkewFilter = 50;
+    private static final int kRollingHeightFilter = 5;
 
     private final String mTableName;
     
     private static CAM side;
+    private RollingAverage skewRoller;
+    private RollingAverage heightRoller;
 
     public Limelight(CAM type){
         if (type == CAM.BALL_SIDE){
@@ -43,9 +50,13 @@ public class Limelight{
             mTableName = kPanelCamName;
         }
         side = type;
+        skewRoller = new RollingAverage(kRollingSkewFilter);
+        heightRoller = new RollingAverage(kRollingHeightFilter);
     }
     public Limelight(String tableName){
         mTableName = tableName;
+        skewRoller = new RollingAverage(kRollingSkewFilter);
+        heightRoller = new RollingAverage(kRollingHeightFilter);
     }  
 
     /**
@@ -70,22 +81,88 @@ public class Limelight{
     }
 
     public double tHeight(){
-        Double[] y = getArray("tcorny");
-        return ((y[0] - y[2]) + (y[1] - y[3])) / 2d;
+
+        if (!hasTarget())
+            return 0;
+        Double[] xData = getArray("tcornx");
+        Double[] yData = getArray("tcorny");
+        
+        if (xData.length < 4 || yData.length < 4){
+            return 0;
+        }
+
+        ArrayList<Integer> rightPair = new ArrayList<>();
+        ArrayList<Integer> leftPair = new ArrayList<>();
+
+        int cnt;
+        for (int i = 0; i < xData.length; i++){
+            cnt = 0;
+            for (int j = 0; j < xData.length; j++){
+                if (xData[i] > xData[j]){
+                    cnt++;
+                }
+            }
+            if (cnt >= 2){
+                rightPair.add(i);
+            } else{
+                leftPair.add(i);
+            }
+        }
+
+        try{    
+             skewRoller.add((
+                Math.abs(yData[rightPair.get(0)] - yData[rightPair.get(1)]) + 
+                Math.abs(yData[leftPair.get(0)] - yData[leftPair.get(1)]))
+                * 0.5);
+        }catch (Exception e){ return 0; }
+
+        return skewRoller.getAverage();
     }
 
     public double getSkew(){
+        
+        if (!hasTarget())
+            return 0;
         Double[] xData = getArray("tcornx");
         Double[] yData = getArray("tcorny");
+        
+        if (xData.length < 4 || yData.length < 4){
+            return 0;
+        }
 
-        Double[] topLeft  = new Double[]{xData[0], yData[0]};
-        Double[] topRight = new Double[]{xData[1], yData[1]};
-        Double[] botLeft  = new Double[]{xData[2], yData[2]};
-        Double[] botRight = new Double[]{xData[3], yData[3]};
+        ArrayList<Integer> rightPair = new ArrayList<>();
+        ArrayList<Integer> leftPair = new ArrayList<>();
 
-        double height = ((topLeft[1] - botLeft[1]) + (topRight[1] - botRight[1])) / 2d;
+        int cnt;
+        for (int i = 0; i < xData.length; i++){
+            cnt = 0;
+            for (int j = 0; j < xData.length; j++){
+                if (xData[i] > xData[j]){
+                    cnt++;
+                }
+            }
+            if (cnt >= 2){
+                rightPair.add(i);
+            } else{
+                leftPair.add(i);
+            }
+        }
 
-        return ((topLeft[1] - botLeft[1]) - (topRight[1] - botRight[1])) / height;       
+
+        try{
+            heightRoller.add((Math.abs(
+                        yData[leftPair.get(0)] - 
+                        yData[leftPair.get(1)]
+                    ) - 
+                    Math.abs(
+                        yData[rightPair.get(0)] - 
+                        yData[rightPair.get(1)]
+                    )) / tHeight());
+        }catch (Exception e){
+            return 0;
+        }
+
+        return heightRoller.getAverage();
    }
 
     public void setLED(LED_STATE state){

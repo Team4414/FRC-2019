@@ -57,7 +57,7 @@ public class Hand extends Subsystem{
         mHolder.set(ControlMode.PercentOutput, pwr);
     }
 
-    public State getHandState(){
+    public HandState getHandState(){
         return mCurrentState;
     }
 

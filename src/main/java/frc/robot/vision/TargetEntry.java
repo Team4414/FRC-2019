@@ -3,6 +3,7 @@ package frc.robot.vision;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.util.Limelight.CAM;
 
 public class TargetEntry{
@@ -29,7 +30,7 @@ public class TargetEntry{
             theta    = rowScanner.nextDouble();
             height   = rowScanner.nextDouble();
             
-        }catch(NullPointerException e){
+        }catch(Exception e){
             System.out.println("!!!!!!!!!! INCORRECT CSV DATA: "+ csvData +" FOR TARGET ENTRY !!!!!!!!!!");
             distance = 0;
             theta    = 0;
@@ -75,15 +76,16 @@ public class TargetEntry{
             if ((err > 0) & (err < distLow)){
                 //if the error is positive (sample is less than target)
                 lowBound = curr;
-                distLow = err;
+                distLow = Math.abs(err);
             }
 
             if ((err < 0) & (err < distHigh)){
-                //if the error us negative (sample is above the target)
+                //if the error is negative (sample is above the target)
                 highBound = curr;
-                distHigh = err;
+                distHigh = Math.abs(err);
             }
         }
+
 
         boolean isBallSide = (camUsed == CAM.BALL_SIDE) ? true : false;
 
@@ -94,6 +96,7 @@ public class TargetEntry{
         //HighDist - LowDist
         //------------------ * (HighValue + LowValue)
         //  dist - LowDist
+
 
         double pos = ((high.height() - low.height()) / (tHeight - low.height()));
         double theta = ((isBallSide) ? -1 : 1) * (high.theta() + low.theta()) * pos;

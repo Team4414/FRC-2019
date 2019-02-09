@@ -2,15 +2,17 @@ package frc.robot;
 
 import java.util.ArrayList;
 
-
+import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.Timer;
 import frc.robot.subsystems.Drivetrain;
+import frc.robot.subsystems.Finger;
 import frc.robot.vision.TargetEntry;
-import frc.robot.vision.VisionHelper;
 import frc.robot.vision.VisionTune;
 import frc.util.CheesyDriveHelper;
 import frc.util.Limelight;
 import frc.util.Limelight.CAM;
+import frc.util.Limelight.CAM_MODE;
 import frc.util.Limelight.LED_STATE;
 import frc.util.logging.CSVLogger;
 
@@ -23,9 +25,8 @@ public class Robot extends TimedRobot {
   public static Limelight limeBall  = new Limelight(CAM.BALL_SIDE);
 
   public static ArrayList<TargetEntry> visionTable;
-  private final String kVisionTableLocation = "/U/visionlookup.csv";
+  private final String kVisionTableLocation = "visionlookup";
   //------------------------------------
-
 
   @Override
   public void robotInit() {
@@ -34,7 +35,10 @@ public class Robot extends TimedRobot {
 
     for (String data: CSVLogger.fromCSV(kVisionTableLocation)){
       visionTable.add(new TargetEntry(data));
+      System.out.println(data);
     }
+    
+    Drivetrain.getInstance().zeroSensor();
   }
 
   @Override
@@ -52,6 +56,8 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopInit() {
     limePanel.setUSBCam(true);
+    limePanel.setLED(LED_STATE.ON);
+    limePanel.setCamMode(CAM_MODE.VISION);
   }
 
   private double turnSignal = 0;
@@ -59,18 +65,29 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
 
-    turnSignal = VisionHelper.turnCorrection() + OI.getInstance().getLeft();
+    // turnSignal = VisionHelper.turnCorrection() + OI.getInstance().getLeft();
 
-    System.out.println(turnSignal);
+    // System.out.println(turnSignal);
+    // VisionHelper.turnCorrection();
+
+    // limePanel.tHeight();
+    // System.out.printf("%.3f",limePanel.getSkew());
+    // System.out.println(limePanel.getSkew());
+    // SmartDashboard.putNumber("SKEW", limePanel.getSkew());
+    // SmartDashboard.putNumber("THEIGHT", limePanel.tHeight());
+    // SmartDashboard.putNumber("DIST", VisionHelper.turnCorrection());
+    // limePanel.tHeight();
     
-    // Drivetrain.getInstance().setRawSpeed(
-    //   drive.cheesyDrive(
-    //     OI.getInstance().getForward(), 
-    //     turnSignal,
-    //     OI.getInstance().getQuickTurn(), 
-    //     false
-    //   )
-    // );
+    Drivetrain.getInstance().setRawSpeed(
+      drive.cheesyDrive(
+        OI.getInstance().getForward(), 
+        OI.getInstance().getLeft(),
+        OI.getInstance().getQuickTurn(), 
+        false
+      )
+    );
+
+    // Drivetrain.getInstance().setRawSpeed(0.5, 0.5);
   }
 
   boolean mCollected = false;
@@ -84,7 +101,7 @@ public class Robot extends TimedRobot {
   @Override
   public void testPeriodic() {
     if (!mCollected){
-      mCollected = VisionTune.getInstance().areaAutoTune(0.5, 6);
+      mCollected = VisionTune.getInstance().areaAutoTune(0.1, 4);
     }
   }
 
@@ -93,5 +110,9 @@ public class Robot extends TimedRobot {
     limePanel.setLED(LED_STATE.OFF);
     limeBall.setLED(LED_STATE.OFF);
     limePanel.setUSBCam(false); 
+  }
+
+  @Override
+  public void disabledPeriodic(){
   }
 }
