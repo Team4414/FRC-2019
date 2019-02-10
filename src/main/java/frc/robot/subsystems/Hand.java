@@ -31,7 +31,7 @@ public class Hand extends Subsystem{
     }
 
     private Hand(){
-        mHolder = CTREFactory.createVictor(RobotMap.DustpanMap.kIntake);
+        mHolder = CTREFactory.createVictor(RobotMap.HandMap.kHand);
         mCurrentState = HandState.OFF;
     }
 

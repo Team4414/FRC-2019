@@ -4,6 +4,8 @@ import java.util.LinkedHashMap;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
+import com.ctre.phoenix.motorcontrol.InvertType;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 
 import edu.wpi.first.wpilibj.command.Subsystem;
@@ -18,13 +20,24 @@ import frc.util.talon.CTREFactory;
 
 public class Elevator extends Subsystem implements ILoggable {
 
-    private static final double kP = 1;
+    private static Elevator instance;
+    public static Elevator getInstance(){
+        if (instance == null)
+            instance = new Elevator();
+        return instance;
+    }
+
+    private static final double kP = 0.1;
     private static final double kI = 0;
     private static final double kD = 0;
-    private static final double kF = 0;
+    private static final double kF = 0.08;
 
-    private static final int kMMacceleration = 0;
-    private static final int kMMvelocity = 0;
+    private static final int kMMacceleration = 40000;
+    private static final int kMMvelocity = 8000;
+
+    private static final int kTopLimit = 35663;
+
+    private static int mZeroOffset = 0;
     
     private LimitableSRX mMaster;
     private VictorSPX mSlave;
@@ -64,7 +77,7 @@ public class Elevator extends Subsystem implements ILoggable {
         mMaster = new LimitableSRX(CTREFactory.createDefaultTalon(RobotMap.ElevatorMap.kMaster));
         mSlave = CTREFactory.createPermanentSlaveVictor(RobotMap.ElevatorMap.kSlave, mMaster);
 
-        mLowLimit = new LimitSwitch(RobotMap.ElevatorMap.kSwitch, Travel.BACKWARD, mMaster);
+        mLowLimit = new LimitSwitch(RobotMap.ElevatorMap.kSwitch, Travel.BACKWARD, true, mMaster);
 
         mMaster.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative);
 
@@ -76,10 +89,23 @@ public class Elevator extends Subsystem implements ILoggable {
         mMaster.configMotionAcceleration(kMMacceleration);
         mMaster.configMotionCruiseVelocity(kMMvelocity);
 
-        mMaster.setSensorPhase(false);
+        mMaster.setSensorPhase(true); //good
+        mMaster.overrideLimitSwitchesEnable(false);
 
-        mMaster.setInverted(false);
-        mSlave.setInverted(false);
+        mMaster.configPeakOutputForward(1);
+        mMaster.configPeakOutputReverse(-1);
+
+        mMaster.setInverted(true); //good
+        mSlave.setInverted(InvertType.FollowMaster);
+
+        mMaster.configClosedLoopPeakOutput(0, 1);
+
+        mMaster.configForwardSoftLimitEnable(true);
+
+        mMaster.setNeutralMode(NeutralMode.Brake);
+        mSlave.setNeutralMode(NeutralMode.Brake);
+
+        zero();
 
         setupLogger();
     }
@@ -88,16 +114,37 @@ public class Elevator extends Subsystem implements ILoggable {
         mMaster.set(ControlMode.PercentOutput, percent);
     }
 
+    public void setF(double val){
+        mMaster.config_kF(0, val);
+    }
+
     public void setPosition(int position){
-        mMaster.set(ControlMode.MotionMagic, position);
+        mMaster.set(ControlMode.MotionMagic, position + mZeroOffset);
     }
 
     public void setPosition(Setpoint setpoint){
         setPosition(heightSetpoints.get(setpoint));
     }
 
+    public double getError(){
+        return mMaster.getClosedLoopError();
+    }
+
     public static double getSetpoint(Setpoint point){
         return heightSetpoints.get(point);
+    }
+
+    public double getPosition(){
+        return mMaster.getSelectedSensorPosition() - mZeroOffset;
+    }
+
+    public void zero(){
+        mZeroOffset = mMaster.getSelectedSensorPosition();
+        mMaster.configForwardSoftLimitThreshold(kTopLimit + mZeroOffset);
+    }
+
+    public boolean getSwitch(){
+        return mLowLimit.get();
     }
 
     @Override

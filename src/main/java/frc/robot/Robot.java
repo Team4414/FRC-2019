@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.Drivetrain;
+import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Finger;
 import frc.robot.vision.TargetEntry;
 import frc.robot.vision.VisionTune;
@@ -45,7 +46,11 @@ public class Robot extends TimedRobot {
       System.out.println(data);
     }
     
-    // Drivetrain.getInstance().zeroSensor();
+    Drivetrain.getInstance().zeroSensor();
+    
+    SmartDashboard.putNumber("ERROR", Elevator.getInstance().getError());
+    
+    Elevator.getInstance();
   }
 
   @Override
@@ -65,13 +70,11 @@ public class Robot extends TimedRobot {
     limePanel.setUSBCam(true);
     limePanel.setLED(LED_STATE.ON);
     limePanel.setCamMode(CAM_MODE.VISION);
+    Elevator.getInstance().zero();
+    Elevator.getInstance().setPosition(0);
   }
 
   private double turnSignal = 0;
-
-  private LimitableSRX limitTest = new LimitableSRX(CTREFactory.createDefaultTalon(RobotMap.DrivetrainMap.kRightMaster));
-  private LimitSwitch limitSwitch = new LimitSwitch(0, Travel.FORWARD, true, limitTest);
-
   @Override
   public void teleopPeriodic() {
 
@@ -109,6 +112,11 @@ public class Robot extends TimedRobot {
     // System.out.println(limitSwitch.get());
 
     // Drivetrain.getInstance().setRawSpeed(0.5, 0.5);
+    // System.out.println(Elevator.getInstance().getPosition());
+    // Elevator.getInstance().setPosition(15000);
+    System.out.println(Elevator.getInstance().getPosition());
+    Elevator.getInstance().setPosition(25000);
+    SmartDashboard.putNumber("ERROR", Elevator.getInstance().getError());
   }
 
   boolean mCollected = false;
@@ -117,6 +125,7 @@ public class Robot extends TimedRobot {
   public void testInit() {
     mCollected = false;
     Drivetrain.getInstance().zeroSensor();
+    Elevator.getInstance().zero();
   }
 
   @Override
