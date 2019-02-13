@@ -41,6 +41,8 @@ public class DustPan extends Subsystem{
         mPiston = new Solenoid(RobotMap.DustpanMap.kPiston);
         mIntake = CTREFactory.createVictor(RobotMap.DustpanMap.kIntake);
 
+        mIntake.setInverted(true);
+
         mBoomState = PanelBoomState.RETRACTED;
         mIntakeState = IntakeState.OFF;
     }
@@ -49,6 +51,7 @@ public class DustPan extends Subsystem{
         if (!mExtend){
             deploy = false;
         }
+        mPiston.set(deploy);
         mBoomState = (deploy) ? PanelBoomState.EXTENDED : PanelBoomState.RETRACTED;
     }
 

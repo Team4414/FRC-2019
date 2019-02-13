@@ -36,13 +36,13 @@ public class RobotMap{
 
     public static class DustpanMap{
         public static final int kIntake = 7;
-        public static final int kPiston = 2;
+        public static final int kPiston = 0;
     }
 
     public static class FingerMap{
         public static final int kFinger = 3;
-        public static final int kArm = 4;
+        public static final int kArm = 2;
 
-        public static final int kSwitch = 3;
+        public static final int kSwitch = 10;
     }
 }

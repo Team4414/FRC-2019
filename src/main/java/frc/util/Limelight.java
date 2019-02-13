@@ -31,6 +31,14 @@ public class Limelight{
         BALL_SIDE, PANEL_SIDE;
     };
 
+    private static final int kFOVvert = 41;
+    private static final int kFOVhor = 54;
+
+    private static final int kResVert = 240;
+    private static final int kResHor = 320;
+
+    private static final int kHeightTarget = 6; //actual height of the target
+
     private static final String kBallCamName = "limelight-ball";
     private static final String kPanelCamName = "limelight-panel";
     
@@ -110,62 +118,24 @@ public class Limelight{
         }
 
         try{    
-             skewRoller.add((
+             heightRoller.add((
                 Math.abs(yData[rightPair.get(0)] - yData[rightPair.get(1)]) + 
                 Math.abs(yData[leftPair.get(0)] - yData[leftPair.get(1)]))
                 * 0.5);
         }catch (Exception e){ return 0; }
 
-        return skewRoller.getAverage();
+        return heightRoller.getAverage();
+    }
+
+    public double getAbsDist(){
+        //         h
+        // d = -----------
+        //      2tan( (h * vFOV) / ( 2 * resVert) )
+
+        return (kHeightTarget / (2 * Math.tan((tHeight() * kFOVvert) / (2 *kResVert))));
     }
 
     public double getSkew(){
-        
-        if (!hasTarget())
-            return 0;
-        Double[] xData = getArray("tcornx");
-        Double[] yData = getArray("tcorny");
-        
-        if (xData.length < 4 || yData.length < 4){
-            return 0;
-        }
-
-        ArrayList<Integer> rightPair = new ArrayList<>();
-        ArrayList<Integer> leftPair = new ArrayList<>();
-
-        int cnt;
-        for (int i = 0; i < xData.length; i++){
-            cnt = 0;
-            for (int j = 0; j < xData.length; j++){
-                if (xData[i] > xData[j]){
-                    cnt++;
-                }
-            }
-            if (cnt >= 2){
-                rightPair.add(i);
-            } else{
-                leftPair.add(i);
-            }
-        }
-
-
-        try{
-            heightRoller.add((Math.abs(
-                        yData[leftPair.get(0)] - 
-                        yData[leftPair.get(1)]
-                    ) - 
-                    Math.abs(
-                        yData[rightPair.get(0)] - 
-                        yData[rightPair.get(1)]
-                    )) / tHeight());
-        }catch (Exception e){
-            return 0;
-        }
-
-        return heightRoller.getAverage();
-   }
-
-   public double getWHratio(){
         if (!hasTarget())
             return 0;
         Double[] xData = getArray("tcornx");
@@ -202,7 +172,7 @@ public class Limelight{
         }
 
         return sign * (get("thor") / get("tvert") - 2.2);
-   }
+    }
 
     public void setLED(LED_STATE state){
         switch(state){
