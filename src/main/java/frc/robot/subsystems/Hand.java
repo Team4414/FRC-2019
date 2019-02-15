@@ -9,7 +9,8 @@ import frc.util.talon.CTREFactory;
 
 public class Hand extends Subsystem{
 
-    public static enum HandState{
+    public static HandState handState;
+    public static enum HandState{   
         OFF,
         HOLDING,
         INTAKING,
@@ -21,7 +22,6 @@ public class Hand extends Subsystem{
     private static final double kDropPwr = -1;
 
     private VictorSPX mHolder;
-    private HandState mCurrentState;
 
     private static Hand instance;
     public static Hand getInstance(){
@@ -32,7 +32,7 @@ public class Hand extends Subsystem{
 
     private Hand(){
         mHolder = CTREFactory.createVictor(RobotMap.HandMap.kHand);
-        mCurrentState = HandState.OFF;
+        handState = HandState.OFF;
     }
 
     public void set(HandState state){
@@ -50,15 +50,15 @@ public class Hand extends Subsystem{
                 setRaw(kDropPwr);
                 break;
         }
-        mCurrentState = state;
+        handState = state;
     }
 
     public void setRaw(double pwr){
         mHolder.set(ControlMode.PercentOutput, pwr);
     }
 
-    public HandState getHandState(){
-        return mCurrentState;
+    public boolean hasBall(){
+        return false;
     }
 
     @Override

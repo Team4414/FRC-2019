@@ -7,12 +7,12 @@ import frc.robot.RobotMap;
 
 public class Finger extends Subsystem{
 
-    public static enum ArmState{
+    public static enum FingerArmState{
         RETRACTED,
         EXTENDED
     }
 
-    public static enum FingerState{
+    public static enum FingerClapperState{
         HOLDING,
         OPEN
     }
@@ -21,8 +21,8 @@ public class Finger extends Subsystem{
     private Solenoid mArm;
     private DigitalInput mSwitch;
     
-    private ArmState mArmState;
-    private FingerState mFingerState;
+    public static FingerArmState armState;
+    public static FingerClapperState clapperState;
 
     private static Finger instance;
     public static Finger getInstance(){
@@ -36,26 +36,34 @@ public class Finger extends Subsystem{
         mArm = new Solenoid(RobotMap.FingerMap.kArm);
         mSwitch = new DigitalInput(RobotMap.FingerMap.kSwitch);
 
-        mArmState = ArmState.RETRACTED;
-        mFingerState = FingerState.OPEN;
+        armState = FingerArmState.RETRACTED;
+        clapperState = FingerClapperState.OPEN;
     }
 
     public void setArm(boolean extended){
         mArm.set(extended);
-        mArmState = (extended) ? ArmState.EXTENDED : ArmState.RETRACTED;
+        armState = (extended) ? FingerArmState.EXTENDED : FingerArmState.RETRACTED;
+    }
+
+    public void setArm(FingerArmState state){
+        if (state == FingerArmState.EXTENDED){
+            setArm(true);
+        }else{
+            setArm(false);
+        }
     }
 
     public void setFinger(boolean holding){
         mFinger.set(holding);
-        mFingerState = (holding) ? FingerState.HOLDING : FingerState.OPEN;
+        clapperState = (holding) ? FingerClapperState.HOLDING : FingerClapperState.OPEN;
     }
 
-    public ArmState getArmState(){
-        return mArmState;
-    }
-
-    public FingerState getFingerState(){
-        return mFingerState;
+    public void setFinger(FingerClapperState state){
+        if (state == FingerClapperState.HOLDING){
+            setFinger(true);
+        }else{
+            setFinger(false);
+        }
     }
 
     public boolean getSwitch(){

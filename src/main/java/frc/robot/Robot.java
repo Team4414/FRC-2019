@@ -1,28 +1,27 @@
 package frc.robot;
 
 import java.util.ArrayList;
+import java.util.concurrent.ArrayBlockingQueue;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
-
-import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.wpilibj.AnalogInput;
+import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.Drivetrain;
+import frc.robot.subsystems.DustPan;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Finger;
+import frc.robot.subsystems.Intake;
 import frc.robot.vision.TargetEntry;
 import frc.robot.vision.VisionTune;
 import frc.util.CheesyDriveHelper;
 import frc.util.Limelight;
-import frc.util.LimitSwitch;
 import frc.util.Limelight.CAM;
 import frc.util.Limelight.CAM_MODE;
 import frc.util.Limelight.LED_STATE;
-import frc.util.LimitSwitch.Travel;
 import frc.util.logging.CSVLogger;
-import frc.util.talon.CTREFactory;
-import frc.util.talon.LimitableSRX;
 
 public class Robot extends TimedRobot {
 
@@ -38,6 +37,8 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotInit() {
+
+
     drive = new CheesyDriveHelper();
     visionTable = new ArrayList<>();
 
@@ -72,11 +73,18 @@ public class Robot extends TimedRobot {
     limePanel.setCamMode(CAM_MODE.VISION);
     Elevator.getInstance().zero();
     Elevator.getInstance().setPosition(0);
+    // Finger.getInstance();
   }
 
   private double turnSignal = 0;
+
+  DigitalInput dIO = new DigitalInput(1);
+  AnalogInput aIO = new AnalogInput(2);
+
   @Override
   public void teleopPeriodic() {
+
+    System.out.println(dIO + "\t\t\t\t" + aIO);
 
     // turnSignal = VisionHelper.turnCorrection() + OI.getInstance().getLeft();
 
@@ -92,14 +100,14 @@ public class Robot extends TimedRobot {
     // SmartDashboard.putNumber("WHRation", limePanel.getWHratio());
     // limePanel.tHeight();
     
-    // Drivetrain.getInstance().setRawSpeed(
-    //   drive.cheesyDrive(
-    //     OI.getInstance().getForward(), 
-    //     OI.getInstance().getLeft(),
-    //     OI.getInstance().getQuickTurn(), 
-    //     false
-    //   )
-    // );
+    Drivetrain.getInstance().setRawSpeed(
+      drive.cheesyDrive(
+        OI.getInstance().getForward(), 
+        OI.getInstance().getLeft(),
+        false, 
+        false
+      )
+    );
 
     // if (Timer.getFPGATimestamp() % 20 > 10){
     //   Finger.getInstance().setFinger(true);
@@ -114,9 +122,38 @@ public class Robot extends TimedRobot {
     // Drivetrain.getInstance().setRawSpeed(0.5, 0.5);
     // System.out.println(Elevator.getInstance().getPosition());
     // Elevator.getInstance().setPosition(15000);
-    System.out.println(Elevator.getInstance().getPosition());
-    Elevator.getInstance().setPosition(25000);
-    SmartDashboard.putNumber("ERROR", Elevator.getInstance().getError());
+    // System.out.println(Elevator.getInstance().getPosition());
+    // Elevator.getInstance().setPosition(25000);
+    // SmartDashboard.putNumber("ERROR", Elevator.getInstance().getError());
+
+    if(OI.getInstance().getXbox().getBumper(Hand.kLeft)){
+      DustPan.getInstance().intake(true);
+      DustPan.getInstance().deploy(true);
+    }else{
+      DustPan.getInstance().intake(false);
+      DustPan.getInstance().deploy(false);
+    }
+
+    if(OI.getInstance().getXbox().getBumper(Hand.kRight)){
+      Intake.getInstance().deploy(true);
+      Intake.getInstance().intake(true);
+    }else{
+      Intake.getInstance().deploy(false);
+      Intake.getInstance().intake(false);
+    }
+
+    if (OI.getInstance().getXbox().getAButton()){
+      Finger.getInstance().setArm(true);
+    }else{
+      Finger.getInstance().setArm(false);
+    }
+
+    if (OI.getInstance().getXbox().getBButton()){
+      Finger.getInstance().setFinger(true);
+    }else{
+      Finger.getInstance().setFinger(false);
+    }
+
   }
 
   boolean mCollected = false;

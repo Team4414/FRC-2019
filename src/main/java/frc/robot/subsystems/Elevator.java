@@ -45,10 +45,13 @@ public class Elevator extends Subsystem implements ILoggable {
     @SuppressWarnings("unused")
     private LimitSwitch mLowLimit;
 
+    public static Setpoint currentState;
+
     public static enum Setpoint{
         HAND_CLR,
         FINGER_CLR,
 
+        STOW,
         BOTTOM,
         CARGO_SHIP,
         FUEL_LOW,
@@ -64,6 +67,7 @@ public class Elevator extends Subsystem implements ILoggable {
     private Elevator(){
         
         heightSetpoints.put(Setpoint.BOTTOM,     0);
+        heightSetpoints.put(Setpoint.STOW,       0);
         heightSetpoints.put(Setpoint.CARGO_SHIP, 0);
         heightSetpoints.put(Setpoint.FUEL_LOW,   0);
         heightSetpoints.put(Setpoint.HATCH_MID,  0);
@@ -123,6 +127,7 @@ public class Elevator extends Subsystem implements ILoggable {
     }
 
     public void setPosition(Setpoint setpoint){
+        currentState = setpoint;
         setPosition(heightSetpoints.get(setpoint));
     }
 
@@ -131,6 +136,7 @@ public class Elevator extends Subsystem implements ILoggable {
     }
 
     public static double getSetpoint(Setpoint point){
+
         return heightSetpoints.get(point);
     }
 
@@ -141,6 +147,7 @@ public class Elevator extends Subsystem implements ILoggable {
     public void zero(){
         mZeroOffset = mMaster.getSelectedSensorPosition();
         mMaster.configForwardSoftLimitThreshold(kTopLimit + mZeroOffset);
+        currentState = Setpoint.BOTTOM;
     }
 
     public boolean getSwitch(){

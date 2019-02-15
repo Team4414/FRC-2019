@@ -10,12 +10,12 @@ import frc.util.talon.CTREFactory;
 
 public class Intake extends Subsystem{
 
-    public static enum BallBoomState{
+    public static enum IntakeBoomState{
         RETRACTED,
         EXTENDED
     }
 
-    public static enum WheelState{
+    public static enum IntakeWheelState{
         ON,
         OFF
     }
@@ -25,8 +25,8 @@ public class Intake extends Subsystem{
     private Solenoid mPiston;
     private VictorSPX mIntake;
 
-    private WheelState mIntakeState;
-    private BallBoomState mBoomState;
+    public static IntakeWheelState wheelState;
+    public static IntakeBoomState boomState;
 
     private static Intake instance;
     public static Intake getInstance(){
@@ -39,22 +39,35 @@ public class Intake extends Subsystem{
         mPiston = new Solenoid(RobotMap.IntakeMap.kPiston);
         mIntake = CTREFactory.createVictor(RobotMap.IntakeMap.kIntake);
 
-        mIntakeState = WheelState.OFF;
-        mBoomState = BallBoomState.RETRACTED;
+        wheelState = IntakeWheelState.OFF;
+        boomState = IntakeBoomState.RETRACTED;
     }
 
     public void deploy (boolean deploy){
         mPiston.set(deploy);
-        mBoomState = (deploy) ? BallBoomState.EXTENDED : BallBoomState.RETRACTED;
+        boomState = (deploy) ? IntakeBoomState.EXTENDED : IntakeBoomState.RETRACTED;
+    }
+
+    public void deploy(IntakeBoomState state){
+        if (state == IntakeBoomState.EXTENDED){
+            deploy(true);
+        }else{
+            deploy(false);
+        }
     }
 
     public void intake (boolean run){
         setRaw( (run) ? kIntakePwr : 0 );
-        mIntakeState = (run) ? WheelState.ON : WheelState.OFF; 
+        wheelState = (run) ? IntakeWheelState.ON : IntakeWheelState.OFF; 
     }
 
-    public WheelState  getIntakeState(){  return mIntakeState; }
-    public BallBoomState getBoomState()  { return mBoomState;   }
+    public void intake(IntakeWheelState state){
+        if (state == IntakeWheelState.ON){
+            intake(true);
+        }else{
+            intake(false);
+        }
+    }
 
     public void setRaw(double pwr){
         mIntake.set(ControlMode.PercentOutput, pwr);
