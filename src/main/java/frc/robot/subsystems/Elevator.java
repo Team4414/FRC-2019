@@ -8,8 +8,10 @@ import com.ctre.phoenix.motorcontrol.InvertType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 
+import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Subsystem;
 import frc.robot.Constants;
+import frc.robot.Robot;
 import frc.robot.RobotMap;
 import frc.robot.Robot.Side;
 import frc.util.LimitSwitch;
@@ -37,6 +39,8 @@ public class Elevator extends Subsystem implements ILoggable {
     private static final int kMMvelocity = 8000;
 
     private static final int kTopLimit = 35663;
+
+    private static final int kElevatorTolerance = 300;
 
     private static int mZeroOffset = 0;
     private static boolean mNeedsZero; 
@@ -149,6 +153,38 @@ public class Elevator extends Subsystem implements ILoggable {
         return false;
     }
 
+    public Command jogElevatorCommand(Position pos){
+        return new Command(){
+
+            @Override
+            protected void initialize() {
+                super.initialize();
+                setPosition(getSignal(pos, Robot.activeSide));
+            }
+        
+            @Override
+            protected boolean isFinished() {
+                return isAtSetpoint();
+            }
+        };
+    }
+
+    public Command jogElevatorCommand(Setpoint pos){
+        return new Command(){
+
+            @Override
+            protected void initialize() {
+                super.initialize();
+                setPosition(pos);
+            }
+        
+            @Override
+            protected boolean isFinished() {
+                return isAtSetpoint();
+            }
+        };
+    }
+
     public static Setpoint getSignal(Position pos, Side side){
         Setpoint mSetpoint = currentState;
         if (side == Side.BALL){
@@ -192,6 +228,10 @@ public class Elevator extends Subsystem implements ILoggable {
 
     public double getError(){
         return mMaster.getClosedLoopError();
+    }
+
+    public boolean isAtSetpoint(){
+        return (Math.abs(getError()) < kElevatorTolerance);
     }
 
     public static double getSetpoint(Setpoint point){

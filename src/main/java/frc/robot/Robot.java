@@ -43,6 +43,7 @@ public class Robot extends TimedRobot {
 
   private CheesyDriveHelper drive;
   public static Side activeSide;
+  public static boolean respectPerimeter;
 
   private static ZeroElevator mZeroElevatorCommand;
 

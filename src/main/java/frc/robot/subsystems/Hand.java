@@ -4,6 +4,7 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 
 import edu.wpi.first.wpilibj.AnalogInput;
+import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Subsystem;
 import frc.robot.RobotMap;
 import frc.util.talon.CTREFactory;
@@ -58,6 +59,17 @@ public class Hand extends Subsystem{
                 break;
         }
         handState = state;
+    }
+
+    public Command setHandCommand(HandState state){
+        return new Command(){
+        
+            @Override
+            protected boolean isFinished() {
+                set(state);
+                return true;
+            }
+        };
     }
 
     public void setRaw(double pwr){

@@ -2,7 +2,9 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Subsystem;
+import frc.robot.Robot;
 import frc.robot.RobotMap;
 
 public class Finger extends Subsystem{
@@ -53,6 +55,20 @@ public class Finger extends Subsystem{
         }
     }
 
+    public Command setArmCommand(boolean extended){
+        return new Command(){
+        
+            @Override
+            protected boolean isFinished() {
+                if (Robot.respectPerimeter){
+                    return true;
+                }
+                setArm(extended);
+                return true;
+            }
+        };
+    }
+
     public void setFinger(boolean holding){
         mFinger.set(!holding);
         clapperState = (holding) ? FingerClapperState.HOLDING : FingerClapperState.OPEN;
@@ -64,6 +80,17 @@ public class Finger extends Subsystem{
         }else{
             setFinger(false);
         }
+    }
+
+    public Command setFingerCommand(boolean holding){
+        return new Command(){
+        
+            @Override
+            protected boolean isFinished() {
+                setFinger(holding);
+                return true;
+            }
+        };
     }
 
     public boolean getSwitch(){

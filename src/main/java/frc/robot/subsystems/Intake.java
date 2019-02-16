@@ -4,6 +4,7 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 
 import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Subsystem;
 import frc.robot.RobotMap;
 import frc.util.talon.CTREFactory;
@@ -58,6 +59,17 @@ public class Intake extends Subsystem{
         }
     }
 
+    public Command deployCommand(boolean deploy){
+        return new Command(){
+        
+            @Override
+            protected boolean isFinished() {
+                deploy(deploy);
+                return true;
+            }
+        };
+    }
+
     public void intake (boolean run){
         setRaw( (run) ? kIntakePwr : 0 );
         wheelState = (run) ? IntakeWheelState.ON : IntakeWheelState.OFF; 
@@ -69,6 +81,17 @@ public class Intake extends Subsystem{
         }else{
             intake(false);
         }
+    }
+
+    public Command intakeCommand(IntakeWheelState state){
+        return new Command(){
+        
+            @Override
+            protected boolean isFinished() {
+                intake(state);
+                return true;
+            }
+        };
     }
 
     public void setRaw(double pwr){

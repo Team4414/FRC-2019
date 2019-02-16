@@ -4,6 +4,7 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 
 import edu.wpi.first.wpilibj.Solenoid;
+import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Subsystem;
 import frc.robot.Robot;
 import frc.robot.RobotMap;
@@ -48,6 +49,31 @@ public class DustPan extends Subsystem{
 
         boomState = DustpanBoomState.RETRACTED;
         intakeState = DustpanIntakeState.OFF;
+    }
+
+    public Command deployCommand(boolean extend){
+        return new Command(){
+        
+            @Override
+            protected boolean isFinished() {
+                if (Robot.respectPerimeter){
+                    return true;
+                }
+                deploy( (extend) ? DustpanBoomState.EXTENDED : DustpanBoomState.RETRACTED);
+                return true;
+            }
+        };
+    }
+
+    public Command intakeCommand(DustpanIntakeState state){
+        return new Command(){
+        
+            @Override
+            protected boolean isFinished() {
+                intake(state);
+                return true;
+            }
+        };
     }
 
     public void deploy (boolean deploy){
