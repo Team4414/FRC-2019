@@ -32,19 +32,6 @@ public class LimitSwitch extends Trigger{
 
     @Override
     public boolean get(){
-        if (getSwitch()){
-            if (mTravelType == Travel.FORWARD){
-                mController.limitForwardTravel(true);
-            }
-
-            if (mTravelType == Travel.BACKWARD){
-                mController.limitReverseTravel(true);
-            }
-        } else {
-            mController.limitForwardTravel(false);
-            mController.limitReverseTravel(false);
-        }
-
         return getSwitch();
     }
 

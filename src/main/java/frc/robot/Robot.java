@@ -1,45 +1,79 @@
 package frc.robot;
 
 import java.util.ArrayList;
-import java.util.concurrent.ArrayBlockingQueue;
 
 import edu.wpi.first.wpilibj.AnalogInput;
-import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.I2C;
+import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.GenericHID.Hand;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.command.Command;
+import edu.wpi.first.wpilibj.command.Scheduler;
+import frc.robot.commands.IntakePanelSequence;
+import frc.robot.commands.ZeroElevator;
+import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.DustPan;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Finger;
+import frc.robot.subsystems.Hand;
 import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.Superstructure;
+import frc.robot.subsystems.DustPan.DustpanBoomState;
+import frc.robot.subsystems.DustPan.DustpanIntakeState;
+import frc.robot.subsystems.Elevator.Setpoint;
+import frc.robot.subsystems.Finger.FingerArmState;
+import frc.robot.subsystems.Finger.FingerClapperState;
+import frc.robot.subsystems.Hand.HandState;
+import frc.robot.subsystems.Intake.IntakeBoomState;
+import frc.robot.subsystems.Intake.IntakeWheelState;
+import frc.robot.subsystems.Superstructure.State;
 import frc.robot.vision.TargetEntry;
 import frc.robot.vision.VisionTune;
 import frc.util.CheesyDriveHelper;
 import frc.util.Limelight;
-import frc.util.Limelight.CAM;
 import frc.util.Limelight.CAM_MODE;
 import frc.util.Limelight.LED_STATE;
 import frc.util.logging.CSVLogger;
 
 public class Robot extends TimedRobot {
 
+  public static enum Side{
+    BALL,
+    PANEL,
+  };
+
   private CheesyDriveHelper drive;
+  public static Side activeSide;
+
+  private static ZeroElevator mZeroElevatorCommand;
+
+  public static PowerDistributionPanel pdp;
 
   //---------- Vision Items ------------
-  public static Limelight limePanel = new Limelight(CAM.PANEL_SIDE);
-  public static Limelight limeBall  = new Limelight(CAM.BALL_SIDE);
+  public static Limelight limePanel = new Limelight(Side.PANEL);
+  public static Limelight limeBall  = new Limelight(Side.BALL );
 
   public static ArrayList<TargetEntry> visionTable;
   private final String kVisionTableLocation = "visionlookup";
   //------------------------------------
 
   @Override
-  public void robotInit() {
+  public void robotInit(){
+
+    pdp = new PowerDistributionPanel();
+
+    Elevator.getInstance();
+    Hand.getInstance();
+    Finger.getInstance();
+    DustPan.getInstance();
+    Intake.getInstance();
+    Drivetrain.getInstance().zeroSensor();
+
+    OI.getInstance();
 
 
     drive = new CheesyDriveHelper();
+    mZeroElevatorCommand = new ZeroElevator();
+
     visionTable = new ArrayList<>();
 
     for (String data: CSVLogger.fromCSV(kVisionTableLocation)){
@@ -47,19 +81,34 @@ public class Robot extends TimedRobot {
       System.out.println(data);
     }
     
-    Drivetrain.getInstance().zeroSensor();
-    
-    SmartDashboard.putNumber("ERROR", Elevator.getInstance().getError());
-    
-    Elevator.getInstance();
+    activeSide = (Hand.getInstance().hasBall()) ? Side.BALL : Side.PANEL;
+
+    // test = new Superstructure(new State(
+    //   DustpanBoomState.RETRACTED,
+    //   DustpanIntakeState.OFF,
+    //   Setpoint.FUEL_MID, 
+    //   FingerClapperState.HOLDING, 
+    //   FingerArmState.RETRACTED, 
+    //   HandState.OFF, 
+    //   IntakeBoomState.RETRACTED, 
+    //   IntakeWheelState.OFF));
+
+    // test = new IntakePanelSequence();
+    // test = new Superstructure(Superstructure.intakePanel);
   }
 
   @Override
   public void robotPeriodic() {
+    // System.out.println(Elevator.getInstance().checkNeedsZero());
+    System.out.println(Elevator.getInstance().getPosition());
+    // System.out.println(aio.getVoltage());
+    // System.out.println(Hand.getInstance().getSensorVoltage());
+    // System.out.println(Hand.getInstance().hasBall());
   }
 
   @Override
   public void autonomousInit() {
+    mZeroElevatorCommand.start();
   }
 
   @Override
@@ -68,37 +117,31 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
+    mZeroElevatorCommand.start();
+
     limePanel.setUSBCam(true);
     limePanel.setLED(LED_STATE.ON);
     limePanel.setCamMode(CAM_MODE.VISION);
     Elevator.getInstance().zero();
-    Elevator.getInstance().setPosition(0);
+    Elevator.getInstance().setRaw(0);
     // Finger.getInstance();
+
+    // test.start();
   }
 
   private double turnSignal = 0;
 
-  DigitalInput dIO = new DigitalInput(1);
-  AnalogInput aIO = new AnalogInput(2);
+  Command test;
+
+  AnalogInput aio;
 
   @Override
-  public void teleopPeriodic() {
+  public void teleopPeriodic(){
 
-    System.out.println(dIO + "\t\t\t\t" + aIO);
-
-    // turnSignal = VisionHelper.turnCorrection() + OI.getInstance().getLeft();
-
-    // System.out.println(turnSignal);
-    // VisionHelper.turnCorrection();
-
-    // limePanel.tHeight();
-    // System.out.printf("%.3f",limePanel.getSkew());
-    // System.out.println(limePanel.getSkew());
-    // SmartDashboard.putNumber("SKEW", limePanel.getSkew());
-    // SmartDashboard.putNumber("THEIGHT", limePanel.tHeight());
-    // SmartDashboard.putNumber("DIST", VisionHelper.turnCorrection());
-    // SmartDashboard.putNumber("WHRation", limePanel.getWHratio());
-    // limePanel.tHeight();
+    // DustPan.getInstance().deploy(DustpanBoomState.);
+    
+    // System.out.println(aio.getVoltage());
+    Scheduler.getInstance().run();
     
     Drivetrain.getInstance().setRawSpeed(
       drive.cheesyDrive(
@@ -109,51 +152,9 @@ public class Robot extends TimedRobot {
       )
     );
 
-    // if (Timer.getFPGATimestamp() % 20 > 10){
-    //   Finger.getInstance().setFinger(true);
-    // }else{
-    //   Finger.getInstance().setFinger(false);
-    // }
-    // limePanel.setLED(LED_STATE.ON);
-
-    // limitTest.set(ControlMode.PercentOutput, -0.5);
-    // System.out.println(limitSwitch.get());
-
-    // Drivetrain.getInstance().setRawSpeed(0.5, 0.5);
-    // System.out.println(Elevator.getInstance().getPosition());
-    // Elevator.getInstance().setPosition(15000);
-    // System.out.println(Elevator.getInstance().getPosition());
-    // Elevator.getInstance().setPosition(25000);
-    // SmartDashboard.putNumber("ERROR", Elevator.getInstance().getError());
-
-    if(OI.getInstance().getXbox().getBumper(Hand.kLeft)){
-      DustPan.getInstance().intake(true);
-      DustPan.getInstance().deploy(true);
-    }else{
-      DustPan.getInstance().intake(false);
-      DustPan.getInstance().deploy(false);
-    }
-
-    if(OI.getInstance().getXbox().getBumper(Hand.kRight)){
-      Intake.getInstance().deploy(true);
-      Intake.getInstance().intake(true);
-    }else{
-      Intake.getInstance().deploy(false);
-      Intake.getInstance().intake(false);
-    }
-
-    if (OI.getInstance().getXbox().getAButton()){
-      Finger.getInstance().setArm(true);
-    }else{
-      Finger.getInstance().setArm(false);
-    }
-
-    if (OI.getInstance().getXbox().getBButton()){
-      Finger.getInstance().setFinger(true);
-    }else{
-      Finger.getInstance().setFinger(false);
-    }
-
+    Climber.getInstance().setClimbRaw(OI.getInstance().getXboxAxis(1));
+    Climber.getInstance().setPullRaw(OI.getInstance().getXboxAxis(5));
+    
   }
 
   boolean mCollected = false;
@@ -177,6 +178,9 @@ public class Robot extends TimedRobot {
     limePanel.setLED(LED_STATE.OFF);
     limeBall.setLED(LED_STATE.OFF);
     limePanel.setUSBCam(false); 
+    Climber.getInstance().setBrakeMode(false);
+    Elevator.getInstance().setPosition(0);
+    Drivetrain.getInstance().setBrakeMode(false);
   }
 
   @Override

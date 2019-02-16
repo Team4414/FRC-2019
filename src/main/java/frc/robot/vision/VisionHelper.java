@@ -49,13 +49,12 @@ public class VisionHelper{
         //----------------------------
         //        (out - in)
 
-        // return 
-        //     Math.max(0, 
-        //     Math.min(1, 
-        //         (((kOutPoint - kInPoint) - (dist - kInPoint)) / (kOutPoint - kInPoint))
-        //     )
-        //     );
-        return 1;
+        return 
+            Math.max(0, 
+            Math.min(1, 
+                (((kOutPoint - kInPoint) - (dist - kInPoint)) / (kOutPoint - kInPoint))
+            )
+            );
     }
     private static void updateEntry(){
         mEntry = TargetEntry.interpolate(Robot.visionTable, mActiveCam.tHeight(), mActiveCam.getCamSide());

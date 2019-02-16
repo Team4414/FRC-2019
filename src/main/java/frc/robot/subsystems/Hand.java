@@ -3,11 +3,14 @@ package frc.robot.subsystems;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 
+import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.command.Subsystem;
 import frc.robot.RobotMap;
 import frc.util.talon.CTREFactory;
 
 public class Hand extends Subsystem{
+
+    private static final double kDetectThreshold = 1.0;
 
     public static HandState handState;
     public static enum HandState{   
@@ -22,6 +25,7 @@ public class Hand extends Subsystem{
     private static final double kDropPwr = -1;
 
     private VictorSPX mHolder;
+    private AnalogInput mSensor;
 
     private static Hand instance;
     public static Hand getInstance(){
@@ -33,6 +37,9 @@ public class Hand extends Subsystem{
     private Hand(){
         mHolder = CTREFactory.createVictor(RobotMap.HandMap.kHand);
         handState = HandState.OFF;
+        mSensor = new AnalogInput(RobotMap.HandMap.kSensorPort);
+
+        mHolder.setInverted(false);
     }
 
     public void set(HandState state){
@@ -58,7 +65,11 @@ public class Hand extends Subsystem{
     }
 
     public boolean hasBall(){
-        return false;
+        return (mSensor.getVoltage() > kDetectThreshold);
+    }
+
+    public double getSensorVoltage(){
+        return mSensor.getVoltage();
     }
 
     @Override

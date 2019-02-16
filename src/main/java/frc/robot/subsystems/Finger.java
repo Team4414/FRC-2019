@@ -37,7 +37,7 @@ public class Finger extends Subsystem{
         mSwitch = new DigitalInput(RobotMap.FingerMap.kSwitch);
 
         armState = FingerArmState.RETRACTED;
-        clapperState = FingerClapperState.OPEN;
+        clapperState = FingerClapperState.HOLDING;
     }
 
     public void setArm(boolean extended){
@@ -54,7 +54,7 @@ public class Finger extends Subsystem{
     }
 
     public void setFinger(boolean holding){
-        mFinger.set(holding);
+        mFinger.set(!holding);
         clapperState = (holding) ? FingerClapperState.HOLDING : FingerClapperState.OPEN;
     }
 

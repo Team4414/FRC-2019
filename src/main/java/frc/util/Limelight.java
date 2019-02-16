@@ -3,6 +3,7 @@ package frc.util;
 import java.util.ArrayList;
 
 import edu.wpi.first.networktables.NetworkTableInstance;
+import frc.robot.Robot.Side;
 
 /**
  * A Simple Driver for the Limelight
@@ -24,18 +25,13 @@ public class Limelight{
         VISION, DRIVER;
     }
 
-    /**
-     * Which Limelight to use
-     */
-    public static enum CAM{
-        BALL_SIDE, PANEL_SIDE;
-    };
-
     private static final int kFOVvert = 41;
     private static final int kFOVhor = 54;
 
     private static final int kResVert = 240;
     private static final int kResHor = 320;
+
+    private static Side mSide;
 
     private static final int kHeightTarget = 6; //actual height of the target
 
@@ -46,18 +42,17 @@ public class Limelight{
     private static final int kRollingHeightFilter = 5;
 
     private final String mTableName;
-    
-    private static CAM side;
+
     private RollingAverage skewRoller;
     private RollingAverage heightRoller;
 
-    public Limelight(CAM type){
-        if (type == CAM.BALL_SIDE){
+    public Limelight(Side type){
+        if (type == Side.BALL){
            mTableName = kBallCamName;
         } else {
             mTableName = kPanelCamName;
         }
-        side = type;
+        mSide = type;
         skewRoller = new RollingAverage(kRollingSkewFilter);
         heightRoller = new RollingAverage(kRollingHeightFilter);
     }
@@ -206,8 +201,8 @@ public class Limelight{
         set ("stream", (isPrimary) ? 2 : 0);
     }
 
-    public CAM getCamSide(){
-        return side;
+    public Side getCamSide(){
+        return mSide;
     }
 
     private double get(String varName){

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.util.Limelight.CAM;
+import frc.robot.Robot.Side;
 
 public class TargetEntry{
     private final double mDistance;
@@ -61,7 +61,7 @@ public class TargetEntry{
     }
 
 
-    public static TargetEntry interpolate(ArrayList<TargetEntry> data, double tHeight, CAM camUsed){
+    public static TargetEntry interpolate(ArrayList<TargetEntry> data, double tHeight, Side camUsed){
         TargetEntry lowBound = data.get(0);
         TargetEntry highBound = data.get(0);
 
@@ -87,7 +87,7 @@ public class TargetEntry{
         }
 
 
-        boolean isBallSide = (camUsed == CAM.BALL_SIDE) ? true : false;
+        boolean isBallSide = (camUsed == Side.BALL) ? true : false;
 
         return interpolate(highBound, lowBound, tHeight, isBallSide);
     }

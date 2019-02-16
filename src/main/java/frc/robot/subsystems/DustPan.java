@@ -5,10 +5,14 @@ import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.command.Subsystem;
+import frc.robot.Robot;
 import frc.robot.RobotMap;
 import frc.util.talon.CTREFactory;
 
 public class DustPan extends Subsystem{
+
+    private static final int kPDPport = RobotMap.DustpanMap.kIntake - 1;
+    private static final double kCurrentThreshold = 10;
 
     public static enum DustpanBoomState{
         EXTENDED,
@@ -17,7 +21,8 @@ public class DustPan extends Subsystem{
 
     public static enum DustpanIntakeState{
         ON,
-        OFF
+        OFF,
+        HOLD
     }
 
     private static final double kIntakePwr = 1;
@@ -66,6 +71,8 @@ public class DustPan extends Subsystem{
     public void intake(DustpanIntakeState state){
         if (state == DustpanIntakeState.ON){
             intake(true);
+        }else if (state == DustpanIntakeState.HOLD){
+            setRaw(0.25);
         }else{
             intake(false);
         }
@@ -73,6 +80,14 @@ public class DustPan extends Subsystem{
 
     public void setRaw(double pwr){
         mIntake.set(ControlMode.PercentOutput, pwr);
+    }
+
+    public boolean hasPanel(){
+        return (getRawCurrent() >= kCurrentThreshold);
+    }
+
+    public double getRawCurrent(){
+        return Robot.pdp.getCurrent(kPDPport);
     }
 
     @Override

@@ -11,6 +11,7 @@ import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import edu.wpi.first.wpilibj.command.Subsystem;
 import frc.robot.Constants;
 import frc.robot.RobotMap;
+import frc.robot.Robot.Side;
 import frc.util.LimitSwitch;
 import frc.util.LimitSwitch.Travel;
 import frc.util.logging.ILoggable;
@@ -27,17 +28,18 @@ public class Elevator extends Subsystem implements ILoggable {
         return instance;
     }
 
-    private static final double kP = 0.1;
+    private static final double kP = 0.7;
     private static final double kI = 0;
     private static final double kD = 0;
     private static final double kF = 0.08;
 
-    private static final int kMMacceleration = 40000;
+    private static final int kMMacceleration = 20000; //400000
     private static final int kMMvelocity = 8000;
 
     private static final int kTopLimit = 35663;
 
     private static int mZeroOffset = 0;
+    private static boolean mNeedsZero; 
     
     private LimitableSRX mMaster;
     private VictorSPX mSlave;
@@ -47,18 +49,26 @@ public class Elevator extends Subsystem implements ILoggable {
 
     public static Setpoint currentState;
 
-    public static enum Setpoint{
-        HAND_CLR,
-        FINGER_CLR,
+    public static enum Position{
+        INTAKE,
+        LOW,
+        SECOND,
+        MIDDLE,
+        HIGH,
+    }
 
-        STOW,
-        BOTTOM,
-        CARGO_SHIP,
-        FUEL_LOW,
-        HATCH_MID,
-        FUEL_MID,
-        HATCH_HIGH,
-        FUEL_HIGH,
+    public static enum Setpoint{
+        FINGER_CLR, //4000
+
+        STOW,   //1600
+        BOTTOM, //0
+        FLOOR_INTAKE, //400
+        CARGO_SHIP, //14000
+        FUEL_LOW, //11000
+        HATCH_MID, //16000
+        FUEL_MID, //24732
+        HATCH_HIGH, //29000
+        FUEL_HIGH, //36291
     };
 
     private static final LinkedHashMap<Setpoint, Integer> heightSetpoints = new LinkedHashMap<>();
@@ -67,15 +77,15 @@ public class Elevator extends Subsystem implements ILoggable {
     private Elevator(){
         
         heightSetpoints.put(Setpoint.BOTTOM,     0);
-        heightSetpoints.put(Setpoint.STOW,       0);
-        heightSetpoints.put(Setpoint.CARGO_SHIP, 0);
-        heightSetpoints.put(Setpoint.FUEL_LOW,   0);
-        heightSetpoints.put(Setpoint.HATCH_MID,  0);
-        heightSetpoints.put(Setpoint.FUEL_MID,   0);
-        heightSetpoints.put(Setpoint.HATCH_HIGH, 0);
-        heightSetpoints.put(Setpoint.FUEL_HIGH,  0);
-        heightSetpoints.put(Setpoint.HAND_CLR,   0);
-        heightSetpoints.put(Setpoint.FINGER_CLR, 0);
+        heightSetpoints.put(Setpoint.STOW,       1600);
+        heightSetpoints.put(Setpoint.FLOOR_INTAKE,400);
+        heightSetpoints.put(Setpoint.CARGO_SHIP, 14000);
+        heightSetpoints.put(Setpoint.FUEL_LOW,   11000);
+        heightSetpoints.put(Setpoint.HATCH_MID,  16000);
+        heightSetpoints.put(Setpoint.FUEL_MID,   24732);
+        heightSetpoints.put(Setpoint.HATCH_HIGH, 29000);
+        heightSetpoints.put(Setpoint.FUEL_HIGH,  36291);
+        heightSetpoints.put(Setpoint.FINGER_CLR, 4000);
 
 
         mMaster = new LimitableSRX(CTREFactory.createDefaultTalon(RobotMap.ElevatorMap.kMaster));
@@ -109,7 +119,7 @@ public class Elevator extends Subsystem implements ILoggable {
         mMaster.setNeutralMode(NeutralMode.Brake);
         mSlave.setNeutralMode(NeutralMode.Brake);
 
-        zero();
+        checkNeedsZero();
 
         setupLogger();
     }
@@ -122,13 +132,62 @@ public class Elevator extends Subsystem implements ILoggable {
         mMaster.config_kF(0, val);
     }
 
-    public void setPosition(int position){
+    public boolean setPosition(int position){
+        if (mNeedsZero)
+            return false;
         mMaster.set(ControlMode.MotionMagic, position + mZeroOffset);
+        return true;
     }
 
-    public void setPosition(Setpoint setpoint){
-        currentState = setpoint;
-        setPosition(heightSetpoints.get(setpoint));
+    public boolean setPosition(Setpoint setpoint){
+
+        if (setPosition(heightSetpoints.get(setpoint))){
+            currentState = setpoint;
+            return true;
+        }
+
+        return false;
+    }
+
+    public static Setpoint getSignal(Position pos, Side side){
+        Setpoint mSetpoint = currentState;
+        if (side == Side.BALL){
+            switch(pos){
+                case INTAKE:
+                    mSetpoint = Setpoint.BOTTOM;
+                    break;
+                case LOW:
+                    mSetpoint = Setpoint.FUEL_LOW;
+                    break;
+                case SECOND:
+                    mSetpoint = Setpoint.CARGO_SHIP;
+                    break;
+                case MIDDLE:
+                    mSetpoint = Setpoint.FUEL_MID;
+                    break;
+                case HIGH:
+                    mSetpoint = Setpoint.FUEL_HIGH;
+                    break;
+            }
+        }else{
+            switch(pos){
+                case INTAKE:
+                    mSetpoint = Setpoint.STOW;
+                case LOW:
+                    mSetpoint = Setpoint.STOW;
+                    break;
+                case SECOND:
+                    mSetpoint = Setpoint.HATCH_MID;
+                    break;
+                case MIDDLE:
+                    mSetpoint = Setpoint.HATCH_MID;
+                    break;
+                case HIGH:
+                    mSetpoint = Setpoint.HATCH_HIGH;
+                    break;
+            }
+        }
+        return mSetpoint;
     }
 
     public double getError(){
@@ -136,7 +195,6 @@ public class Elevator extends Subsystem implements ILoggable {
     }
 
     public static double getSetpoint(Setpoint point){
-
         return heightSetpoints.get(point);
     }
 
@@ -147,11 +205,24 @@ public class Elevator extends Subsystem implements ILoggable {
     public void zero(){
         mZeroOffset = mMaster.getSelectedSensorPosition();
         mMaster.configForwardSoftLimitThreshold(kTopLimit + mZeroOffset);
+        mMaster.configReverseSoftLimitThreshold(mZeroOffset);
         currentState = Setpoint.BOTTOM;
     }
 
     public boolean getSwitch(){
         return mLowLimit.get();
+    }
+
+    public boolean checkNeedsZero(){
+        if (mLowLimit.get()){
+            zero();
+            mNeedsZero = false;
+        }
+        return mNeedsZero;
+    }
+
+    public void forceNeedZero(boolean force){
+        mNeedsZero = force;
     }
 
     @Override

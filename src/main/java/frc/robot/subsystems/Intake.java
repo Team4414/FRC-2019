@@ -39,6 +39,8 @@ public class Intake extends Subsystem{
         mPiston = new Solenoid(RobotMap.IntakeMap.kPiston);
         mIntake = CTREFactory.createVictor(RobotMap.IntakeMap.kIntake);
 
+        mIntake.setInverted(true);
+
         wheelState = IntakeWheelState.OFF;
         boomState = IntakeBoomState.RETRACTED;
     }

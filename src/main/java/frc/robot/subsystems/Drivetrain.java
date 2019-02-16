@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import com.ctre.phoenix.sensors.PigeonIMU;
@@ -162,6 +163,10 @@ public class Drivetrain extends Subsystem implements ILoggable{
      */
     public double getGyroAngle(){
         return mGyro.getFusedHeading() - mGyroOffset;
+    }
+
+    public void setBrakeMode(boolean brake){
+        mLeftMaster.setNeutralMode((brake) ? NeutralMode.Brake : NeutralMode.Coast);
     }
 
     /**

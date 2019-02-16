@@ -15,9 +15,9 @@ import frc.robot.subsystems.Intake.IntakeWheelState;
 public class Superstructure extends Command{
 
     private static final double kIntakeMoveTime = 1;
-    private static final double kArmMoveTime = 1;
-    private static final double kElevatorDeadzone = 100; //ticks
-    private static final double kHandThreshold = Elevator.getSetpoint(Elevator.Setpoint.HAND_CLR);
+    private static final double kArmMoveTime = 3;
+    private static final double kElevatorDeadzone = 300; //ticks
+    private static final double kHandThreshold = 15000;
 
     public static class State{
         public DustPan.DustpanBoomState dustPanBoomState;
@@ -50,6 +50,24 @@ public class Superstructure extends Command{
             this.intakeWheelState = intakeState;
         }
 
+        public State(State state){
+            this(
+                state.dustPanBoomState,
+                state.dustPanIntakeState,
+                state.elevatorSetpoint,
+                state.fingerClapperState,
+                state.fingerArmState,
+                state.handState,
+                state.intakeBoomState,
+                state.intakeWheelState
+            );
+        }
+
+        public State(Elevator.Setpoint setpoint){
+            this();
+            this.elevatorSetpoint = setpoint;
+        }
+
         public State(){
             this(null, null, null, null, null, null, null, null);
         }
@@ -69,7 +87,7 @@ public class Superstructure extends Command{
     public static State intakePanel = new State(
         DustpanBoomState.EXTENDED,
         DustpanIntakeState.ON,
-        Setpoint.STOW,
+        Setpoint.FLOOR_INTAKE,
         FingerClapperState.OPEN,
         FingerArmState.RETRACTED,
         HandState.OFF,
@@ -88,49 +106,62 @@ public class Superstructure extends Command{
         IntakeWheelState.OFF
     );
 
+    public static State lowStow = new State(
+        DustpanBoomState.RETRACTED,
+        DustpanIntakeState.OFF,
+        Setpoint.STOW,
+        FingerClapperState.HOLDING,
+        FingerArmState.RETRACTED,
+        HandState.HOLDING,
+        IntakeBoomState.RETRACTED,
+        IntakeWheelState.OFF
+    );
+
+    public static State ballStow = new State(
+        DustpanBoomState.RETRACTED,
+        DustpanIntakeState.OFF,
+        Setpoint.FUEL_LOW,
+        FingerClapperState.HOLDING,
+        FingerArmState.RETRACTED,
+        HandState.HOLDING,
+        IntakeBoomState.RETRACTED,
+        IntakeWheelState.OFF
+    );
+
+    public static State ballScore = new State(
+        null,
+        null,
+        null,
+        null,
+        null,
+        HandState.DROP,
+        null,
+        null
+    );
+
+    public static State panelScore = new State(
+        null,
+        null,
+        null,
+        FingerClapperState.OPEN,
+        FingerArmState.EXTENDED,
+        null,
+        null,
+        null
+    );
+
     public static State mNullState = new State();
 
-    private static State mTargetState = mNullState;
+    private State mTargetState = mNullState;
 
     private static boolean mExtend = true;
 
     public Superstructure(State state){
-
-        
-        // set all states to a valid state regardless of whether they need to be changed or not
-        if (state.elevatorSetpoint == null){
-            state.elevatorSetpoint = Elevator.currentState;
-        }
-
-        if (state.fingerArmState == null){
-            state.fingerArmState = Finger.armState;
-        }
-
-        if (state.fingerClapperState == null){
-            state.fingerClapperState = Finger.clapperState;
-        }
-
-        if (state.handState == null){
-            state.handState = Hand.handState;
-        }
-
-        if (state.dustPanBoomState == null){
-            state.dustPanBoomState = DustPan.boomState;
-        }
-
-        if (state.dustPanIntakeState == null){
-            state.dustPanIntakeState = DustPan.intakeState;
-        }
-
-        if (state.intakeBoomState == null){
-            state.intakeBoomState = Intake.boomState;
-        }
-
-        if (state.intakeWheelState == null){
-            state.intakeWheelState = Intake.wheelState;
-        }
-
         mTargetState = state;
+    }
+
+    public Superstructure(Setpoint elevatorSetpoint){
+        mTargetState = new State(elevatorSetpoint);
     }
 
     private boolean mDustpanBoomDone;
@@ -149,6 +180,9 @@ public class Superstructure extends Command{
 
     @Override
     protected void initialize() {
+        System.out.println("INIT");
+        // set all states to a valid state regardless of whether they need to be changed or not
+
         mDustpanBoomDone = false;
         mDustpanIntakeDone = false;
         mIntakeBoomDone = false;
@@ -158,12 +192,56 @@ public class Superstructure extends Command{
         mClapperDone = false;
         mElevatorDone = false;
 
+
+        if (mTargetState.elevatorSetpoint == null || mTargetState.elevatorSetpoint == Elevator.currentState){
+            mTargetState.elevatorSetpoint = Elevator.currentState;
+            mElevatorDone = true;
+        }
+
+        if (mTargetState.fingerArmState == null || mTargetState.fingerArmState == Finger.armState){
+            mTargetState.fingerArmState = Finger.armState;
+            mArmDone = true;
+        }
+
+        if (mTargetState.fingerClapperState == null || mTargetState.fingerClapperState == Finger.clapperState){
+            mTargetState.fingerClapperState = Finger.clapperState;
+            mClapperDone = true;
+        }
+
+        if (mTargetState.handState == null || mTargetState.handState == Hand.handState){
+            mTargetState.handState = Hand.handState;
+            mHandDone = true;
+        }
+
+        if (mTargetState.dustPanBoomState == null || mTargetState.dustPanBoomState == DustPan.boomState){
+            mTargetState.dustPanBoomState = DustPan.boomState;
+            mDustpanBoomDone = true;
+        }
+
+        if (mTargetState.dustPanIntakeState == null || mTargetState.dustPanIntakeState == DustPan.intakeState){
+            mTargetState.dustPanIntakeState = DustPan.intakeState;
+            mDustpanIntakeDone = true;
+        }
+
+        if (mTargetState.intakeBoomState == null || mTargetState.intakeBoomState == Intake.boomState){
+            mTargetState.intakeBoomState = Intake.boomState;
+            mIntakeBoomDone = true;
+        }
+
+        if (mTargetState.intakeWheelState == null || mTargetState.intakeWheelState == Intake.wheelState){
+            mTargetState.intakeWheelState = Intake.wheelState;
+            mIntakeWheelsDone = true;
+        }
+
         mIntakeBoomTime = -1;
         mArmTime = -1;
     }
 
+
     @Override
     protected void execute() {
+
+        System.out.println(Math.abs(Elevator.getInstance().getPosition() - Elevator.getSetpoint(mTargetState.elevatorSetpoint)));
 
         if (!mDustpanBoomDone){
             //if you need to move the dustpan up or down
@@ -179,13 +257,23 @@ public class Superstructure extends Command{
         if (!mDustpanIntakeDone){
             //if you need to run the dustpan intake, do it
             DustPan.getInstance().intake(mTargetState.dustPanIntakeState);
-            mDustpanBoomDone = true;
+            mDustpanIntakeDone = true;
         }
 
         if (!mHandDone){
-            //if you need to set the hand, do it
-            Hand.getInstance().set(mTargetState.handState);
-            mHandDone = true;
+            //if you need to set your hand
+            if (mTargetState.handState == HandState.DROP){
+                //if you want to drop the ball
+                if (mElevatorDone){
+                    //and the elevator is done, drop.
+                    Hand.getInstance().set(HandState.DROP);
+                    mHandDone = true;
+                }
+            }else{
+                //if you need to set the hand, do it
+                Hand.getInstance().set(mTargetState.handState);
+                mHandDone = true;       
+            }
         }
 
         if (!mIntakeWheelsDone){
@@ -201,9 +289,7 @@ public class Superstructure extends Command{
             if (mArmTime == -1){
                 //if the timer is not started, start it
                 mArmTime = Timer.getFPGATimestamp();
-            }
-
-            if (timer(mArmTime, kArmMoveTime)){
+            }else if (timer(mArmTime, kArmMoveTime)){
                 //if the timer has finished
                 mArmTime = -1;
                 mArmDone = true;
@@ -213,10 +299,10 @@ public class Superstructure extends Command{
         if(!mClapperDone){
             //if the clapper needs to be set
 
-            if (mArmDone){
-                //and the arm has finished moving, set the arm
-                Finger.getInstance().setFinger(mTargetState.fingerClapperState);
-            }
+            
+            //and the arm has finished moving, set the clapper
+            Finger.getInstance().setFinger(mTargetState.fingerClapperState);
+            mClapperDone = true;
         }
 
         if (!mElevatorDone){
@@ -252,21 +338,7 @@ public class Superstructure extends Command{
                 }else{
                     //if the elevator needs the intake to move, deploy it
                     Intake.getInstance().deploy(IntakeBoomState.EXTENDED);
-
-                    if (mIntakeBoomTime == -1){
-                        //if the timer is not started, start it
-                        mIntakeBoomTime = Timer.getFPGATimestamp();
-                    }
-
-                    if (timer(mIntakeBoomTime, kIntakeMoveTime)){
-                        //if the timer has finished, signal it
-                        mIntakeBoomTime = -1;
-                        mElevatorNeedsIntakeMove = false;
-                        //if the intake had to extend anyway, than you are done
-                        if (mTargetState.intakeBoomState == IntakeBoomState.EXTENDED){
-                            mIntakeBoomDone = true;
-                        }
-                    }
+                    mElevatorNeedsIntakeMove = false;
                 }
             }
 
@@ -281,6 +353,8 @@ public class Superstructure extends Command{
             }
         }
 
+        
+
         if (!mIntakeBoomDone){
             //if you still need to set your intake
 
@@ -290,17 +364,7 @@ public class Superstructure extends Command{
                 if (mElevatorDone){
                     //and your elevator is done moving, set the intake
                     Intake.getInstance().deploy(mTargetState.intakeBoomState);
-        
-                    if (mIntakeBoomTime == -1){
-                        //if the timer is not started, start it
-                        mIntakeBoomTime = Timer.getFPGATimestamp();
-                    }
-        
-                    if (timer(mIntakeBoomTime, kIntakeMoveTime)){
-                        //if the timer has finished
-                        mIntakeBoomTime = -1;
-                        mIntakeBoomDone = true;
-                    }
+                    mIntakeBoomDone = true;
                 }
             }else{
                 mIntakeBoomDone = true;
@@ -311,18 +375,25 @@ public class Superstructure extends Command{
     @Override
     protected boolean isFinished() {
         //if literally everything is done, finish the command.
+        System.out.println(mDustpanBoomDone + "\n" +  mDustpanIntakeDone + "\n" + mIntakeBoomDone + "\n" + mIntakeWheelsDone + "\n" + mArmDone + "\n"+  mHandDone + "\n" + mClapperDone + "\n" + mElevatorDone + "\n");
         return (
             mDustpanBoomDone && mDustpanIntakeDone &&
             mIntakeBoomDone  && mIntakeWheelsDone  &&
             mArmDone         && mHandDone          &&
             mClapperDone     && mElevatorDone
         );
-    };
+
+    }
+
+    @Override
+    protected void end() {
+        System.out.println("HEE");
+    }
 
 
 
     private boolean timer(double initTime, double delay){
-        return (initTime + delay >= Timer.getFPGATimestamp());
+        return ((initTime + delay) <= Timer.getFPGATimestamp());
     }
 
 
