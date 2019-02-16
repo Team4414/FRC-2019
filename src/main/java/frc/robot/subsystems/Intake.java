@@ -29,6 +29,8 @@ public class Intake extends Subsystem{
     public static IntakeWheelState wheelState;
     public static IntakeBoomState boomState;
 
+    private static boolean mLocked;
+
     private static Intake instance;
     public static Intake getInstance(){
         if (instance == null)
@@ -44,9 +46,14 @@ public class Intake extends Subsystem{
 
         wheelState = IntakeWheelState.OFF;
         boomState = IntakeBoomState.RETRACTED;
+
+        mLocked = false;
     }
 
     public void deploy (boolean deploy){
+        if (mLocked){
+            return;
+        }
         mPiston.set(deploy);
         boomState = (deploy) ? IntakeBoomState.EXTENDED : IntakeBoomState.RETRACTED;
     }
@@ -96,6 +103,14 @@ public class Intake extends Subsystem{
 
     public void setRaw(double pwr){
         mIntake.set(ControlMode.PercentOutput, pwr);
+    }
+
+    public boolean isLocked(){
+        return mLocked;
+    }
+
+    public void lock(boolean lock){
+        mLocked = lock;
     }
 
     @Override

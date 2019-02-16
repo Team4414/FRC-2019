@@ -77,6 +77,9 @@ public class Elevator extends Subsystem implements ILoggable {
 
     private static final LinkedHashMap<Setpoint, Integer> heightSetpoints = new LinkedHashMap<>();
 
+    
+    public static int kHandThreshold;
+
 
     private Elevator(){
         
@@ -90,6 +93,8 @@ public class Elevator extends Subsystem implements ILoggable {
         heightSetpoints.put(Setpoint.HATCH_HIGH, 29000);
         heightSetpoints.put(Setpoint.FUEL_HIGH,  36291);
         heightSetpoints.put(Setpoint.FINGER_CLR, 4000);
+
+        kHandThreshold = heightSetpoints.get(Setpoint.FUEL_LOW);
 
 
         mMaster = new LimitableSRX(CTREFactory.createDefaultTalon(RobotMap.ElevatorMap.kMaster));
