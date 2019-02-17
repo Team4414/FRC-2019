@@ -11,7 +11,7 @@ import frc.util.talon.CTREFactory;
 
 public class Hand extends Subsystem{
 
-    private static final double kDetectThreshold = 1.0;
+    private static final double kDetectThreshold = 1.5;
 
     public static HandState handState;
     public static enum HandState{   
@@ -21,7 +21,7 @@ public class Hand extends Subsystem{
         DROP
     }
 
-    private static final double kHoldPwr = 0.5;
+    private static final double kHoldPwr = 0.40;
     private static final double kIntakePwr = 1;
     private static final double kDropPwr = -1;
 
@@ -77,7 +77,7 @@ public class Hand extends Subsystem{
     }
 
     public boolean hasBall(){
-        return (mSensor.getVoltage() > kDetectThreshold);
+        return (getSensorVoltage() >= kDetectThreshold);
     }
 
     public double getSensorVoltage(){

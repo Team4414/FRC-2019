@@ -3,18 +3,20 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj.command.Command;
 import frc.robot.Robot;
 import frc.robot.Robot.Side;
+import frc.robot.commands.actions.ScoreBall;
+import frc.robot.commands.actions.ScorePanel;
 import frc.robot.subsystems.Superstructure;
 
 public class Score extends Command{
 
-    private Superstructure mScoreCommand;
+    private Command mScoreCommand;
 
     @Override
     protected void initialize() {
         if (Robot.activeSide == Side.BALL){
-            mScoreCommand = new Superstructure(Superstructure.ballScore);
+            mScoreCommand = new ScoreBall();
         }else{
-            mScoreCommand = new Superstructure(Superstructure.panelScore);
+            mScoreCommand = new ScorePanel();
         }
         mScoreCommand.start();
     }
@@ -22,6 +24,11 @@ public class Score extends Command{
     @Override
     protected boolean isFinished() {
         return !mScoreCommand.isRunning();
+    }
+
+    @Override
+    protected void interrupted() {
+        mScoreCommand.cancel();
     }
 
 }

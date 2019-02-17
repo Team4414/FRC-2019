@@ -2,13 +2,14 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.command.Command;
 import frc.robot.Robot;
+import frc.robot.commands.actions.SafeElevatorMove;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Superstructure;
 import frc.robot.subsystems.Elevator.Position;
 
 public class JogElevator extends Command{
 
-    private Superstructure mMoveCommand;
+    private Command mMoveCommand;
     private Position mPos;
 
     public JogElevator(Position pos){
@@ -17,7 +18,7 @@ public class JogElevator extends Command{
 
     @Override
     protected void initialize() {
-        mMoveCommand = new Superstructure(Elevator.getSignal(mPos, Robot.activeSide));
+        mMoveCommand = new SafeElevatorMove(Elevator.getSignal(mPos, Robot.activeSide));
         mMoveCommand.start();
     }
 

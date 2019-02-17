@@ -17,30 +17,35 @@ public class SafeElevatorMove extends CommandGroup{
 
     public SafeElevatorMove(Setpoint setpoint){
         //store initial state
-        addSequential(new Command(){
+        addSequential(new DebugMessage("STARTED"));
+        // addSequential(new Command(){
         
-            @Override
-            protected boolean isFinished() {
-                mInitState = Intake.boomState;
-                return true;
-            }
-        });
+        //     @Override
+        //     protected boolean isFinished() {
+        //         mInitState = Intake.boomState;
+        //         return true;
+        //     }
+        // });
 
+        addSequential(new DebugMessage("1"));
         //handle safety by moving/waiting on the intake
-        addSequential(new DoMoveIntakeAndWait(setpoint));
+        // addSequential(new DoMoveIntakeAndWait(setpoint));
+        addSequential(new DebugMessage("2"));
 
         //jog the elevator
         addSequential(Elevator.getInstance().jogElevatorCommand(setpoint));
-        
+        addSequential(new DebugMessage("3"));
+
         //restore the intake boom back to initial state
-        addSequential(new Command(){
+        // addSequential(new Command(){
         
-            @Override
-            protected boolean isFinished() {
-                Intake.getInstance().deploy(mInitState);
-                return true;
-            }
-        });
+        //     @Override
+        //     protected boolean isFinished() {
+        //         Intake.getInstance().lock(false);
+        //         Intake.getInstance().deploy(mInitState);
+        //         return true;
+        //     }
+        // });
     }
 
     private class DoMoveIntakeAndWait extends CommandGroup{
@@ -76,11 +81,11 @@ public class SafeElevatorMove extends CommandGroup{
                 if (Hand.getInstance().hasBall()){
                     //if the hand has a ball
     
-                    if (Elevator.getInstance().getPosition() > Elevator.getSetpoint(mSetpoint)){
-                        //and you are above the target
-    
-                        if (Elevator.getSetpoint(mSetpoint) < Elevator.kHandThreshold){
-                            //and you want to go below the threshold, you need to move the elevator.
+                    if (Elevator.getInstance().getPosition() < Elevator.kHandThreshold){
+                        //and you are below the target
+
+                        if (Elevator.getSetpoint(mSetpoint) > Elevator.kHandThreshold){
+                            //and you want to go above the threshold, you need to move the elevator.
                             Intake.getInstance().deploy(true);
                             Intake.getInstance().lock(true);
                             mNeedsWait = true;
@@ -88,11 +93,11 @@ public class SafeElevatorMove extends CommandGroup{
     
                     }
     
-                    if (Elevator.getInstance().getPosition() < Elevator.getSetpoint(mSetpoint)){
-                        //and you are below the target
+                    if (Elevator.getInstance().getPosition() > Elevator.kHandThreshold){
+                        //and you are aboce the target
     
-                        if (Elevator.getSetpoint(mSetpoint) > Elevator.kHandThreshold){
-                            //and you want to go above the threshold, you need to move the elevator.
+                        if (Elevator.getSetpoint(mSetpoint) < Elevator.kHandThreshold){
+                            //and you want to go below the threshold, you need to move the elevator.
                             Intake.getInstance().deploy(true);
                             Intake.getInstance().lock(true);
                             mNeedsWait = true;
@@ -103,7 +108,7 @@ public class SafeElevatorMove extends CommandGroup{
     
             @Override
             protected boolean isFinished() {
-                return false;
+                return true;
             }
     
             public boolean needsWait(){
@@ -111,5 +116,21 @@ public class SafeElevatorMove extends CommandGroup{
             }
     
         } 
+    }
+
+    public class DebugMessage extends Command{
+
+        String mMessage;
+
+        public DebugMessage(String message){
+            mMessage = message;
+        }
+
+        @Override
+        protected boolean isFinished() {
+            System.out.println(mMessage);
+            return true;
+        }
+
     }
 }

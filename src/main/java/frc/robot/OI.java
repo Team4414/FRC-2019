@@ -13,8 +13,12 @@ import frc.robot.commands.IntakePanelSequence;
 import frc.robot.commands.JogElevator;
 import frc.robot.commands.Score;
 import frc.robot.commands.actions.GrabPanel;
+import frc.robot.commands.actions.ScorePanel;
+import frc.robot.commands.actions.Unjam;
 import frc.robot.subsystems.Finger;
 import frc.robot.subsystems.Elevator.Position;
+import frc.robot.subsystems.Finger.FingerArmState;
+import frc.robot.subsystems.Hand.HandState;
 
 public class OI{
     
@@ -52,11 +56,11 @@ public class OI{
     private Trigger jogTop;
     private Trigger jogCrg;
 
-    private Trigger intakeBall;
-    private Trigger intakePanel;
+    private JoystickButton intakeBall;
+    private JoystickButton intakePanel;
 
+    private Trigger unJam;
     private Trigger score;
-
      
     private OI(){
 
@@ -106,25 +110,47 @@ public class OI{
 
         };
 
-        intakeBall = new Trigger(){
+        intakePanel = new JoystickButton(turnNub, kNubTopButton);
+        intakeBall = new JoystickButton(turnNub, kNubBotButton);
+
+        IntakePanelSequence intake = new IntakePanelSequence();
+        IntakeBallSequence  ball = new IntakeBallSequence();
+
+        intakePanel.whenPressed(new Command(){
         
             @Override
-            public boolean get() {
-                return turnNub.getRawButton(kNubBotButton);
+            protected boolean isFinished() {
+                intake.start();
+                return true;
             }
+        });
 
-        };
-
-        intakePanel = new Trigger(){
-            
+        intakePanel.whenInactive(new Command(){
             @Override
-            public boolean get() {
-                return turnNub.getRawButton(kNubTopButton);
+            protected boolean isFinished() {
+                intake.cancel();
+                return true;
             }
+        });
 
-        };
+        intakeBall.whenPressed(new Command(){
+        
+            @Override
+            protected boolean isFinished() {
+                ball.start();
+                return true;
+            }
+        });
 
-        score = new Trigger(){
+        intakeBall.whenInactive(new Command(){
+            @Override
+            protected boolean isFinished() {
+                ball.cancel();
+                return true;
+            }
+        });
+
+        unJam = new Trigger(){
         
             @Override
             public boolean get() {
@@ -133,43 +159,44 @@ public class OI{
 
         };
 
-        jogLow.whenActive(new JogElevator(Position.LOW));
-        jogMid.whenActive(new JogElevator(Position.MIDDLE));
-        jogTop.whenActive(new JogElevator(Position.HIGH));
-        jogCrg.whenActive(new JogElevator(Position.SECOND));
-
-        intakePanel.whenActive(new IntakePanelSequence());
-        intakeBall.whileActive(new IntakeBallSequence());
-
-        intakePanel.whenInactive(new GrabPanel());
-
-        score.whileActive(new Command(){
+        score = new Trigger(){
         
             @Override
-            protected boolean isFinished() {
-                Finger.getInstance().setArm(true);
-                Finger.getInstance().setFinger(false);
-                return true;
+            public boolean get() {
+                return xbox.getBumper(Hand.kRight);
             }
-        });
+
+        };
+
+        Command scoreCommand = new Score();
+
+        score.whileActive(scoreCommand);
 
         score.whenInactive(new Command(){
         
             @Override
             protected boolean isFinished() {
-                Finger.getInstance().setArm(false);
+                Finger.getInstance().setArm(FingerArmState.RETRACTED);
                 Finger.getInstance().setFinger(true);
+                frc.robot.subsystems.Hand.getInstance().set(HandState.OFF);
                 return true;
             }
         });
+
+        jogLow.whenActive(new JogElevator(Position.LOW));
+        jogMid.whenActive(new JogElevator(Position.MIDDLE));
+        jogTop.whenActive(new JogElevator(Position.HIGH));
+        jogCrg.whenActive(new JogElevator(Position.SECOND));
+
+        unJam.whileActive(new Unjam());
     }
 
     public double getLeft(){
-        return -kTurnScalar * turnNub.getRawAxis(kTurnAxis) - kTurnStickOffset;
+        return kTurnScalar * turnNub.getRawAxis(kTurnAxis) - kTurnStickOffset;
     }
 
     public double getForward(){
-        return kThrottleScaler * throttleNub.getRawAxis(kThrottleAxis) - kThrottleStickOffset;
+        return -kThrottleScaler * throttleNub.getRawAxis(kThrottleAxis) - kThrottleStickOffset;
     }
 
     public boolean getQuickTurn(){

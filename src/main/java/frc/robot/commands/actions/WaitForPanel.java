@@ -10,4 +10,8 @@ public class WaitForPanel extends Command{
         return DustPan.getInstance().hasPanel();
     }
 
+    @Override
+    protected void end() {
+    }
+
 }

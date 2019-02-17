@@ -23,7 +23,8 @@ public class DustPan extends Subsystem{
     public static enum DustpanIntakeState{
         ON,
         OFF,
-        HOLD
+        HOLD,
+        UNJAM
     }
 
     private static final double kIntakePwr = 1;
@@ -99,6 +100,8 @@ public class DustPan extends Subsystem{
             intake(true);
         }else if (state == DustpanIntakeState.HOLD){
             setRaw(0.25);
+        }else if (state == DustpanIntakeState.UNJAM){
+            setRaw(-1);
         }else{
             intake(false);
         }

@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
+import com.ctre.phoenix.motorcontrol.InvertType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
@@ -89,9 +90,13 @@ public class Drivetrain extends Subsystem implements ILoggable{
         mLeftMaster.setSensorPhase(true);
         mRightMaster.setSensorPhase(true);
 
+        mLeftMaster.setInverted(false);
+        mLeftSlaveA.setInverted(InvertType.FollowMaster);
+        mLeftSlaveB.setInverted(InvertType.FollowMaster);
+
         mRightMaster.setInverted(true);
-        mRightSlaveA.setInverted(true);
-        mRightSlaveB.setInverted(true);
+        mRightSlaveA.setInverted(InvertType.FollowMaster);
+        mRightSlaveB.setInverted(InvertType.FollowMaster);
 
         //Zero Odometery:
         x = 0;
@@ -167,6 +172,7 @@ public class Drivetrain extends Subsystem implements ILoggable{
 
     public void setBrakeMode(boolean brake){
         mLeftMaster.setNeutralMode((brake) ? NeutralMode.Brake : NeutralMode.Coast);
+        mRightMaster.setNeutralMode((brake) ? NeutralMode.Brake : NeutralMode.Coast);
     }
 
     /**

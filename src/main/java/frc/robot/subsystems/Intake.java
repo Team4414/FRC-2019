@@ -18,7 +18,8 @@ public class Intake extends Subsystem{
 
     public static enum IntakeWheelState{
         ON,
-        OFF
+        OFF,
+        UNJAM
     }
 
     private static final double kIntakePwr = 1;
@@ -85,6 +86,8 @@ public class Intake extends Subsystem{
     public void intake(IntakeWheelState state){
         if (state == IntakeWheelState.ON){
             intake(true);
+        }else if (state == IntakeWheelState.UNJAM){
+            setRaw(-1);
         }else{
             intake(false);
         }
