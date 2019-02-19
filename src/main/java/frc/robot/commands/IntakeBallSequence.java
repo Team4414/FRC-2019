@@ -28,9 +28,10 @@ public class IntakeBallSequence extends CommandGroup{
         //     }
         // });
 
+        addSequential(Intake.getInstance().intakeCommand(IntakeWheelState.ON));
         addSequential(Intake.getInstance().deployCommand(true));
         addSequential(new SafeElevatorMove(Setpoint.BOTTOM));
-        addSequential(Intake.getInstance().intakeCommand(IntakeWheelState.ON));
+        addSequential(Elevator.getInstance().lockElevatorCommand(true));
         addSequential(Hand.getInstance().setHandCommand(HandState.INTAKING));
         addSequential(new WaitForBall());
     }
@@ -49,6 +50,7 @@ public class IntakeBallSequence extends CommandGroup{
         Intake.getInstance().intake(false);
         Hand.getInstance().set(HandState.OFF);
         Intake.getInstance().intake(IntakeWheelState.OFF);
+        Elevator.getInstance().lockElevator(false);
         Elevator.getInstance().setPosition(Setpoint.STOW);
     }
 
@@ -63,9 +65,9 @@ public class IntakeBallSequence extends CommandGroup{
                     return true;
                 }
             });
-    
-            addSequential(Hand.getInstance().setHandCommand(HandState.HOLDING));
-    
+
+            addSequential(Hand.getInstance().setHandCommand(HandState.HOLDING)); 
+            addSequential(Elevator.getInstance().lockElevatorCommand(false));
             addSequential(new SafeElevatorMove(Setpoint.FUEL_LOW));
             addSequential(Intake.getInstance().deployCommand(false));
             addSequential(Intake.getInstance().intakeCommand(IntakeWheelState.OFF));

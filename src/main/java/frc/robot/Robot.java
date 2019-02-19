@@ -108,15 +108,22 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotPeriodic() {
-    // System.out.println(Elevator.getInstance().checkNeedsZero());
+    // System.out.println(Elevator.getInstance().getPosition());
+    System.out.println("Acceleration: " + Elevator.getInstance().getAcceleration());
     // System.out.println(Elevator.getInstance().getSwitch());
     // System.out.println(aio.getVoltage());
     // System.out.println(Hand.getInstance().getSensorVoltage());
     // System.out.println(Hand.getInstance().hasBall());
     // System.out.println(DustPan.getInstance().getRawCurrent());
 
-    if (Elevator.getInstance().getSwitch()){
-      Elevator.getInstance().zero();
+    // if (Elevator.getInstance().getSwitch()){
+    //   Elevator.getInstance().zero();
+    // }
+
+    if(Hand.getInstance().hasBall()){
+      activeSide = Side.BALL;
+    }else{
+      activeSide = Side.PANEL;
     }
   }
 
@@ -134,8 +141,12 @@ public class Robot extends TimedRobot {
     mZeroElevatorCommand.start();
 
     limePanel.setUSBCam(true);
-    limePanel.setLED(LED_STATE.ON);
-    limePanel.setCamMode(CAM_MODE.VISION);
+    limePanel.setLED(LED_STATE.OFF);
+    limePanel.setCamMode(CAM_MODE.DRIVER);
+    limeBall.setUSBCam(true);
+    limeBall.setLED(LED_STATE.OFF);
+    limeBall.setCamMode(CAM_MODE.DRIVER);
+
     Elevator.getInstance().checkNeedsZero();
     Elevator.getInstance().setRaw(0);
     // Finger.getInstance();
@@ -156,6 +167,11 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic(){
 
+    if (OI.getInstance().getVision()){
+      turnSignal = limePanel.getTheta() * 0.2;
+    }else{
+      turnSignal = OI.getInstance().getLeft();
+    }
     // System.out.println(Elevator.getInstance().getError());
 
     // Drivetrain.getInstance().setRawSpeed(0.5, 0.5);
@@ -168,14 +184,16 @@ public class Robot extends TimedRobot {
     Drivetrain.getInstance().setRawSpeed(
       drive.cheesyDrive(
         OI.getInstance().getForward(), 
-        OI.getInstance().getLeft(),
-        false, 
+        turnSignal,
+        OI.getInstance().getQuickTurn(), 
         false
       )
     );
 
     // Climber.getInstance().setClimbRaw(OI.getInstance().getXboxAxis(1));
     // Climber.getInstance().setPullRaw(OI.getInstance().getXboxAxis(5));
+
+    // Elevator.getInstance().setupLogger().log();
     
   }
 
@@ -207,6 +225,8 @@ public class Robot extends TimedRobot {
     Climber.getInstance().setBrakeMode(false);
     Elevator.getInstance().setPosition(0);
     Drivetrain.getInstance().setBrakeMode(false);
+
+    CSVLogger.logCSV("ELEVATORLOG", Elevator.getInstance().setupLogger().get());
   }
 
   @Override

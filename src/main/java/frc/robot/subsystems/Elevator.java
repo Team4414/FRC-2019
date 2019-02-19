@@ -30,15 +30,15 @@ public class Elevator extends Subsystem implements ILoggable {
         return instance;
     }
 
-    private static final double kP = 0.7; //1
+    private static final double kP = 0.5; //1
     private static final double kI = 0; //000.1
     private static final double kD = 0;
     private static final double kF = 0.15;
 
-    private static final int kMMacceleration = 10000; //40000 | 20000
-    private static final int kMMvelocity = 4000; //8000
+    private static final int kMMacceleration = 30000; //40000 | 20000
+    private static final int kMMvelocity = 12000; //8000
 
-    private static final int kTopLimit = 35663;
+    private static final int kTopLimit = 72387;
 
     private static final int kElevatorTolerance = 500;
 
@@ -52,6 +52,8 @@ public class Elevator extends Subsystem implements ILoggable {
     private LimitSwitch mLowLimit;
 
     public static Setpoint currentState;
+
+    private static boolean mLockElevator = false;
 
     public static enum Position{
         INTAKE,
@@ -84,15 +86,15 @@ public class Elevator extends Subsystem implements ILoggable {
     private Elevator(){
         
         heightSetpoints.put(Setpoint.BOTTOM,     0);
-        heightSetpoints.put(Setpoint.STOW,       1600);
-        heightSetpoints.put(Setpoint.FLOOR_INTAKE,400);
-        heightSetpoints.put(Setpoint.CARGO_SHIP, 16000);
-        heightSetpoints.put(Setpoint.FUEL_LOW,   8600);
-        heightSetpoints.put(Setpoint.HATCH_MID,  16000);
-        heightSetpoints.put(Setpoint.FUEL_MID,   21532);
-        heightSetpoints.put(Setpoint.HATCH_HIGH, 29000);
-        heightSetpoints.put(Setpoint.FUEL_HIGH,  35443);
-        heightSetpoints.put(Setpoint.FINGER_CLR, 4000);
+        heightSetpoints.put(Setpoint.STOW,       1745);
+        heightSetpoints.put(Setpoint.FLOOR_INTAKE,850);
+        heightSetpoints.put(Setpoint.CARGO_SHIP, 38000);
+        heightSetpoints.put(Setpoint.FUEL_LOW,   17419);
+        heightSetpoints.put(Setpoint.HATCH_MID,  32000);
+        heightSetpoints.put(Setpoint.FUEL_MID,   41500);
+        heightSetpoints.put(Setpoint.HATCH_HIGH, 57282);
+        heightSetpoints.put(Setpoint.FUEL_HIGH,  71000);
+        heightSetpoints.put(Setpoint.FINGER_CLR, 5695);
 
         kHandThreshold = heightSetpoints.get(Setpoint.FUEL_LOW);
 
@@ -149,6 +151,8 @@ public class Elevator extends Subsystem implements ILoggable {
     public boolean setPosition(int position){
         if (mNeedsZero)
             return false;
+        if (mLockElevator)
+            return false;
         mMaster.set(ControlMode.MotionMagic, position + mZeroOffset);
         return true;
     }
@@ -196,6 +200,17 @@ public class Elevator extends Subsystem implements ILoggable {
             @Override
             protected void end() {
                 super.end();
+            }
+        };
+    }
+
+    public Command lockElevatorCommand(boolean lock){
+        return new Command(){
+        
+            @Override
+            protected boolean isFinished() {
+                mLockElevator = lock;
+                return true;
             }
         };
     }
@@ -267,6 +282,10 @@ public class Elevator extends Subsystem implements ILoggable {
         mNeedsZero = false;
     }
 
+    public void lockElevator(boolean lock){
+        mLockElevator = lock;
+    }
+
     public boolean getSwitch(){
         return mLowLimit.get();
     }
@@ -278,9 +297,26 @@ public class Elevator extends Subsystem implements ILoggable {
         return mNeedsZero;
     }
 
+    private double mLastVel = 0;
+
+    public double getAcceleration(){
+        double returnMe;
+        returnMe =  (mMaster.getSelectedSensorVelocity() - mLastVel) * 0.02;
+        mLastVel = mMaster.getSelectedSensorVelocity();
+        return returnMe;
+    }  
+
     @Override
     public Loggable setupLogger() {
-        return null;
+        return new Loggable("ElevatorLog"){
+            @Override
+            protected LogObject[] collectData() {
+                return new LogObject[]{
+                    new LogObject("Setpoint",  mMaster.getClosedLoopTarget()),
+                    new LogObject("Traj", mMaster.getSelectedSensorPosition())
+                };
+            }
+        };
 	}
 
     @Override

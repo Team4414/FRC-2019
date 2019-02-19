@@ -40,6 +40,7 @@ public class IntakePanelSequence extends CommandGroup{
         addSequential(Finger.getInstance().setArmCommand(false));
         addSequential(Finger.getInstance().setFingerCommand(false));
         addSequential(new SafeElevatorMove(Setpoint.FLOOR_INTAKE));
+        addSequential(Elevator.getInstance().lockElevatorCommand(true));
         addSequential(new WaitCommand(0.5));
         addSequential(new WaitForPanel());
     }
@@ -58,6 +59,8 @@ public class IntakePanelSequence extends CommandGroup{
         DustPan.getInstance().intake(false);
         Finger.getInstance().setFinger(FingerClapperState.HOLDING);
         Finger.getInstance().setArm(false);
+        Elevator.getInstance().lockElevator(false);
+        Elevator.getInstance().setPosition(Setpoint.STOW);
         mInterrupted = true;
     }
 
@@ -76,9 +79,10 @@ public class IntakePanelSequence extends CommandGroup{
             
             addSequential(new WaitCommand(0.5));
             addSequential(DustPan.getInstance().deployCommand(false));
-            addSequential(new WaitCommand(1));
+            addSequential(new WaitCommand(1.5));
             addSequential(Finger.getInstance().setFingerCommand(true));
             addSequential(new WaitCommand(0.25));
+            addSequential(Elevator.getInstance().lockElevatorCommand(false));
             addSequential(new SafeElevatorMove(Setpoint.FINGER_CLR));
             addSequential(DustPan.getInstance().intakeCommand(DustpanIntakeState.OFF));
             addSequential(new SafeElevatorMove(Setpoint.STOW));

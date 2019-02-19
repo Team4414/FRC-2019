@@ -31,6 +31,8 @@ public class Limelight{
     private static final int kResVert = 240;
     private static final int kResHor = 320;
 
+    private static final double kCamOffset = 27d/2d;
+
     private static Side mSide;
 
     private static final int kHeightTarget = 6; //actual height of the target
@@ -120,6 +122,10 @@ public class Limelight{
         }catch (Exception e){ return 0; }
 
         return heightRoller.getAverage();
+    }
+
+    public double getTheta(){
+        return Math.acos(kCamOffset * getAbsDist());
     }
 
     public double getAbsDist(){

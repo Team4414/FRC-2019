@@ -12,12 +12,14 @@ import frc.robot.commands.IntakeBallSequence;
 import frc.robot.commands.IntakePanelSequence;
 import frc.robot.commands.JogElevator;
 import frc.robot.commands.Score;
+import frc.robot.commands.actions.Climb;
 import frc.robot.commands.actions.GrabPanel;
 import frc.robot.commands.actions.ScorePanel;
 import frc.robot.commands.actions.Unjam;
 import frc.robot.subsystems.Finger;
 import frc.robot.subsystems.Elevator.Position;
 import frc.robot.subsystems.Finger.FingerArmState;
+import frc.robot.subsystems.Finger.FingerClapperState;
 import frc.robot.subsystems.Hand.HandState;
 
 public class OI{
@@ -32,12 +34,6 @@ public class OI{
     private static final int kThrottleNubID = 0;
     private static final int kTurnNubID = 1;
     private static final int kXboxID = 2;
-
-    private double kThrottleStickOffset = 0;
-    private double kTurnStickOffset = 0;
-
-    private static final double kThrottleScaler = 1;
-    private static final double kTurnScalar = 1;
 
     private static final int kTurnAxis = 0;
     private static final int kThrottleAxis = 1;
@@ -56,23 +52,19 @@ public class OI{
     private Trigger jogTop;
     private Trigger jogCrg;
 
-    private JoystickButton intakeBall;
-    private JoystickButton intakePanel;
+    private Trigger intakeBall;
+    private Trigger intakePanel;
 
     private Trigger unJam;
     private Trigger score;
+
+    private Trigger climb;
      
     private OI(){
 
         throttleNub = new Joystick(kThrottleNubID);
         turnNub = new Joystick(kTurnNubID);
         xbox = new XboxController(kXboxID);
-
-        kThrottleStickOffset = 0;
-        kTurnStickOffset = 0;
-
-        kThrottleStickOffset = getForward();
-        kTurnStickOffset = getLeft();
 
         jogLow = new Trigger(){
         
@@ -110,20 +102,37 @@ public class OI{
 
         };
 
-        intakePanel = new JoystickButton(turnNub, kNubTopButton);
-        intakeBall = new JoystickButton(turnNub, kNubBotButton);
+        intakeBall = new Trigger(){
+
+            @Override
+            public boolean get() {
+                return xbox.getBumper(Hand.kLeft);
+            }
+
+        };
+
+        intakePanel = new Trigger(){
+
+            @Override
+            public boolean get() {
+                return xbox.getBumper(Hand.kRight);
+            }
+
+        };
+
+        climb = new Trigger(){
+        
+            @Override
+            public boolean get() {
+                xbox.getStartButton();
+                return true;
+            }
+        };
 
         IntakePanelSequence intake = new IntakePanelSequence();
         IntakeBallSequence  ball = new IntakeBallSequence();
 
-        intakePanel.whenPressed(new Command(){
-        
-            @Override
-            protected boolean isFinished() {
-                intake.start();
-                return true;
-            }
-        });
+        intakePanel.whenActive(intake);
 
         intakePanel.whenInactive(new Command(){
             @Override
@@ -133,14 +142,7 @@ public class OI{
             }
         });
 
-        intakeBall.whenPressed(new Command(){
-        
-            @Override
-            protected boolean isFinished() {
-                ball.start();
-                return true;
-            }
-        });
+        intakeBall.whenActive(ball);
 
         intakeBall.whenInactive(new Command(){
             @Override
@@ -163,22 +165,23 @@ public class OI{
         
             @Override
             public boolean get() {
-                return xbox.getBumper(Hand.kRight);
+                return turnNub.getRawButton(kNubTopButton);
             }
 
         };
 
         Command scoreCommand = new Score();
 
-        score.whileActive(scoreCommand);
+        score.whenActive(scoreCommand);
 
         score.whenInactive(new Command(){
         
             @Override
             protected boolean isFinished() {
-                Finger.getInstance().setArm(FingerArmState.RETRACTED);
-                Finger.getInstance().setFinger(true);
-                frc.robot.subsystems.Hand.getInstance().set(HandState.OFF);
+                scoreCommand.cancel();
+                // Finger.getInstance().setArm(FingerArmState.RETRACTED);
+                // Finger.getInstance().setFinger(FingerClapperState.HOLDING);
+                // frc.robot.subsystems.Hand.getInstance().set(HandState.OFF);
                 return true;
             }
         });
@@ -188,15 +191,17 @@ public class OI{
         jogTop.whenActive(new JogElevator(Position.HIGH));
         jogCrg.whenActive(new JogElevator(Position.SECOND));
 
+        climb.whileActive(new Climb());
+
         unJam.whileActive(new Unjam());
     }
 
     public double getLeft(){
-        return kTurnScalar * turnNub.getRawAxis(kTurnAxis) - kTurnStickOffset;
+        return turnNub.getRawAxis(kTurnAxis);
     }
 
     public double getForward(){
-        return -kThrottleScaler * throttleNub.getRawAxis(kThrottleAxis) - kThrottleStickOffset;
+        return -throttleNub.getRawAxis(kThrottleAxis);
     }
 
     public boolean getQuickTurn(){

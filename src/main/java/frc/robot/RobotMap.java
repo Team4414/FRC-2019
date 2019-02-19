@@ -22,6 +22,8 @@ public class RobotMap{
         public static final int kClimber = 13;
         public static final int kPuller = 12;
 
+        public static final int kPullerPiston = 4;
+
         public static final int kSwitchUp = 3;
         public static final int kSwitchDown = 4;
     }

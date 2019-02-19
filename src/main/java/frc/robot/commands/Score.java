@@ -5,7 +5,6 @@ import frc.robot.Robot;
 import frc.robot.Robot.Side;
 import frc.robot.commands.actions.ScoreBall;
 import frc.robot.commands.actions.ScorePanel;
-import frc.robot.subsystems.Superstructure;
 
 public class Score extends Command{
 
@@ -28,7 +27,13 @@ public class Score extends Command{
 
     @Override
     protected void interrupted() {
+        // mScoreCommand.cancel();
+    }
+
+    @Override
+    public synchronized void cancel() {
         mScoreCommand.cancel();
+        super.cancel();
     }
 
 }
