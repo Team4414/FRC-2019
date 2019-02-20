@@ -67,6 +67,7 @@ public class Elevator extends Subsystem implements ILoggable {
         FINGER_CLR, //4000
 
         STOW,   //1600
+        PANEL_GRAB,
         BOTTOM, //0
         FLOOR_INTAKE, //400
         CARGO_SHIP, //14000
@@ -87,6 +88,7 @@ public class Elevator extends Subsystem implements ILoggable {
         
         heightSetpoints.put(Setpoint.BOTTOM,     0);
         heightSetpoints.put(Setpoint.STOW,       1745);
+        heightSetpoints.put(Setpoint.PANEL_GRAB,  5250);
         heightSetpoints.put(Setpoint.FLOOR_INTAKE,850);
         heightSetpoints.put(Setpoint.CARGO_SHIP, 38000);
         heightSetpoints.put(Setpoint.FUEL_LOW,   17419);
@@ -284,6 +286,17 @@ public class Elevator extends Subsystem implements ILoggable {
 
     public void lockElevator(boolean lock){
         mLockElevator = lock;
+    }
+
+    public Command dropElevatorABit(boolean drop){
+        return new Command(){
+        
+            @Override
+            protected boolean isFinished() {
+                setPosition((int)(getSetpoint(currentState)) - ((drop) ? 700 : -700));
+                return true;
+            }
+        };
     }
 
     public boolean getSwitch(){

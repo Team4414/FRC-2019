@@ -2,16 +2,12 @@ package frc.robot;
 
 import java.util.ArrayList;
 
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
-import frc.robot.commands.IntakePanelSequence;
 import frc.robot.commands.ZeroElevator;
-import frc.robot.commands.actions.SafeElevatorMove;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.DustPan;
@@ -19,24 +15,12 @@ import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Finger;
 import frc.robot.subsystems.Hand;
 import frc.robot.subsystems.Intake;
-import frc.robot.subsystems.Superstructure;
-import frc.robot.subsystems.DustPan.DustpanBoomState;
-import frc.robot.subsystems.DustPan.DustpanIntakeState;
-import frc.robot.subsystems.Elevator.Setpoint;
-import frc.robot.subsystems.Finger.FingerArmState;
-import frc.robot.subsystems.Finger.FingerClapperState;
-import frc.robot.subsystems.Hand.HandState;
-import frc.robot.subsystems.Intake.IntakeBoomState;
-import frc.robot.subsystems.Intake.IntakeWheelState;
-import frc.robot.subsystems.Superstructure.State;
 import frc.robot.vision.TargetEntry;
-import frc.robot.vision.VisionTune;
 import frc.util.CheesyDriveHelper;
 import frc.util.Limelight;
 import frc.util.Limelight.CAM_MODE;
 import frc.util.Limelight.LED_STATE;
 import frc.util.logging.CSVLogger;
-import frc.util.talon.CTREFactory;
 
 public class Robot extends TimedRobot {
 
@@ -48,6 +32,7 @@ public class Robot extends TimedRobot {
   private CheesyDriveHelper drive;
   public static Side activeSide;
   public static boolean respectPerimeter;
+  public static boolean isClimbing;
 
   private static ZeroElevator mZeroElevatorCommand;
 
@@ -104,17 +89,19 @@ public class Robot extends TimedRobot {
     // test = Elevator.getInstance().jogElevatorCommand(4000);
 
     respectPerimeter = false;
+    isClimbing = false;
   }
 
   @Override
   public void robotPeriodic() {
     // System.out.println(Elevator.getInstance().getPosition());
-    System.out.println("Acceleration: " + Elevator.getInstance().getAcceleration());
+    // System.out.println("Acceleration: " + Elevator.getInstance().getAcceleration());
     // System.out.println(Elevator.getInstance().getSwitch());
     // System.out.println(aio.getVoltage());
     // System.out.println(Hand.getInstance().getSensorVoltage());
     // System.out.println(Hand.getInstance().hasBall());
     // System.out.println(DustPan.getInstance().getRawCurrent());
+    // System.out.println(Climber.getInstance().getBotSwitch());
 
     // if (Elevator.getInstance().getSwitch()){
     //   Elevator.getInstance().zero();
@@ -149,6 +136,7 @@ public class Robot extends TimedRobot {
 
     Elevator.getInstance().checkNeedsZero();
     Elevator.getInstance().setRaw(0);
+    Climber.getInstance().deployPiston(false);
     // Finger.getInstance();
 
     // test.start();
@@ -180,15 +168,18 @@ public class Robot extends TimedRobot {
     
     // System.out.println(aio.getVoltage());
     Scheduler.getInstance().run();
-    
-    Drivetrain.getInstance().setRawSpeed(
-      drive.cheesyDrive(
-        OI.getInstance().getForward(), 
-        turnSignal,
-        OI.getInstance().getQuickTurn(), 
-        false
-      )
-    );
+
+
+    if (!isClimbing){
+      Drivetrain.getInstance().setRawSpeed(
+        drive.cheesyDrive(
+          OI.getInstance().getForward(), 
+          turnSignal,
+          OI.getInstance().getQuickTurn(), 
+          false
+        )
+      );
+    }
 
     // Climber.getInstance().setClimbRaw(OI.getInstance().getXboxAxis(1));
     // Climber.getInstance().setPullRaw(OI.getInstance().getXboxAxis(5));

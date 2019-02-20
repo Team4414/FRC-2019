@@ -28,7 +28,7 @@ public class Climber extends Subsystem implements ILoggable {
     private final TalonSRX mClimber;
     private final VictorSPX mPuller;
 
-    // private final Solenoid mPiston;
+    private final Solenoid mPiston;
 
     private final DigitalInput topSwitch;
     private final DigitalInput botSwitch;
@@ -43,7 +43,7 @@ public class Climber extends Subsystem implements ILoggable {
     private Climber(){
         mClimber = CTREFactory.createDefaultTalon(RobotMap.ClimberMap.kClimber);
         mPuller = CTREFactory.createVictor(RobotMap.ClimberMap.kPuller);
-        // mPiston = new Solenoid(RobotMap.ClimberMap.kPullerPiston);
+        mPiston = new Solenoid(RobotMap.ClimberMap.kPullerPiston);
 
         mClimber.configPeakCurrentLimit(kCurrentLimit);
         mClimber.configPeakCurrentDuration(0);
@@ -52,7 +52,7 @@ public class Climber extends Subsystem implements ILoggable {
         topSwitch = new DigitalInput(RobotMap.ClimberMap.kSwitchUp);
         botSwitch = new DigitalInput(RobotMap.ClimberMap.kSwitchDown);
 
-        mClimber.setInverted(true);
+        mClimber.setInverted(false);
 
         setBrakeMode(true);
 
@@ -69,6 +69,10 @@ public class Climber extends Subsystem implements ILoggable {
 
     public void retract (boolean retract){
         mClimber.set(ControlMode.PercentOutput, (retract) ? -Math.abs(kRetractPower) : 0);
+    }
+
+    public void deployPiston(boolean deploy){
+        mPiston.set(deploy);
     }
 
     public boolean getTopSwitch(){
@@ -124,7 +128,7 @@ public class Climber extends Subsystem implements ILoggable {
         
             @Override
             protected boolean isFinished() {
-                // mPiston.set(true);
+                mPiston.set(true);
                 return true;
             }
         };
@@ -133,11 +137,13 @@ public class Climber extends Subsystem implements ILoggable {
 
 
     public void setClimbRaw(double pwr){
-        if (!topSwitch.get() && pwr > 0){
+        if (getTopSwitch() && pwr < 0){
             pwr = 0;
+            System.out.println("TOP");
         }
-        if (!botSwitch.get() && pwr < 0){
+        if (getBotSwitch() && pwr > 0){
             pwr = 0;
+            System.out.println("BOTTOM");
         }
 
         mClimber.set(ControlMode.PercentOutput, pwr);

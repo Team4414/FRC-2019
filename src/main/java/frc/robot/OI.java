@@ -13,9 +13,13 @@ import frc.robot.commands.IntakePanelSequence;
 import frc.robot.commands.JogElevator;
 import frc.robot.commands.Score;
 import frc.robot.commands.actions.Climb;
+import frc.robot.commands.actions.ClimbingGroup;
 import frc.robot.commands.actions.GrabPanel;
+import frc.robot.commands.actions.RetractClimber;
 import frc.robot.commands.actions.ScorePanel;
+import frc.robot.commands.actions.StationGrab;
 import frc.robot.commands.actions.Unjam;
+import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Finger;
 import frc.robot.subsystems.Elevator.Position;
 import frc.robot.subsystems.Finger.FingerArmState;
@@ -57,8 +61,11 @@ public class OI{
 
     private Trigger unJam;
     private Trigger score;
+    private Trigger stationPanel;
 
     private Trigger climb;
+    private Trigger releaseClimber;
+    private Trigger retractClimb;
      
     private OI(){
 
@@ -124,8 +131,31 @@ public class OI{
         
             @Override
             public boolean get() {
-                xbox.getStartButton();
-                return true;
+                return xbox.getPOV() == 0;
+            }
+        };
+
+        releaseClimber = new Trigger(){
+        
+            @Override
+            public boolean get() {
+                return xbox.getPOV() == 270;
+            }
+        };
+
+        retractClimb = new Trigger(){
+        
+            @Override
+            public boolean get() {
+                return xbox.getPOV() == 180;
+            }
+        };
+
+        stationPanel = new Trigger(){
+        
+            @Override
+            public boolean get() {
+                return xbox.getStickButton(Hand.kRight);
             }
         };
 
@@ -191,7 +221,31 @@ public class OI{
         jogTop.whenActive(new JogElevator(Position.HIGH));
         jogCrg.whenActive(new JogElevator(Position.SECOND));
 
-        climb.whileActive(new Climb());
+        ClimbingGroup climbCommand = new ClimbingGroup();
+
+        climb.whenActive(climbCommand);
+        climb.whenInactive(new Command(){
+        
+            @Override
+            protected boolean isFinished() {
+                climbCommand.cancel();
+                return true;
+            }
+        });
+        retractClimb.whileActive(new RetractClimber());
+        releaseClimber.whenActive(Climber.getInstance().deployPistonCommand(true));
+
+        StationGrab stationGrab = new StationGrab();
+
+        stationPanel.whenActive(stationGrab);
+        stationPanel.whenInactive(new Command(){
+        
+            @Override
+            protected boolean isFinished() {
+                stationGrab.cancel();
+                return true;
+            }
+        });
 
         unJam.whileActive(new Unjam());
     }

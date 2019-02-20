@@ -11,8 +11,9 @@ public class ScoreBall extends CommandGroup{
     }
 
     @Override
-    protected void interrupted() {
+    public synchronized void cancel() {
         Hand.getInstance().set(HandState.OFF);
+        super.cancel();
     }
 
 }
