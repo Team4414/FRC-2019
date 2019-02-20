@@ -3,8 +3,8 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj.command.Command;
 import frc.robot.Robot;
 import frc.robot.Robot.Side;
-import frc.robot.commands.actions.ScoreBall;
-import frc.robot.commands.actions.ScorePanel;
+import frc.robot.commands.balls.ScoreBall;
+import frc.robot.commands.panels.ScorePanel;
 
 public class Score extends Command{
 
@@ -23,11 +23,6 @@ public class Score extends Command{
     @Override
     protected boolean isFinished() {
         return !mScoreCommand.isRunning();
-    }
-
-    @Override
-    protected void interrupted() {
-        // mScoreCommand.cancel();
     }
 
     @Override

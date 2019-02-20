@@ -5,6 +5,7 @@ package frc.util.kinematics.pos;
  * 
  * <p>A simple object to hold the position of a robot that can only be set, not modified.</p>
  */
+@Deprecated
 public class RobotPos{
 
     /**

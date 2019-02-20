@@ -1,32 +1,20 @@
-package frc.robot.commands;
+package frc.robot.commands.balls;
 
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.CommandGroup;
 import frc.robot.Robot;
 import frc.robot.Robot.Side;
-import frc.robot.commands.actions.SafeElevatorMove;
-import frc.robot.commands.actions.WaitForBall;
+import frc.robot.commands.elevator.SafeElevatorMove;
 import frc.robot.subsystems.Elevator;
-import frc.robot.subsystems.Hand;
-import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Elevator.Setpoint;
+import frc.robot.subsystems.Hand;
 import frc.robot.subsystems.Hand.HandState;
+import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Intake.IntakeWheelState;
 
-public class IntakeBallSequence extends CommandGroup{
+public class IntakeBallSequence extends CommandGroup {
 
-    // private boolean mInterrupted = false;
-
-    public IntakeBallSequence(){
-
-        // addSequential(new Command(){
-        
-        //     @Override
-        //     protected boolean isFinished() {
-        //         mInterrupted = false;
-        //         return true;
-        //     }
-        // });
+    public IntakeBallSequence() {
 
         addSequential(Intake.getInstance().intakeCommand(IntakeWheelState.ON));
         addSequential(Intake.getInstance().deployCommand(true));
@@ -37,10 +25,8 @@ public class IntakeBallSequence extends CommandGroup{
     }
 
     @Override
+    @SuppressWarnings("resource")
     protected void end() {
-        // if (!mInterrupted){
-        //     new StowSequence().start();
-        // }
         new StowSequence().start();
     }
     
@@ -71,22 +57,6 @@ public class IntakeBallSequence extends CommandGroup{
             addSequential(new SafeElevatorMove(Setpoint.FUEL_LOW));
             addSequential(Intake.getInstance().deployCommand(false));
             addSequential(Intake.getInstance().intakeCommand(IntakeWheelState.OFF));
-        }
-
-    }
-
-    public class DebugMessage extends Command{
-
-        String mMessage;
-
-        public DebugMessage(String message){
-            mMessage = message;
-        }
-
-        @Override
-        protected boolean isFinished() {
-            System.out.println(mMessage);
-            return true;
         }
 
     }

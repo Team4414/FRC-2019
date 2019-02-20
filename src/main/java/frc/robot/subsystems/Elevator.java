@@ -30,17 +30,18 @@ public class Elevator extends Subsystem implements ILoggable {
         return instance;
     }
 
-    private static final double kP = 0.5; //1
-    private static final double kI = 0; //000.1
+    private static final double kP = 0.5;
+    private static final double kI = 0; 
     private static final double kD = 0;
     private static final double kF = 0.15;
 
-    private static final int kMMacceleration = 30000; //40000 | 20000
-    private static final int kMMvelocity = 12000; //8000
+    private static final int kMMacceleration = 30000;
+    private static final int kMMvelocity = 12000;
 
     private static final int kTopLimit = 72387;
 
     private static final int kElevatorTolerance = 500;
+    private static final int kDropForPanelClearDistance = 700;
 
     private static int mZeroOffset = 0;
     private static boolean mNeedsZero; 
@@ -48,7 +49,6 @@ public class Elevator extends Subsystem implements ILoggable {
     private LimitableSRX mMaster;
     private VictorSPX mSlave;
 
-    @SuppressWarnings("unused")
     private LimitSwitch mLowLimit;
 
     public static Setpoint currentState;
@@ -64,18 +64,18 @@ public class Elevator extends Subsystem implements ILoggable {
     }
 
     public static enum Setpoint{
-        FINGER_CLR, //4000
+        FINGER_CLR,
 
-        STOW,   //1600
+        STOW,
         PANEL_GRAB,
-        BOTTOM, //0
-        FLOOR_INTAKE, //400
-        CARGO_SHIP, //14000
-        FUEL_LOW, //11000
-        HATCH_MID, //16000
-        FUEL_MID, //24732
-        HATCH_HIGH, //29000
-        FUEL_HIGH, //36291
+        BOTTOM,
+        FLOOR_INTAKE,
+        CARGO_SHIP,
+        FUEL_LOW,
+        HATCH_MID,
+        FUEL_MID,
+        HATCH_HIGH,
+        FUEL_HIGH,
     };
 
     private static final LinkedHashMap<Setpoint, Integer> heightSetpoints = new LinkedHashMap<>();
@@ -119,13 +119,13 @@ public class Elevator extends Subsystem implements ILoggable {
         mMaster.configMotionAcceleration(kMMacceleration);
         mMaster.configMotionCruiseVelocity(kMMvelocity);
 
-        mMaster.setSensorPhase(true); //good
+        mMaster.setSensorPhase(true);
         mMaster.overrideLimitSwitchesEnable(false);
 
         mMaster.configPeakOutputForward(1);
         mMaster.configPeakOutputReverse(-1);
 
-        mMaster.setInverted(true); //good
+        mMaster.setInverted(true);
         mSlave.setInverted(InvertType.FollowMaster);
 
         mMaster.configClosedLoopPeakOutput(0, 1);
@@ -293,7 +293,7 @@ public class Elevator extends Subsystem implements ILoggable {
         
             @Override
             protected boolean isFinished() {
-                setPosition((int)(getSetpoint(currentState)) - ((drop) ? 700 : -700));
+                setPosition((int)(getSetpoint(currentState)) - ((drop) ? kDropForPanelClearDistance : -kDropForPanelClearDistance));
                 return true;
             }
         };

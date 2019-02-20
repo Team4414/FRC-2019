@@ -12,16 +12,9 @@ import edu.wpi.first.wpilibj.command.Subsystem;
 import frc.robot.RobotMap;
 import frc.util.logging.ILoggable;
 import frc.util.logging.Loggable;
-import frc.util.talon.LimitableSRX;
 import frc.util.talon.CTREFactory;
 
 public class Climber extends Subsystem implements ILoggable {
-
-    private static final double kClimbPower = 0.25;
-    private static final double kInitClimbPower = 0.1;
-    private static final double kRetractPower = 0.25;
-
-    private static final double kPullPower = 0.1;
 
     private static final int kCurrentLimit = 20;
 
@@ -40,6 +33,8 @@ public class Climber extends Subsystem implements ILoggable {
             instance = new Climber();
         return instance;
     }
+
+
     private Climber(){
         mClimber = CTREFactory.createDefaultTalon(RobotMap.ClimberMap.kClimber);
         mPuller = CTREFactory.createVictor(RobotMap.ClimberMap.kPuller);
@@ -63,14 +58,6 @@ public class Climber extends Subsystem implements ILoggable {
     @Override
     protected void initDefaultCommand() {}
 
-    public void climb (boolean climb){
-        mClimber.set(ControlMode.PercentOutput, (climb) ? Math.abs(kClimbPower) : 0);
-    }
-
-    public void retract (boolean retract){
-        mClimber.set(ControlMode.PercentOutput, (retract) ? -Math.abs(kRetractPower) : 0);
-    }
-
     public void deployPiston(boolean deploy){
         mPiston.set(deploy);
     }
@@ -83,46 +70,6 @@ public class Climber extends Subsystem implements ILoggable {
         return !botSwitch.get();
     }
 
-    public Command climbCommand(boolean waitOnSwitch){
-        return new Command(){
-
-            @Override
-            protected void initialize() {
-                setClimbRaw((waitOnSwitch) ? kClimbPower : kInitClimbPower);
-            }
-        
-            @Override
-            protected boolean isFinished() {
-                if (!waitOnSwitch){
-                    return true;
-                }else{
-                    return getTopSwitch();
-                }
-            }
-
-            @Override
-            protected void end() {
-                setClimbRaw(0);
-            }
-
-            @Override
-            protected void interrupted() {
-                setClimbRaw(0);
-            }
-        };
-    }
-
-    public Command pullCommand(boolean pull){
-        return new Command(){
-        
-            @Override
-            protected boolean isFinished() {
-                setPullRaw(kPullPower);
-                return true;
-            }
-        };
-    }
-
     public Command deployPistonCommand(boolean deploy){
         return new Command(){
         
@@ -133,7 +80,6 @@ public class Climber extends Subsystem implements ILoggable {
             }
         };
     }
-
 
 
     public void setClimbRaw(double pwr){

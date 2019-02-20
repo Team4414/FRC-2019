@@ -3,9 +3,9 @@ package frc.robot.vision;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Robot.Side;
 
+@Deprecated
 public class TargetEntry{
     private final double mDistance;
     private final double mTheta;

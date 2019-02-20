@@ -9,6 +9,7 @@ import frc.util.Limelight.CAM_MODE;
 import frc.util.Limelight.LED_STATE;
 import frc.util.logging.CSVLogger;
 
+@Deprecated
 public class VisionTune{
 
     private double mLastDistance;

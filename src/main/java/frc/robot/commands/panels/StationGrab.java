@@ -1,9 +1,8 @@
-package frc.robot.commands.actions;
+package frc.robot.commands.panels;
 
-import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.CommandGroup;
 import edu.wpi.first.wpilibj.command.WaitCommand;
-import frc.robot.subsystems.Elevator;
+import frc.robot.commands.elevator.SafeElevatorMove;
 import frc.robot.subsystems.Finger;
 import frc.robot.subsystems.Elevator.Setpoint;
 
@@ -26,6 +25,7 @@ public class StationGrab extends CommandGroup{
     }
 
     @Override
+    @SuppressWarnings("resource")
     protected void end() {
         new RetractPanel().start();
     }

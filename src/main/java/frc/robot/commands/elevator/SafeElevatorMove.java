@@ -1,4 +1,4 @@
-package frc.robot.commands.actions;
+package frc.robot.commands.elevator;
 
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.CommandGroup;
@@ -15,38 +15,10 @@ public class SafeElevatorMove extends CommandGroup{
     private static final double kIntakeMoveTime = 0.5;
 
     public SafeElevatorMove(Setpoint setpoint){
-        //store initial state
-        addSequential(new DebugMessage("STARTED"));
-        // addSequential(new Command(){
-        
-        //     @Override
-        //     protected boolean isFinished() {
-        //         mInitState = Intake.boomState;
-        //         return true;
-        //     }
-        // });
-
-        addSequential(new DebugMessage("1"));
-        //handle safety by moving/waiting on the intake
-        // addSequential(new DoMoveIntakeAndWait(setpoint));
-        addSequential(new DebugMessage("2"));
-
-        //jog the elevator
         addSequential(Elevator.getInstance().jogElevatorCommand(setpoint));
-        addSequential(new DebugMessage("3"));
-
-        //restore the intake boom back to initial state
-        // addSequential(new Command(){
-        
-        //     @Override
-        //     protected boolean isFinished() {
-        //         Intake.getInstance().lock(false);
-        //         Intake.getInstance().deploy(mInitState);
-        //         return true;
-        //     }
-        // });
     }
 
+    @SuppressWarnings("unused")
     private class DoMoveIntakeAndWait extends CommandGroup{
 
         private DoMoveIntake mMove;
@@ -115,21 +87,5 @@ public class SafeElevatorMove extends CommandGroup{
             }
     
         } 
-    }
-
-    public class DebugMessage extends Command{
-
-        String mMessage;
-
-        public DebugMessage(String message){
-            mMessage = message;
-        }
-
-        @Override
-        protected boolean isFinished() {
-            System.out.println(mMessage);
-            return true;
-        }
-
     }
 }

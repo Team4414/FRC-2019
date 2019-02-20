@@ -9,11 +9,9 @@ import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import com.ctre.phoenix.sensors.PigeonIMU;
 
-import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.command.Subsystem;
 import frc.robot.Constants;
 import frc.robot.RobotMap;
-import frc.util.kinematics.pos.RobotPos;
 import frc.util.logging.ILoggable;
 import frc.util.logging.Loggable;
 import frc.util.talon.CTREFactory;
@@ -30,7 +28,6 @@ public class Drivetrain extends Subsystem implements ILoggable{
 
     //Hardware Controllers:
     private TalonSRX mLeftMaster, mRightMaster;
-    @SuppressWarnings("unused") 
     private VictorSPX mLeftSlaveA, mLeftSlaveB, mRightSlaveA, mRightSlaveB;
 
     private PigeonIMU mGyro;
@@ -47,11 +44,6 @@ public class Drivetrain extends Subsystem implements ILoggable{
     private double kF = 0.17;
 
     private double kFriction = 0; //0.1
-
-    //Odometery variables:
-    private double mLastPos, mCurrentPos, mDeltaPos;
-    volatile double x, y, theta;
-    private Notifier odometery;
 
 
     private Drivetrain(){
@@ -97,21 +89,6 @@ public class Drivetrain extends Subsystem implements ILoggable{
         mRightMaster.setInverted(true);
         mRightSlaveA.setInverted(InvertType.FollowMaster);
         mRightSlaveB.setInverted(InvertType.FollowMaster);
-
-        //Zero Odometery:
-        x = 0;
-        y = 0;
-        theta = 0;
-
-        //Set up Odometery Notifier
-        odometery = new Notifier(() ->{
-            mCurrentPos = (getLeftSensorPosition() + getRightSensorPosition())/2.0;
-            mDeltaPos = mCurrentPos - mLastPos;
-            theta = getGyroAngle();
-            x +=  Math.cos(d2r(theta)) * mDeltaPos;
-            y +=  Math.sin(d2r(theta)) * mDeltaPos;
-            mLastPos = mCurrentPos;
-        });
 
         setupLogger();
     }
@@ -203,44 +180,6 @@ public class Drivetrain extends Subsystem implements ILoggable{
         return Constants.kNativeU2FPS * mRightMaster.getSelectedSensorVelocity(Constants.kCTREpidIDX);
     }
 
-    /**
-     * Start Odometery Method
-     * 
-     * <p> Starts tracking the robot position </p>
-     * 
-     * @param period timestep to update at.
-     */
-    public void startOdometery(double period){
-        odometery.startPeriodic(period);
-    }
-
-    /**
-     * Stop Odometery Method
-     * 
-     * <p> Stops tracking the robot position </p>
-     */
-    public void stopOdometery(){
-        odometery.stop();
-    }
-
-    /**
-     * Get Robot Position Method.
-     * 
-     * @return The position of the robot.
-     */
-    public RobotPos getRobotPos(){
-        return new RobotPos(x, y, theta);
-    }
-
-    /**
-     * Sets the Position of the Robot
-     */
-    public void setPosition(RobotPos pos){
-        this.x = pos.getX();
-        this.y = pos.getY();
-        this.theta = pos.getHeading();
-    }
-
     @Override
     public Loggable setupLogger(){
         return new Loggable("DriveLog"){
@@ -252,9 +191,5 @@ public class Drivetrain extends Subsystem implements ILoggable{
                 };
             }
         };
-    }
-
-    private static double d2r(double degrees){
-        return (degrees / 180) * Math.PI;
     }
 }

@@ -21,7 +21,6 @@ public class VisionHelper{
     private static boolean hasLock = false;
 
     private static Limelight mActiveCam = Robot.limePanel;
-    private static TargetEntry mEntry = TargetEntry.BLANK_DATA;
 
     public static double turnCorrection(){
         if (!mActiveCam.hasTarget()){
@@ -29,19 +28,10 @@ public class VisionHelper{
             return 0;
         }
         hasLock = true;
-        
-        updateEntry();
-
-        mTracking = (mActiveCam.tX() - mEntry.theta()) * (kTrackingGain * getScaler(mEntry.dist()));
-
-        // System.out.println(getScaler(mEntry.dist()));
-        // System.out.println(mEntry.dist());
 
         mSkew = mActiveCam.getSkew() * kSkewGain;
 
         return (mTracking + mSkew);
-
-        // return mActiveCam.tX();
     }
 
     private static double getScaler(double dist){
@@ -55,9 +45,6 @@ public class VisionHelper{
                 (((kOutPoint - kInPoint) - (dist - kInPoint)) / (kOutPoint - kInPoint))
             )
             );
-    }
-    private static void updateEntry(){
-        mEntry = TargetEntry.interpolate(Robot.visionTable, mActiveCam.tHeight(), mActiveCam.getCamSide());
     }
 
     public static void setActiveCam(Limelight cam){ mActiveCam = cam; }

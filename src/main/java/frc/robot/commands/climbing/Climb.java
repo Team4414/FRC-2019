@@ -1,4 +1,4 @@
-package frc.robot.commands.actions;
+package frc.robot.commands.climbing;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.command.Command;
@@ -8,18 +8,19 @@ import frc.robot.subsystems.Drivetrain;
 
 public class Climb extends Command{
 
+    //---------- Climb Konstants ----------
     private static final double kMaxClimbSpeed = 1;
     private static final double kPullerSpeed = 0;
     private static final double kDrivePullSpeed = 0;
 
     private static final double kTimeToMaxSpeed = 2;
     private static final double kPullDelay = 1;
+    //-------------------------------------
 
     private double mInitTime;
 
     @Override
     protected void initialize() {
-        System.out.println("CLIMBSTART");
         mInitTime = Timer.getFPGATimestamp();
         Robot.isClimbing = true;
 
@@ -29,7 +30,6 @@ public class Climb extends Command{
 
     @Override
     protected void execute() {
-        System.out.println("CLIMBING");
         Climber.getInstance().setClimbRaw(getClimbSpeed());
 
         if (getTime() > kPullDelay){
@@ -49,11 +49,6 @@ public class Climb extends Command{
         Climber.getInstance().setPullRaw(0);
         Drivetrain.getInstance().setRawSpeed(0, 0);
         Robot.isClimbing = false;
-    }
-
-    @Override
-    protected void end() {
-        System.out.println("ENDED");
     }
 
     private double getTime(){

@@ -2,12 +2,10 @@ package frc.robot;
 
 import java.util.ArrayList;
 
-import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
-import frc.robot.commands.ZeroElevator;
+import frc.robot.commands.elevator.ZeroElevator;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.DustPan;
@@ -15,7 +13,6 @@ import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Finger;
 import frc.robot.subsystems.Hand;
 import frc.robot.subsystems.Intake;
-import frc.robot.vision.TargetEntry;
 import frc.util.CheesyDriveHelper;
 import frc.util.Limelight;
 import frc.util.Limelight.CAM_MODE;
@@ -29,28 +26,33 @@ public class Robot extends TimedRobot {
     PANEL,
   };
 
+  //---------- Commands/Controllers ---------
   private CheesyDriveHelper drive;
+  private static ZeroElevator mZeroElevatorCommand;
+  //-----------------------------------------
+
+  //--------- System Wide Variables ----------
   public static Side activeSide;
   public static boolean respectPerimeter;
   public static boolean isClimbing;
-
-  private static ZeroElevator mZeroElevatorCommand;
-
+  
   public static PowerDistributionPanel pdp;
+  //------------------------------------------
 
   //---------- Vision Items ------------
   public static Limelight limePanel = new Limelight(Side.PANEL);
   public static Limelight limeBall  = new Limelight(Side.BALL );
-
-  public static ArrayList<TargetEntry> visionTable;
-  private final String kVisionTableLocation = "visionlookup";
   //------------------------------------
+
+  private boolean mInitCalled;
+  private double mTurnSignal;
 
   @Override
   public void robotInit(){
 
     pdp = new PowerDistributionPanel();
 
+    //Instantiate all subsystems
     Elevator.getInstance();
     Hand.getInstance();
     Finger.getInstance();
@@ -58,55 +60,24 @@ public class Robot extends TimedRobot {
     Intake.getInstance();
     Drivetrain.getInstance().zeroSensor();
 
-    OI.getInstance();
+    OI.getInstance(); //OI goes last, needs subsystems to be instantiated first.
 
 
+    //Create Commands & Controllers
     drive = new CheesyDriveHelper();
     mZeroElevatorCommand = new ZeroElevator();
 
-    visionTable = new ArrayList<>();
-
-    for (String data: CSVLogger.fromCSV(kVisionTableLocation)){
-      visionTable.add(new TargetEntry(data));
-      System.out.println(data);
-    }
-    
+    //Set all system wide variables
     activeSide = (Hand.getInstance().hasBall()) ? Side.BALL : Side.PANEL;
-
-    // test = new Superstructure(new State(
-    //   DustpanBoomState.RETRACTED,
-    //   DustpanIntakeState.OFF,
-    //   Setpoint.FUEL_MID, 
-    //   FingerClapperState.HOLDING, 
-    //   FingerArmState.RETRACTED, 
-    //   HandState.OFF, 
-    //   IntakeBoomState.RETRACTED, 
-    //   IntakeWheelState.OFF));
-
-    // test = new IntakePanelSequence();
-    // test = new SafeElevatorMove(Setpoint.HATCH_MID);
-    // test = new Superstructure(Superstructure.intakePanel);
-    // test = Elevator.getInstance().jogElevatorCommand(4000);
-
     respectPerimeter = false;
     isClimbing = false;
+
+    mInitCalled = false;
+    mTurnSignal = 0;
   }
 
   @Override
   public void robotPeriodic() {
-    // System.out.println(Elevator.getInstance().getPosition());
-    // System.out.println("Acceleration: " + Elevator.getInstance().getAcceleration());
-    // System.out.println(Elevator.getInstance().getSwitch());
-    // System.out.println(aio.getVoltage());
-    // System.out.println(Hand.getInstance().getSensorVoltage());
-    // System.out.println(Hand.getInstance().hasBall());
-    // System.out.println(DustPan.getInstance().getRawCurrent());
-    // System.out.println(Climber.getInstance().getBotSwitch());
-
-    // if (Elevator.getInstance().getSwitch()){
-    //   Elevator.getInstance().zero();
-    // }
-
     if(Hand.getInstance().hasBall()){
       activeSide = Side.BALL;
     }else{
@@ -116,15 +87,14 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
-    mZeroElevatorCommand.start();
-  }
-
-  @Override
-  public void autonomousPeriodic() {
+    this.teleopInit(); //Just start teleop in sandstorm
   }
 
   @Override
   public void teleopInit() {
+    if (mInitCalled)
+      return;
+
     mZeroElevatorCommand.start();
 
     limePanel.setUSBCam(true);
@@ -137,36 +107,22 @@ public class Robot extends TimedRobot {
     Elevator.getInstance().checkNeedsZero();
     Elevator.getInstance().setRaw(0);
     Climber.getInstance().deployPiston(false);
-    // Finger.getInstance();
 
-    // test.start();
     Drivetrain.getInstance().setBrakeMode(false);
-    
-    Elevator.getInstance().setPosition(4000);
+
+    mInitCalled = true;
 
   }
-
-  private double turnSignal = 0;
-
-  Command test;
-
-  AnalogInput aio;
 
   @Override
   public void teleopPeriodic(){
 
     if (OI.getInstance().getVision()){
-      turnSignal = limePanel.getTheta() * 0.2;
+      mTurnSignal = limePanel.getTheta() * 0.2;
     }else{
-      turnSignal = OI.getInstance().getLeft();
+      mTurnSignal = OI.getInstance().getLeft();
     }
-    // System.out.println(Elevator.getInstance().getError());
 
-    // Drivetrain.getInstance().setRawSpeed(0.5, 0.5);
-
-    // DustPan.getInstance().deploy(DustpanBoomState.);
-    
-    // System.out.println(aio.getVoltage());
     Scheduler.getInstance().run();
 
 
@@ -174,53 +130,39 @@ public class Robot extends TimedRobot {
       Drivetrain.getInstance().setRawSpeed(
         drive.cheesyDrive(
           OI.getInstance().getForward(), 
-          turnSignal,
+          mTurnSignal,
           OI.getInstance().getQuickTurn(), 
           false
         )
       );
     }
-
-    // Climber.getInstance().setClimbRaw(OI.getInstance().getXboxAxis(1));
-    // Climber.getInstance().setPullRaw(OI.getInstance().getXboxAxis(5));
-
-    // Elevator.getInstance().setupLogger().log();
-    
   }
-
-  boolean mCollected = false;
 
   @Override
   public void testInit() {
-    mCollected = false;
-    Drivetrain.getInstance().zeroSensor();
-    // Elevator.getInstance().zero();
-    Elevator.getInstance().checkNeedsZero();
-    // Elevator.getInstance().setPosition(20000);
-    // test.start();
+    //no-op
   }
 
   @Override
   public void testPeriodic() {
-    // if (!mCollected){
-    //   mCollected = VisionTune.getInstance().areaAutoTune(0.1, 4);
-    // }
-    
+    //no-op
   }
 
   @Override
   public void disabledInit() {
+
     limePanel.setLED(LED_STATE.OFF);
     limeBall.setLED(LED_STATE.OFF);
     limePanel.setUSBCam(false); 
+    limeBall.setUSBCam(false);
+
     Climber.getInstance().setBrakeMode(false);
     Elevator.getInstance().setPosition(0);
     Drivetrain.getInstance().setBrakeMode(false);
-
-    CSVLogger.logCSV("ELEVATORLOG", Elevator.getInstance().setupLogger().get());
   }
 
   @Override
   public void disabledPeriodic(){
+    //no-op
   }
 }

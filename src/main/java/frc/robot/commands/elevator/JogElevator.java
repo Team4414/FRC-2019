@@ -1,10 +1,8 @@
-package frc.robot.commands;
+package frc.robot.commands.elevator;
 
 import edu.wpi.first.wpilibj.command.Command;
 import frc.robot.Robot;
-import frc.robot.commands.actions.SafeElevatorMove;
 import frc.robot.subsystems.Elevator;
-import frc.robot.subsystems.Superstructure;
 import frc.robot.subsystems.Elevator.Position;
 
 public class JogElevator extends Command{

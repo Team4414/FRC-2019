@@ -1,14 +1,14 @@
-package frc.robot.commands.actions;
+package frc.robot.commands.panels;
 
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.CommandGroup;
 import edu.wpi.first.wpilibj.command.WaitCommand;
+import frc.robot.commands.elevator.SafeElevatorMove;
 import frc.robot.subsystems.DustPan;
-import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Finger;
-import frc.robot.subsystems.Superstructure;
 import frc.robot.subsystems.DustPan.DustpanBoomState;
 import frc.robot.subsystems.DustPan.DustpanIntakeState;
+import frc.robot.subsystems.Elevator.Setpoint;
 import frc.robot.subsystems.Finger.FingerClapperState;
 
 public class GrabPanel extends CommandGroup{
@@ -35,7 +35,7 @@ public class GrabPanel extends CommandGroup{
             }
         });
 
-        addSequential(new Superstructure(Elevator.Setpoint.FINGER_CLR));
-        addSequential(new Superstructure(Superstructure.lowStow));
+        addSequential(new SafeElevatorMove(Setpoint.FINGER_CLR));
+        addSequential(new SafeElevatorMove(Setpoint.STOW));
     }
 }

@@ -1,10 +1,9 @@
-package frc.robot.commands.actions;
+package frc.robot.commands.panels;
 
 import edu.wpi.first.wpilibj.command.CommandGroup;
 import edu.wpi.first.wpilibj.command.WaitCommand;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Finger;
-import frc.robot.subsystems.Elevator.Setpoint;
 
 public class ScorePanel extends CommandGroup{
 
