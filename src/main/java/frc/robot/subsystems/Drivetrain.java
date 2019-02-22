@@ -55,7 +55,7 @@ public class Drivetrain extends Subsystem implements ILoggable{
         mRightSlaveA = CTREFactory.createPermanentSlaveVictor(RobotMap.DrivetrainMap.kRightSlaveA, mRightMaster);
         mRightSlaveB = CTREFactory.createPermanentSlaveVictor(RobotMap.DrivetrainMap.kRightSlaveB, mRightMaster);
 
-        mGyro = new PigeonIMU(0);
+        mGyro = new PigeonIMU(Climber.getInstance().mClimber);
 
         mLeftMaster.configOpenloopRamp(0.01, Constants.kCTREtimeout);
         mRightMaster.configOpenloopRamp(0.01, Constants.kCTREtimeout);
@@ -138,6 +138,10 @@ public class Drivetrain extends Subsystem implements ILoggable{
         mGyroOffset = mGyro.getFusedHeading();
     }
 
+    public void zeroGyro(){
+        mGyroOffset = mGyro.getFusedHeading();
+    }
+
     /**
      * Get Gyro Angle.
      * 
@@ -145,6 +149,12 @@ public class Drivetrain extends Subsystem implements ILoggable{
      */
     public double getGyroAngle(){
         return mGyro.getFusedHeading() - mGyroOffset;
+    }
+
+    public static double getAngleCorrected(double angle){
+        while (angle >= 180) angle -= 360;
+        while (angle < -180) angle += 360;
+        return angle;
     }
 
     public void setBrakeMode(boolean brake){

@@ -18,7 +18,7 @@ public class Climber extends Subsystem implements ILoggable {
 
     private static final int kCurrentLimit = 20;
 
-    private final TalonSRX mClimber;
+    public final TalonSRX mClimber;
     private final VictorSPX mPuller;
 
     private final Solenoid mPiston;
@@ -85,11 +85,9 @@ public class Climber extends Subsystem implements ILoggable {
     public void setClimbRaw(double pwr){
         if (getTopSwitch() && pwr < 0){
             pwr = 0;
-            System.out.println("TOP");
         }
         if (getBotSwitch() && pwr > 0){
             pwr = 0;
-            System.out.println("BOTTOM");
         }
 
         mClimber.set(ControlMode.PercentOutput, pwr);

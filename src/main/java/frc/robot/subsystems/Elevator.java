@@ -30,18 +30,22 @@ public class Elevator extends Subsystem implements ILoggable {
         return instance;
     }
 
-    private static final double kP = 0.5;
+    
+    // private static final double mConversionFactor = 17419d / 37797d;
+    private static final double mConversionFactor = 1;
+
+    private static final double kP = 0.5 * mConversionFactor;
     private static final double kI = 0; 
     private static final double kD = 0;
-    private static final double kF = 0.15;
+    private static final double kF = 0.15 * mConversionFactor;
 
-    private static final int kMMacceleration = 30000;
-    private static final int kMMvelocity = 12000;
+    private static final int kMMacceleration = (int) (30000 * mConversionFactor);
+    private static final int kMMvelocity = (int) (12000 * mConversionFactor);
 
-    private static final int kTopLimit = 72387;
+    private static final int kTopLimit = (int) (72387 * mConversionFactor);
 
-    private static final int kElevatorTolerance = 500;
-    private static final int kDropForPanelClearDistance = 700;
+    private static final int kElevatorTolerance = (int) (500 * mConversionFactor);
+    private static final int kDropForPanelClearDistance = (int) (700 * mConversionFactor);
 
     private static int mZeroOffset = 0;
     private static boolean mNeedsZero; 
@@ -155,7 +159,7 @@ public class Elevator extends Subsystem implements ILoggable {
             return false;
         if (mLockElevator)
             return false;
-        mMaster.set(ControlMode.MotionMagic, position + mZeroOffset);
+        mMaster.set(ControlMode.MotionMagic, (position *mConversionFactor) + mZeroOffset);
         return true;
     }
 
@@ -261,7 +265,7 @@ public class Elevator extends Subsystem implements ILoggable {
     }
 
     public double getError(){
-        return mMaster.getClosedLoopTarget() - mMaster.getSelectedSensorPosition();
+        return (mMaster.getClosedLoopTarget() - mMaster.getSelectedSensorPosition()) * mConversionFactor;
     }
 
     public boolean isAtSetpoint(){

@@ -1,7 +1,5 @@
 package frc.robot;
 
-import java.util.ArrayList;
-
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.command.Scheduler;
@@ -13,6 +11,7 @@ import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Finger;
 import frc.robot.subsystems.Hand;
 import frc.robot.subsystems.Intake;
+import frc.robot.vision.VisionHelper;
 import frc.util.CheesyDriveHelper;
 import frc.util.Limelight;
 import frc.util.Limelight.CAM_MODE;
@@ -60,6 +59,13 @@ public class Robot extends TimedRobot {
     Intake.getInstance();
     Drivetrain.getInstance().zeroSensor();
 
+    limePanel.setUSBCam(true);
+    limePanel.setLED(LED_STATE.ON);
+    limePanel.setCamMode(CAM_MODE.VISION);
+    limeBall.setUSBCam(true);
+    limeBall.setLED(LED_STATE.ON);
+    limeBall.setCamMode(CAM_MODE.VISION);
+
     OI.getInstance(); //OI goes last, needs subsystems to be instantiated first.
 
 
@@ -83,6 +89,7 @@ public class Robot extends TimedRobot {
     }else{
       activeSide = Side.PANEL;
     }
+    // System.out.println(Elevator.getInstance().getSwitch());
   }
 
   @Override
@@ -99,10 +106,10 @@ public class Robot extends TimedRobot {
 
     limePanel.setUSBCam(true);
     limePanel.setLED(LED_STATE.OFF);
-    limePanel.setCamMode(CAM_MODE.DRIVER);
+    limePanel.setCamMode(CAM_MODE.VISION);
     limeBall.setUSBCam(true);
     limeBall.setLED(LED_STATE.OFF);
-    limeBall.setCamMode(CAM_MODE.DRIVER);
+    limeBall.setCamMode(CAM_MODE.VISION);
 
     Elevator.getInstance().checkNeedsZero();
     Elevator.getInstance().setRaw(0);
@@ -111,21 +118,29 @@ public class Robot extends TimedRobot {
     Drivetrain.getInstance().setBrakeMode(false);
 
     mInitCalled = true;
-
   }
 
   @Override
   public void teleopPeriodic(){
 
+    System.out.println(Drivetrain.getInstance().getGyroAngle());
+
     if (OI.getInstance().getVision()){
-      mTurnSignal = limePanel.getTheta() * 0.2;
+
+      if (activeSide == Side.BALL){
+        VisionHelper.setActiveCam(limeBall);
+      }else{
+        VisionHelper.setActiveCam(limePanel);
+      }
+
+      mTurnSignal = VisionHelper.turnCorrection();
+
+      // Drivetrain.getInstance().setRawSpeed(-VisionHelper.turnCorrection(), VisionHelper.turnCorrection());
+
     }else{
+      VisionHelper.resetLock();
       mTurnSignal = OI.getInstance().getLeft();
     }
-
-    Scheduler.getInstance().run();
-
-
     if (!isClimbing){
       Drivetrain.getInstance().setRawSpeed(
         drive.cheesyDrive(
@@ -136,6 +151,7 @@ public class Robot extends TimedRobot {
         )
       );
     }
+    Scheduler.getInstance().run();
   }
 
   @Override
@@ -153,8 +169,10 @@ public class Robot extends TimedRobot {
 
     limePanel.setLED(LED_STATE.OFF);
     limeBall.setLED(LED_STATE.OFF);
-    limePanel.setUSBCam(false); 
-    limeBall.setUSBCam(false);
+    limePanel.setUSBCam(true); 
+    limeBall.setUSBCam(true);
+    limePanel.setLED(LED_STATE.ON);
+    limeBall.setLED(LED_STATE.ON);
 
     Climber.getInstance().setBrakeMode(false);
     Elevator.getInstance().setPosition(0);
