@@ -25,6 +25,7 @@ public class Climb extends Command{
         Robot.isClimbing = true;
 
         Climber.getInstance().deployPiston(true);
+        Climber.getInstance().setPullRaw(0);
         Climber.getInstance().setBrakeMode(true);
     }
 

@@ -5,7 +5,7 @@ import frc.robot.subsystems.Climber;
 
 public class RetractClimber extends Command{
 
-    private static final double kRetractPower = -0.5;
+    private static final double kRetractPower = -1.0;
 
     @Override
     protected void execute() {

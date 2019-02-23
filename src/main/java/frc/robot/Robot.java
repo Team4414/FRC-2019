@@ -13,10 +13,10 @@ import frc.robot.subsystems.Hand;
 import frc.robot.subsystems.Intake;
 import frc.robot.vision.VisionHelper;
 import frc.util.CheesyDriveHelper;
+import frc.util.DriveSignal;
 import frc.util.Limelight;
 import frc.util.Limelight.CAM_MODE;
 import frc.util.Limelight.LED_STATE;
-import frc.util.logging.CSVLogger;
 
 public class Robot extends TimedRobot {
 
@@ -58,6 +58,7 @@ public class Robot extends TimedRobot {
     DustPan.getInstance();
     Intake.getInstance();
     Drivetrain.getInstance().zeroSensor();
+    Climber.getInstance();
 
     limePanel.setUSBCam(true);
     limePanel.setLED(LED_STATE.ON);
@@ -89,6 +90,10 @@ public class Robot extends TimedRobot {
     }else{
       activeSide = Side.PANEL;
     }
+
+    if (Elevator.getInstance().getSwitch()){
+      Elevator.getInstance().zero();
+    }
     // System.out.println(Elevator.getInstance().getSwitch());
   }
 
@@ -113,17 +118,26 @@ public class Robot extends TimedRobot {
 
     Elevator.getInstance().checkNeedsZero();
     Elevator.getInstance().setRaw(0);
-    Climber.getInstance().deployPiston(false);
 
     Drivetrain.getInstance().setBrakeMode(false);
+
+    
+    Climber.getInstance().deployPiston(false);
 
     mInitCalled = true;
   }
 
+  double[] operatorSignal;
+
   @Override
   public void teleopPeriodic(){
 
-    System.out.println(Drivetrain.getInstance().getGyroAngle());
+    operatorSignal = drive.cheesyDrive(
+      OI.getInstance().getForward(), 
+      OI.getInstance().getLeft(),
+      OI.getInstance().getQuickTurn(), 
+      false
+    );
 
     if (OI.getInstance().getVision()){
 
@@ -134,22 +148,20 @@ public class Robot extends TimedRobot {
       }
 
       mTurnSignal = VisionHelper.turnCorrection();
-
-      // Drivetrain.getInstance().setRawSpeed(-VisionHelper.turnCorrection(), VisionHelper.turnCorrection());
+      operatorSignal[0] -= mTurnSignal;
+      operatorSignal[1] += mTurnSignal;
 
     }else{
+      limeBall.setLED(LED_STATE.OFF);
+      limePanel.setLED(LED_STATE.OFF);
       VisionHelper.resetLock();
-      mTurnSignal = OI.getInstance().getLeft();
+      mTurnSignal = 0;
     }
+
+
+
     if (!isClimbing){
-      Drivetrain.getInstance().setRawSpeed(
-        drive.cheesyDrive(
-          OI.getInstance().getForward(), 
-          mTurnSignal,
-          OI.getInstance().getQuickTurn(), 
-          false
-        )
-      );
+      Drivetrain.getInstance().setRawSpeed(operatorSignal);
     }
     Scheduler.getInstance().run();
   }

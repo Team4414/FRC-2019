@@ -75,7 +75,10 @@ public class Climber extends Subsystem implements ILoggable {
         
             @Override
             protected boolean isFinished() {
-                mPiston.set(true);
+                mPiston.set(deploy);
+                if (deploy){
+                    setPullRaw(-1);
+                }
                 return true;
             }
         };
