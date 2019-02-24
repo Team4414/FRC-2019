@@ -11,6 +11,7 @@ import com.ctre.phoenix.sensors.PigeonIMU;
 
 import edu.wpi.first.wpilibj.command.Subsystem;
 import frc.robot.Constants;
+import frc.robot.Robot;
 import frc.robot.RobotMap;
 import frc.util.logging.ILoggable;
 import frc.util.logging.Loggable;
@@ -29,6 +30,12 @@ public class Drivetrain extends Subsystem implements ILoggable{
     //Hardware Controllers:
     private TalonSRX mLeftMaster, mRightMaster;
     private VictorSPX mLeftSlaveA, mLeftSlaveB, mRightSlaveA, mRightSlaveB;
+
+    int[] leftPDPs = {
+        RobotMap.DrivetrainMap.kLeftMaster - 1,
+        RobotMap.DrivetrainMap.kLeftSlaveA - 1,
+        RobotMap.DrivetrainMap.kLeftSlaveB - 1
+    };
 
     private PigeonIMU mGyro;
 
@@ -57,14 +64,14 @@ public class Drivetrain extends Subsystem implements ILoggable{
 
         mGyro = new PigeonIMU(Climber.getInstance().mClimber);
 
-        mLeftMaster.configOpenloopRamp(0.01, Constants.kCTREtimeout);
-        mRightMaster.configOpenloopRamp(0.01, Constants.kCTREtimeout);
+        mLeftMaster.configOpenloopRamp(0.00, Constants.kCTREtimeout);
+        mRightMaster.configOpenloopRamp(0.00, Constants.kCTREtimeout);
 
         mLeftMaster.configVoltageCompSaturation(12, Constants.kCTREtimeout);
         mRightMaster.configVoltageCompSaturation(12, Constants.kCTREtimeout);
 
-        mLeftMaster.enableVoltageCompensation(true);
-        mRightMaster.enableVoltageCompensation(true);
+        mLeftMaster.enableVoltageCompensation(false);
+        mRightMaster.enableVoltageCompensation(false);
 
         mLeftMaster.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, Constants.kCTREpidIDX, Constants.kCTREtimeout);
         mRightMaster.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, Constants.kCTREpidIDX, Constants.kCTREtimeout);
@@ -78,6 +85,23 @@ public class Drivetrain extends Subsystem implements ILoggable{
         mRightMaster.config_kI(0, kI, Constants.kCTREtimeout);
         mRightMaster.config_kD(0, kP, Constants.kCTREtimeout);
         mRightMaster.config_kF(0, kF, Constants.kCTREtimeout);
+
+        mLeftMaster.configPeakOutputForward(1);
+        mLeftSlaveA.configPeakOutputForward(1);
+        mLeftSlaveB.configPeakOutputForward(1);
+
+        mLeftMaster.configPeakOutputReverse(-1);
+        mLeftSlaveA.configPeakOutputReverse(-1);
+        mLeftSlaveB.configPeakOutputReverse(-1);
+
+        mRightMaster.configPeakOutputForward(1);
+        mRightSlaveA.configPeakOutputForward(1);
+        mRightSlaveB.configPeakOutputForward(1);
+
+        mRightMaster.configPeakOutputReverse(-1);
+        mRightSlaveA.configPeakOutputReverse(-1);
+        mRightSlaveB.configPeakOutputReverse(-1);
+
 
         mLeftMaster.setSensorPhase(true);
         mRightMaster.setSensorPhase(true);
@@ -105,6 +129,8 @@ public class Drivetrain extends Subsystem implements ILoggable{
     public void setRawSpeed(double left, double right){
         mLeftMaster.set(ControlMode.PercentOutput, left);
         mRightMaster.set(ControlMode.PercentOutput, right);
+
+        System.out.println(Robot.pdp.getCurrent(leftPDPs[0]) + "\t\t" + Robot.pdp.getCurrent(leftPDPs[1]) + "\t\t" + Robot.pdp.getCurrent(leftPDPs[2]));
     }
 
     /**

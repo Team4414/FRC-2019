@@ -1,5 +1,7 @@
 package frc.robot;
 
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.command.Scheduler;
@@ -45,6 +47,8 @@ public class Robot extends TimedRobot {
 
   private boolean mInitCalled;
   private double mTurnSignal;
+
+  private double[] operatorSignal;
 
   @Override
   public void robotInit(){
@@ -99,7 +103,12 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
-    this.teleopInit(); //Just start teleop in sandstorm
+    teleopInit(); //Just start teleop in sandstorm
+  }
+
+  @Override
+  public void autonomousPeriodic() {
+    teleopPeriodic();
   }
 
   @Override
@@ -126,8 +135,6 @@ public class Robot extends TimedRobot {
 
     mInitCalled = true;
   }
-
-  double[] operatorSignal;
 
   @Override
   public void teleopPeriodic(){
@@ -165,7 +172,7 @@ public class Robot extends TimedRobot {
     }
     Scheduler.getInstance().run();
   }
-
+  
   @Override
   public void testInit() {
     //no-op

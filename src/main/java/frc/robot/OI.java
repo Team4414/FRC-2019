@@ -253,7 +253,7 @@ public class OI {
     }
 
     public double getForward(){
-        return -throttleNub.getRawAxis(kThrottleAxis);
+        return -throttleNub.getRawAxis(kThrottleAxis) * 1.25d;
     }
 
     public boolean getQuickTurn(){

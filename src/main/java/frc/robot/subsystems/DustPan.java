@@ -101,7 +101,7 @@ public class DustPan extends Subsystem{
         }else if (state == DustpanIntakeState.HOLD){
             setRaw(0.25);
         }else if (state == DustpanIntakeState.UNJAM){
-            setRaw(-1);
+            setRaw(-0.25);
         }else{
             intake(false);
         }

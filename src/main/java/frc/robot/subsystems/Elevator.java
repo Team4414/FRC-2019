@@ -92,14 +92,14 @@ public class Elevator extends Subsystem implements ILoggable {
         
         heightSetpoints.put(Setpoint.BOTTOM,     0);
         heightSetpoints.put(Setpoint.STOW,       1745);
-        heightSetpoints.put(Setpoint.PANEL_GRAB,  5250);
+        heightSetpoints.put(Setpoint.PANEL_GRAB,  5500);
         heightSetpoints.put(Setpoint.FLOOR_INTAKE,850);
         heightSetpoints.put(Setpoint.CARGO_SHIP, 38000);
-        heightSetpoints.put(Setpoint.FUEL_LOW,   17419);
+        heightSetpoints.put(Setpoint.FUEL_LOW,   17419 + 3000);
         heightSetpoints.put(Setpoint.HATCH_MID,  32000);
-        heightSetpoints.put(Setpoint.FUEL_MID,   41500);
+        heightSetpoints.put(Setpoint.FUEL_MID,   41500 + 3000);
         heightSetpoints.put(Setpoint.HATCH_HIGH, 57282);
-        heightSetpoints.put(Setpoint.FUEL_HIGH,  71000);
+        heightSetpoints.put(Setpoint.FUEL_HIGH,  71000 + 1000);
         heightSetpoints.put(Setpoint.FINGER_CLR, 5695);
 
         kHandThreshold = heightSetpoints.get(Setpoint.FUEL_LOW);

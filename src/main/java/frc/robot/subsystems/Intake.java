@@ -87,7 +87,7 @@ public class Intake extends Subsystem{
         if (state == IntakeWheelState.ON){
             intake(true);
         }else if (state == IntakeWheelState.UNJAM){
-            setRaw(-1);
+            setRaw(-0.25);
         }else{
             intake(false);
         }

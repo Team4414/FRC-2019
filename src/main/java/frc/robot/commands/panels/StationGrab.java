@@ -32,6 +32,7 @@ public class StationGrab extends CommandGroup{
 
     private class RetractPanel extends CommandGroup{
         public RetractPanel(){
+            addSequential(new WaitCommand(0.25));
             addSequential(new SafeElevatorMove(Setpoint.PANEL_GRAB));
             addSequential(Finger.getInstance().setFingerCommand(true));
             addSequential(new WaitCommand(0.5));
