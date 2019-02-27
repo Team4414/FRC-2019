@@ -11,15 +11,15 @@ import frc.robot.subsystems.Hand;
 import frc.robot.subsystems.Hand.HandState;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Intake.IntakeWheelState;
+import frc.util.Limelight.LED_STATE;
 
 public class IntakeBallSequence extends CommandGroup {
 
     public IntakeBallSequence() {
-
-        addSequential(Intake.getInstance().intakeCommand(IntakeWheelState.ON));
-        addSequential(Intake.getInstance().deployCommand(true));
         addSequential(new SafeElevatorMove(Setpoint.BOTTOM));
         addSequential(Elevator.getInstance().lockElevatorCommand(true));
+        addSequential(Intake.getInstance().intakeCommand(IntakeWheelState.ON));
+        addSequential(Intake.getInstance().deployCommand(true));
         addSequential(Hand.getInstance().setHandCommand(HandState.INTAKING));
         addSequential(new WaitForBall());
     }
@@ -52,11 +52,15 @@ public class IntakeBallSequence extends CommandGroup {
                 }
             });
 
+            addSequential(Robot.limePanel.setLEDCommand(LED_STATE.BLINK));
+            addSequential(Robot.limeBall.setLEDCommand(LED_STATE.BLINK));
             addSequential(Hand.getInstance().setHandCommand(HandState.HOLDING)); 
             addSequential(Elevator.getInstance().lockElevatorCommand(false));
             addSequential(new SafeElevatorMove(Setpoint.FUEL_LOW));
             addSequential(Intake.getInstance().deployCommand(false));
             addSequential(Intake.getInstance().intakeCommand(IntakeWheelState.OFF));
+            addSequential(Robot.limePanel.setLEDCommand(LED_STATE.OFF));
+            addSequential(Robot.limeBall.setLEDCommand(LED_STATE.OFF));
         }
 
     }

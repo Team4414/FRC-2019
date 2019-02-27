@@ -3,6 +3,7 @@ package frc.util;
 import java.util.ArrayList;
 
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.command.Command;
 import frc.robot.Robot.Side;
 
 /**
@@ -23,6 +24,10 @@ public class Limelight{
      */
     public static enum CAM_MODE{
         VISION, DRIVER;
+    }
+
+    public static enum TARGET_MODE{
+        LEFT, RIGHT, CENTER;
     }
 
     private static final int kFOVvert = 41;
@@ -192,6 +197,17 @@ public class Limelight{
         }
     }
 
+    public Command setLEDCommand(LED_STATE state){
+        return new Command(){
+        
+            @Override
+            protected boolean isFinished() {
+                setLED(state);
+                return true;
+            }
+        };
+    }
+
     public void setCamMode(CAM_MODE mode){
         switch (mode){
             case VISION:
@@ -209,6 +225,18 @@ public class Limelight{
 
     public Side getCamSide(){
         return mSide;
+    }
+
+    public void setTargetMode(TARGET_MODE mode){
+        if (mode == TARGET_MODE.CENTER){
+            set("pipeline", 0);
+        }
+        if (mode == TARGET_MODE.LEFT){
+            set("pipeline", 1);
+        }
+        if (mode == TARGET_MODE.RIGHT){
+            set("pipeline", 2);
+        }
     }
 
     private double get(String varName){

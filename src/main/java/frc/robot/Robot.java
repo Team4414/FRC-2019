@@ -13,12 +13,14 @@ import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Finger;
 import frc.robot.subsystems.Hand;
 import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.Elevator.Setpoint;
 import frc.robot.vision.VisionHelper;
 import frc.util.CheesyDriveHelper;
 import frc.util.DriveSignal;
 import frc.util.Limelight;
 import frc.util.Limelight.CAM_MODE;
 import frc.util.Limelight.LED_STATE;
+import frc.util.Limelight.TARGET_MODE;
 
 public class Robot extends TimedRobot {
 
@@ -43,6 +45,8 @@ public class Robot extends TimedRobot {
   //---------- Vision Items ------------
   public static Limelight limePanel = new Limelight(Side.PANEL);
   public static Limelight limeBall  = new Limelight(Side.BALL );
+
+  public static Limelight.TARGET_MODE targetMode = TARGET_MODE.CENTER;
   //------------------------------------
 
   private boolean mInitCalled;
@@ -98,7 +102,6 @@ public class Robot extends TimedRobot {
     if (Elevator.getInstance().getSwitch()){
       Elevator.getInstance().zero();
     }
-    // System.out.println(Elevator.getInstance().getSwitch());
   }
 
   @Override
@@ -127,6 +130,7 @@ public class Robot extends TimedRobot {
 
     Elevator.getInstance().checkNeedsZero();
     Elevator.getInstance().setRaw(0);
+    Elevator.getInstance().setPosition(Setpoint.STOW);
 
     Drivetrain.getInstance().setBrakeMode(false);
 
@@ -138,6 +142,8 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopPeriodic(){
+
+    targetMode = OI.getInstance().getVisionSwitcher();
 
     operatorSignal = drive.cheesyDrive(
       OI.getInstance().getForward(), 
@@ -159,8 +165,6 @@ public class Robot extends TimedRobot {
       operatorSignal[1] += mTurnSignal;
 
     }else{
-      limeBall.setLED(LED_STATE.OFF);
-      limePanel.setLED(LED_STATE.OFF);
       VisionHelper.resetLock();
       mTurnSignal = 0;
     }

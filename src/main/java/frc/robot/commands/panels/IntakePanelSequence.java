@@ -12,6 +12,7 @@ import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Elevator.Setpoint;
 import frc.robot.subsystems.Finger;
 import frc.robot.subsystems.Finger.FingerClapperState;
+import frc.util.Limelight.LED_STATE;
 
 public class IntakePanelSequence extends CommandGroup{
 
@@ -67,7 +68,8 @@ public class IntakePanelSequence extends CommandGroup{
                 }
             });
     
-            
+            addSequential(Robot.limeBall.setLEDCommand(LED_STATE.BLINK));
+            addSequential(Robot.limePanel.setLEDCommand(LED_STATE.BLINK));
             addSequential(new WaitCommand(0.5));
             addSequential(DustPan.getInstance().deployCommand(false));
             addSequential(new WaitCommand(1.5));
@@ -77,6 +79,8 @@ public class IntakePanelSequence extends CommandGroup{
             addSequential(new SafeElevatorMove(Setpoint.FINGER_CLR));
             addSequential(DustPan.getInstance().intakeCommand(DustpanIntakeState.OFF));
             addSequential(new SafeElevatorMove(Setpoint.STOW));
+            addSequential(Robot.limeBall.setLEDCommand(LED_STATE.OFF));
+            addSequential(Robot.limePanel.setLEDCommand(LED_STATE.OFF));
         }
 
     }

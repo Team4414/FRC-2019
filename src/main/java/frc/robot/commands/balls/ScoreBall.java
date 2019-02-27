@@ -12,7 +12,7 @@ public class ScoreBall extends CommandGroup{
 
     @Override
     public synchronized void cancel() {
-        Hand.getInstance().set(HandState.OFF);
+        Hand.getInstance().set(HandState.HOLDING);
         super.cancel();
     }
 

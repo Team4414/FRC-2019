@@ -39,6 +39,8 @@ public class VisionHelper{
     }
 
     public static double turnCorrection(){
+        
+        mActiveCam.setTargetMode(Robot.targetMode);
 
         if (!hasLock){
             if (!grabVisionData()){
@@ -47,42 +49,16 @@ public class VisionHelper{
                 hasLock = true;
             }
         }else{
-            if (mActiveCam.tArea() < 8){
+            if (mActiveCam.tArea() < 3){
                 if (mActiveCam.hasTarget()){
                     mGyroTarget =  Drivetrain.getInstance().getGyroAngle()  - mActiveCam.tX();
                 }
+            }else{
+                mActiveCam.setLED(LED_STATE.OFF);
             }
         }
 
         return ((mGyroTarget - Drivetrain.getInstance().getGyroAngle()) * kTrackingGain);
-
-        // if (!mActiveCam.hasTarget() && mActiveCam.tArea() < 5){
-        //     mActiveCam.setCamMode(CAM_MODE.VISION);
-        //     mActiveCam.setLED(LED_STATE.ON);
-            
-        //     return (Drivetrain.getAngleCorrected(Drivetrain.getInstance().getGyroAngle()) * kGyroGain);
-        // }else{
-        //     Drivetrain.getInstance().zeroGyro();
-        //     return (mActiveCam.tX() * kTrackingGain);
-        // }
-
-        // if (!hasLock){
-        //     Drivetrain.getInstance().zeroGyro();
-            
-        //    
-        //     if (mActiveCam.hasTarget()){
-        //         mGyroTarget = mActiveCam.tX();
-        //         hasLock = true;
-        //     }
-        // }
-
-        // if (!hasLock){
-        //     return 0;
-        // }
-        // mTracking = (Drivetrain.getAngleCorrected(Drivetrain.getInstance().getGyroAngle()) - mGyroTarget) * kTrackingGain;
-
-        // System.out.println("EROR: " + (Drivetrain.getAngleCorrected(Drivetrain.getInstance().getGyroAngle()) - mGyroTarget));
-        // return (mTracking);
     }
 
     public static void resetLock(){

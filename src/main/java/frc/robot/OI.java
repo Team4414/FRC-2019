@@ -11,10 +11,13 @@ import frc.robot.commands.balls.IntakeBallSequence;
 import frc.robot.commands.climbing.ClimbingGroup;
 import frc.robot.commands.climbing.RetractClimber;
 import frc.robot.commands.elevator.JogElevator;
+import frc.robot.commands.elevator.ZeroElevator;
 import frc.robot.commands.panels.IntakePanelSequence;
 import frc.robot.commands.panels.StationGrab;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Elevator.Position;
+import frc.util.Limelight;
+import frc.util.Limelight.TARGET_MODE;
 
 public class OI {
 
@@ -44,6 +47,8 @@ public class OI {
     private Trigger jogMid;
     private Trigger jogTop;
     private Trigger jogCrg;
+
+    private Trigger reZero;
 
     private Trigger intakeBall;
     private Trigger intakePanel;
@@ -167,6 +172,15 @@ public class OI {
             }
 
         };
+
+        reZero = new Trigger(){
+        
+            @Override
+            public boolean get() {
+                return xbox.getStartButton();
+            }
+
+        };
         //-------------------------------------------------------
 
         //---------- Binding ----------
@@ -186,7 +200,16 @@ public class OI {
 
 
 
-        intakeBall.whenActive(ball);
+        intakeBall.whenActive(new Command(){
+        
+            @Override
+            protected boolean isFinished() {
+                if (!frc.robot.subsystems.Hand.getInstance().hasBall()){
+                    ball.start();
+                }
+                return true;
+            }
+        });
         intakeBall.whenInactive(new Command(){
             @Override
             protected boolean isFinished() {
@@ -214,6 +237,7 @@ public class OI {
         jogTop.whenActive(new JogElevator(Position.HIGH));
         jogCrg.whenActive(new JogElevator(Position.SECOND));
 
+        reZero.whenActive(new ZeroElevator(true));
 
         climb.whenActive(climbCommand);
         climb.whenInactive(new Command(){
@@ -270,5 +294,15 @@ public class OI {
 
     public boolean getVision(){
         return throttleNub.getRawButton(kNubTopButton);
+    }
+
+    public Limelight.TARGET_MODE getVisionSwitcher(){
+        if (xbox.getTriggerAxis(Hand.kLeft) > 0.7){
+            return TARGET_MODE.LEFT;
+        }
+        if (xbox.getTriggerAxis(Hand.kRight) > 0.7){
+            return TARGET_MODE.RIGHT;
+        }
+        return TARGET_MODE.CENTER;
     }
 }
