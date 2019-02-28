@@ -71,10 +71,10 @@ public class Robot extends TimedRobot {
 
     limePanel.setUSBCam(true);
     limePanel.setLED(LED_STATE.ON);
-    limePanel.setCamMode(CAM_MODE.VISION);
+    limePanel.setCamMode(CAM_MODE.DRIVER);
     limeBall.setUSBCam(true);
     limeBall.setLED(LED_STATE.ON);
-    limeBall.setCamMode(CAM_MODE.VISION);
+    limeBall.setCamMode(CAM_MODE.DRIVER);
 
     OI.getInstance(); //OI goes last, needs subsystems to be instantiated first.
 
@@ -124,10 +124,10 @@ public class Robot extends TimedRobot {
 
     limePanel.setUSBCam(true);
     limePanel.setLED(LED_STATE.OFF);
-    limePanel.setCamMode(CAM_MODE.VISION);
+    limePanel.setCamMode(CAM_MODE.DRIVER);
     limeBall.setUSBCam(true);
     limeBall.setLED(LED_STATE.OFF);
-    limeBall.setCamMode(CAM_MODE.VISION);
+    limeBall.setCamMode(CAM_MODE.DRIVER);
 
     Elevator.getInstance().checkNeedsZero();
     Elevator.getInstance().setRaw(0);

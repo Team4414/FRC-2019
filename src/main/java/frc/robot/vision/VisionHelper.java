@@ -30,7 +30,7 @@ public class VisionHelper{
         mActiveCam.setCamMode(CAM_MODE.VISION);
         mActiveCam.setLED(LED_STATE.ON);
         if (mActiveCam.hasTarget()){
-            mGyroTarget =  Drivetrain.getInstance().getGyroAngle()  - mActiveCam.tX();
+            mGyroTarget =  Drivetrain.getInstance().getGyroAngle() - mActiveCam.tX();
             hasLock = true;
             return true;
         }
@@ -55,6 +55,7 @@ public class VisionHelper{
                 }
             }else{
                 mActiveCam.setLED(LED_STATE.OFF);
+                mActiveCam.setCamMode(CAM_MODE.DRIVER);
             }
         }
 
@@ -64,6 +65,7 @@ public class VisionHelper{
     public static void resetLock(){
         hasLock = false;
         mActiveCam.setLED(LED_STATE.OFF);
+        mActiveCam.setCamMode(CAM_MODE.DRIVER);
     }
 
     private static double getScaler(double dist){
