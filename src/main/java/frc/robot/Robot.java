@@ -47,6 +47,7 @@ public class Robot extends TimedRobot {
   public static Limelight limeBall  = new Limelight(Side.BALL );
 
   public static Limelight.TARGET_MODE targetMode = TARGET_MODE.CENTER;
+  public static boolean overrideVisionToBall = false;
   //------------------------------------
 
   private boolean mInitCalled;
@@ -93,7 +94,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotPeriodic() {
-    if(Hand.getInstance().hasBall()){
+    if(Hand.getInstance().hasBall() || overrideVisionToBall){
       activeSide = Side.BALL;
     }else{
       activeSide = Side.PANEL;

@@ -13,7 +13,14 @@ public class ScoreBall extends CommandGroup{
     @Override
     public synchronized void cancel() {
         Hand.getInstance().set(HandState.HOLDING);
+        new ReGrabBall().start();
         super.cancel();
+    }
+
+    private class ReGrabBall extends GrabBall{
+        public ReGrabBall(){
+            setTimeout(1);
+        }
     }
 
 }

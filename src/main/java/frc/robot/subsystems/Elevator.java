@@ -75,6 +75,7 @@ public class Elevator extends Subsystem implements ILoggable {
         BOTTOM,
         FLOOR_INTAKE,
         CARGO_SHIP,
+        FUEL_STATION,
         FUEL_LOW,
         HATCH_MID,
         FUEL_MID,
@@ -95,6 +96,7 @@ public class Elevator extends Subsystem implements ILoggable {
         heightSetpoints.put(Setpoint.PANEL_GRAB,  5500);
         heightSetpoints.put(Setpoint.FLOOR_INTAKE,850);
         heightSetpoints.put(Setpoint.CARGO_SHIP, 33000);
+        heightSetpoints.put(Setpoint.FUEL_STATION, 33000);
         heightSetpoints.put(Setpoint.FUEL_LOW,   17419 + 3000);
         heightSetpoints.put(Setpoint.HATCH_MID,  32000);
         heightSetpoints.put(Setpoint.FUEL_MID,   41500 + 3000);

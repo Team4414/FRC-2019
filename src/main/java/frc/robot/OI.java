@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj.buttons.Trigger;
 import edu.wpi.first.wpilibj.command.Command;
 import frc.robot.commands.Score;
 import frc.robot.commands.Unjam;
+import frc.robot.commands.balls.GrabStationBall;
 import frc.robot.commands.balls.IntakeBallSequence;
 import frc.robot.commands.climbing.ClimbingGroup;
 import frc.robot.commands.climbing.RetractClimber;
@@ -56,6 +57,7 @@ public class OI {
     private Trigger unJam;
     private Trigger score;
     private Trigger stationPanel;
+    private Trigger stationBall;
 
     private Trigger climb;
     private Trigger releaseClimber;
@@ -155,6 +157,15 @@ public class OI {
             }
         };
 
+        stationPanel = new Trigger(){
+        
+            @Override
+            public boolean get() {
+                return false;
+            }
+
+        };
+
         unJam = new Trigger(){
         
             @Override
@@ -189,7 +200,18 @@ public class OI {
         Command scoreCommand = new Score();
         Command climbCommand = new ClimbingGroup();
 
-        intakePanel.whenActive(intake);
+        intakePanel.whenActive(new Command(){
+        
+            @Override
+            protected boolean isFinished() {
+                if (frc.robot.subsystems.Hand.getInstance().hasBall()){
+                    return true;
+                }else{
+                    intake.start();
+                    return true;
+                }
+            }
+        });
         intakePanel.whenInactive(new Command(){
             @Override
             protected boolean isFinished() {
@@ -254,10 +276,21 @@ public class OI {
         releaseClimber.whenActive(Climber.getInstance().deployPistonCommand(true));
 
 
-        StationGrab stationGrab = new StationGrab();
+        Command stationGrab = new StationGrab();
+        Command ballStation = new GrabStationBall();
 
-
-        stationPanel.whenActive(stationGrab);
+        stationPanel.whenActive(new Command(){
+        
+            @Override
+            protected boolean isFinished() {
+                if (frc.robot.subsystems.Hand.getInstance().hasBall()){
+                    return true;
+                }else{
+                    stationGrab.start();
+                }
+                return true;
+            }
+        });
         stationPanel.whenInactive(new Command(){
         
             @Override
@@ -265,6 +298,17 @@ public class OI {
                 stationGrab.cancel();
                 return true;
             }
+        });
+
+        stationBall.whenActive(ballStation);
+        stationBall.whenInactive(new Command(){
+        
+            @Override
+            protected boolean isFinished() {
+                ballStation.cancel();
+                return true;
+            }
+            
         });
 
 
