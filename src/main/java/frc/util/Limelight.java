@@ -45,12 +45,9 @@ public class Limelight{
     private static final String kBallCamName = "limelight-ball";
     private static final String kPanelCamName = "limelight-panel";
     
-    private static final int kRollingSkewFilter = 50;
     private static final int kRollingHeightFilter = 5;
 
     private final String mTableName;
-
-    private RollingAverage skewRoller;
     private RollingAverage heightRoller;
 
     public Limelight(Side type){
@@ -60,12 +57,10 @@ public class Limelight{
             mTableName = kPanelCamName;
         }
         mSide = type;
-        skewRoller = new RollingAverage(kRollingSkewFilter);
         heightRoller = new RollingAverage(kRollingHeightFilter);
     }
     public Limelight(String tableName){
         mTableName = tableName;
-        skewRoller = new RollingAverage(kRollingSkewFilter);
         heightRoller = new RollingAverage(kRollingHeightFilter);
     }  
 

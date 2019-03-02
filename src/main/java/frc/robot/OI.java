@@ -157,11 +157,11 @@ public class OI {
             }
         };
 
-        stationPanel = new Trigger(){
+        stationBall = new Trigger(){
         
             @Override
             public boolean get() {
-                return false;
+                return xbox.getBackButton();
             }
 
         };
@@ -199,6 +199,7 @@ public class OI {
         Command ball = new IntakeBallSequence();
         Command scoreCommand = new Score();
         Command climbCommand = new ClimbingGroup();
+        Command retractCommand = new RetractClimber();
 
         intakePanel.whenActive(new Command(){
         
@@ -272,7 +273,15 @@ public class OI {
         });
 
 
-        retractClimb.whileActive(new RetractClimber());
+        retractClimb.whenActive(retractCommand);
+        retractClimb.whenInactive(new Command(){
+        
+            @Override
+            protected boolean isFinished() {
+                retractCommand.cancel();
+                return true;
+            }
+        });
         releaseClimber.whenActive(Climber.getInstance().deployPistonCommand(true));
 
 

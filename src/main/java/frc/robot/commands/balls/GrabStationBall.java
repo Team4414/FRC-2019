@@ -5,6 +5,7 @@ import frc.robot.Robot;
 import frc.robot.commands.elevator.SafeElevatorMove;
 import frc.robot.subsystems.Hand;
 import frc.robot.subsystems.Elevator.Setpoint;
+import frc.robot.subsystems.Hand.HandState;
 
 public class GrabStationBall extends CommandGroup{
 
@@ -21,13 +22,13 @@ public class GrabStationBall extends CommandGroup{
 
     @Override
     public synchronized void cancel() {
-        this.end();
+        this.interrupted();
         super.cancel();
     }
 
     @Override
     protected void interrupted() {
-        this.end();
+        Hand.getInstance().set(HandState.HOLDING);
     }
 
     @Override

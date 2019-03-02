@@ -1,7 +1,6 @@
 package frc.robot;
 
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-
+import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.command.Scheduler;
@@ -16,7 +15,6 @@ import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Elevator.Setpoint;
 import frc.robot.vision.VisionHelper;
 import frc.util.CheesyDriveHelper;
-import frc.util.DriveSignal;
 import frc.util.Limelight;
 import frc.util.Limelight.CAM_MODE;
 import frc.util.Limelight.LED_STATE;
@@ -108,6 +106,8 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     teleopInit(); //Just start teleop in sandstorm
+    
+    Elevator.getInstance().setPosition(Setpoint.STOW);
   }
 
   @Override
@@ -131,7 +131,6 @@ public class Robot extends TimedRobot {
 
     Elevator.getInstance().checkNeedsZero();
     Elevator.getInstance().setRaw(0);
-    Elevator.getInstance().setPosition(Setpoint.STOW);
 
     Drivetrain.getInstance().setBrakeMode(false);
 
@@ -197,6 +196,8 @@ public class Robot extends TimedRobot {
     limeBall.setUSBCam(true);
     limePanel.setLED(LED_STATE.ON);
     limeBall.setLED(LED_STATE.ON);
+    limePanel.setCamMode(CAM_MODE.VISION);
+    limePanel.setCamMode(CAM_MODE.VISION);
 
     Climber.getInstance().setBrakeMode(false);
     Elevator.getInstance().setPosition(0);

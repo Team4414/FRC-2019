@@ -21,7 +21,6 @@ public class DriveForwardAfterClimb extends Command{
     protected void interrupted() {
         Climber.getInstance().setPullRaw(0);
         Drivetrain.getInstance().setRawSpeed(0, 0);
-        Robot.isClimbing = false;
     }
 
     @Override

@@ -17,12 +17,11 @@ public class VisionHelper{
     private static final double kOutPoint = 1;
 
     private static final double kTrackingGain = 0.01;
-    private static final double kGyroGain = -0.00;
     //-------------------------------
 
-    private static double mTracking = 0;
     private static double mGyroTarget = 0;
     private static boolean hasLock = false;
+    private static RollingAverage roller = new RollingAverage(3);
 
     private static Limelight mActiveCam = Robot.limePanel;
     
@@ -30,7 +29,8 @@ public class VisionHelper{
         mActiveCam.setCamMode(CAM_MODE.VISION);
         mActiveCam.setLED(LED_STATE.ON);
         if (mActiveCam.hasTarget()){
-            mGyroTarget =  Drivetrain.getInstance().getGyroAngle() - mActiveCam.tX();
+            roller.add(mActiveCam.tX());
+            mGyroTarget =  Drivetrain.getInstance().getGyroAngle() - roller.getAverage();
             hasLock = true;
             return true;
         }
@@ -49,9 +49,10 @@ public class VisionHelper{
                 hasLock = true;
             }
         }else{
-            if (mActiveCam.tArea() < 3){
+            if (mActiveCam.tArea() < 8){
                 if (mActiveCam.hasTarget()){
-                    mGyroTarget =  Drivetrain.getInstance().getGyroAngle()  - mActiveCam.tX();
+                    roller.add(mActiveCam.tX());
+                    mGyroTarget =  Drivetrain.getInstance().getGyroAngle()  - roller.getAverage();
                 }
             }else{
                 mActiveCam.setLED(LED_STATE.OFF);
@@ -60,6 +61,11 @@ public class VisionHelper{
         }
 
         return ((mGyroTarget - Drivetrain.getInstance().getGyroAngle()) * kTrackingGain);
+        // if (mActiveCam.tArea() < 2){    
+        //     return (mActiveCam.tX() * -kTrackingGain);
+        // }else{
+        //     return 0;
+        // }
     }
 
     public static void resetLock(){
