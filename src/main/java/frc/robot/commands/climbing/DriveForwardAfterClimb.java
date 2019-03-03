@@ -7,12 +7,13 @@ import frc.robot.subsystems.Drivetrain;
 
 public class DriveForwardAfterClimb extends Command{
 
-    private static final double kDrivePower = -0.25;
+    private static final double kDrivePower = -0.15;
     private static final double kPullPower = -0.25;
 
     @Override
     protected void initialize() {
         Robot.isClimbing = true;
+        Climber.getInstance().setClimbRaw(0.5/12d);
         Climber.getInstance().setPullRaw(kPullPower);
         Drivetrain.getInstance().setRawSpeed(kDrivePower, kDrivePower);
     }

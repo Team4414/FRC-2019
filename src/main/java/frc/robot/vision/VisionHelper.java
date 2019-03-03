@@ -16,10 +16,13 @@ public class VisionHelper{
     private static final double kInPoint = 6;
     private static final double kOutPoint = 1;
 
-    private static final double kTrackingGain = 0.01;
+    private static final double kTrackingGain = 0.017;
+    private static final double kDerivativeGain = -0.17;
     //-------------------------------
 
     private static double mGyroTarget = 0;
+    private static double mError = 0;
+    private static double mPastError = 0;
     private static boolean hasLock = false;
     private static RollingAverage roller = new RollingAverage(3);
 
@@ -60,7 +63,10 @@ public class VisionHelper{
             }
         }
 
-        return ((mGyroTarget - Drivetrain.getInstance().getGyroAngle()) * kTrackingGain);
+        mPastError = mError;
+        mError = (mGyroTarget - Drivetrain.getInstance().getGyroAngle());
+
+        return (mError * kTrackingGain) + ((mPastError - mError) * kDerivativeGain);
         // if (mActiveCam.tArea() < 2){    
         //     return (mActiveCam.tX() * -kTrackingGain);
         // }else{

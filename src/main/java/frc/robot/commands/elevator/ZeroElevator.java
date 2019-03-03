@@ -2,6 +2,7 @@ package frc.robot.commands.elevator;
 
 import edu.wpi.first.wpilibj.command.Command;
 import frc.robot.subsystems.Elevator;
+import frc.robot.subsystems.Elevator.Setpoint;
 
 public class ZeroElevator extends Command{
 
@@ -45,6 +46,7 @@ public class ZeroElevator extends Command{
         Elevator.getInstance().zero();
         Elevator.getInstance().setRaw(0);
         Elevator.getInstance().lockElevator(false);
+        Elevator.getInstance().setPosition(Setpoint.STOW);
     }
 
 }

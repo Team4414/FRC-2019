@@ -2,6 +2,8 @@ package frc.robot.subsystems;
 
 import java.util.LinkedHashMap;
 
+import javax.swing.text.DefaultStyledDocument.ElementSpec;
+
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.InvertType;
@@ -97,11 +99,11 @@ public class Elevator extends Subsystem implements ILoggable {
         heightSetpoints.put(Setpoint.FLOOR_INTAKE,850);
         heightSetpoints.put(Setpoint.CARGO_SHIP, 33000);
         heightSetpoints.put(Setpoint.FUEL_STATION, 33000);
-        heightSetpoints.put(Setpoint.FUEL_LOW,   17419 + 3000);
+        heightSetpoints.put(Setpoint.FUEL_LOW,   16858);
         heightSetpoints.put(Setpoint.HATCH_MID,  32000);
-        heightSetpoints.put(Setpoint.FUEL_MID,   41500 + 3000);
+        heightSetpoints.put(Setpoint.FUEL_MID,   42500);
         heightSetpoints.put(Setpoint.HATCH_HIGH, 57282);
-        heightSetpoints.put(Setpoint.FUEL_HIGH,  71000 + 1000);
+        heightSetpoints.put(Setpoint.FUEL_HIGH,  71000);
         heightSetpoints.put(Setpoint.FINGER_CLR, 5695);
 
         kHandThreshold = heightSetpoints.get(Setpoint.FUEL_LOW);
@@ -299,6 +301,21 @@ public class Elevator extends Subsystem implements ILoggable {
             @Override
             protected boolean isFinished() {
                 setPosition((int)(getSetpoint(currentState)) - ((drop) ? kDropForPanelClearDistance : -kDropForPanelClearDistance));
+                return true;
+            }
+        };
+    }
+
+    public Command slowElevator(boolean slow){
+        return new Command(){
+        
+            @Override
+            protected boolean isFinished() {
+                if (slow){
+                    mMaster.configMotionAcceleration(kMMacceleration / 2);
+                }else{
+                    mMaster.configMotionAcceleration(kMMacceleration);
+                }
                 return true;
             }
         };

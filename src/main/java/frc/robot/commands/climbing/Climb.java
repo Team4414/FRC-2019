@@ -46,7 +46,6 @@ public class Climb extends Command{
 
     @Override
     protected void interrupted() {
-        Climber.getInstance().setClimbRaw(0);
         Climber.getInstance().setPullRaw(0);
         Drivetrain.getInstance().setRawSpeed(0, 0);
         Robot.isClimbing = false;

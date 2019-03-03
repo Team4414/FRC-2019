@@ -134,7 +134,6 @@ public class Robot extends TimedRobot {
 
     Drivetrain.getInstance().setBrakeMode(false);
 
-    
     Climber.getInstance().deployPiston(false);
 
     mInitCalled = true;
