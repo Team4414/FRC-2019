@@ -12,12 +12,13 @@ public class RetractClimber extends Command{
 
     @Override
     protected void execute() {
+        Drivetrain.getInstance().setRawSpeed(kDrivePower, kDrivePower);
+        
         if (!Climber.getInstance().getTopSwitch()){
             Climber.getInstance().setClimbRaw(kRetractPower);
         }else{
             Climber.getInstance().setClimbRaw(0);
         }
-        Drivetrain.getInstance().setRawSpeed(kDrivePower, kDrivePower);
     }
 
     @Override

@@ -1,9 +1,14 @@
 package frc.robot;
 
 import edu.wpi.first.cameraserver.CameraServer;
+import edu.wpi.first.wpilibj.PWMSpeedController;
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
+import edu.wpi.first.wpilibj.Spark;
+import edu.wpi.first.wpilibj.Talon;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.command.Scheduler;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.commands.elevator.ZeroElevator;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Drivetrain;
@@ -12,7 +17,9 @@ import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Finger;
 import frc.robot.subsystems.Hand;
 import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.SignalLEDS;
 import frc.robot.subsystems.Elevator.Setpoint;
+import frc.robot.subsystems.SignalLEDS.LightPattern;
 import frc.robot.vision.VisionHelper;
 import frc.util.CheesyDriveHelper;
 import frc.util.Limelight;
@@ -119,7 +126,7 @@ public class Robot extends TimedRobot {
   public void teleopInit() {
     if (mInitCalled)
       return;
-
+      
     mZeroElevatorCommand.start();
 
     limePanel.setUSBCam(true);
@@ -141,6 +148,12 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopPeriodic(){
+
+    if (Timer.getMatchTime() < 120){
+      SignalLEDS.getInstance().set(LightPattern.RED_STROBE);
+    }else{
+      SignalLEDS.getInstance().set(LightPattern.TEAL_SOLID);
+    }
 
     targetMode = OI.getInstance().getVisionSwitcher();
 

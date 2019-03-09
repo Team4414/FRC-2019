@@ -10,8 +10,10 @@ public class Climb extends Command{
 
     //---------- Climb Konstants ----------
     private static final double kMaxClimbSpeed = 1;
-    private static final double kPullerSpeed = 0;
+    private static final double kPullerSpeed = -0.1;
     private static final double kDrivePullSpeed = 0;
+
+    private static final double kHoldClimbSpeed = 0.4;
 
     private static final double kTimeToMaxSpeed = 2;
     private static final double kPullDelay = 1;
@@ -25,7 +27,7 @@ public class Climb extends Command{
         Robot.isClimbing = true;
 
         Climber.getInstance().deployPiston(true);
-        Climber.getInstance().setPullRaw(0);
+        Climber.getInstance().setPullRaw(kPullerSpeed);
         Climber.getInstance().setBrakeMode(true);
     }
 
@@ -46,7 +48,7 @@ public class Climb extends Command{
 
     @Override
     protected void interrupted() {
-        Climber.getInstance().setPullRaw(0);
+        Climber.getInstance().setClimbRaw(kHoldClimbSpeed);
         Drivetrain.getInstance().setRawSpeed(0, 0);
         Robot.isClimbing = false;
     }
@@ -56,7 +58,8 @@ public class Climb extends Command{
     }
 
     private double getClimbSpeed(){
-        return Math.min(kMaxClimbSpeed, kMaxClimbSpeed * (getTime() / kTimeToMaxSpeed));
+        // return Math.min(kMaxClimbSpeed, kMaxClimbSpeed * (getTime() / kTimeToMaxSpeed));
+        return kMaxClimbSpeed;
     }   
 
 

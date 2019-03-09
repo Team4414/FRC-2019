@@ -99,7 +99,6 @@ public class Climber extends Subsystem implements ILoggable {
 
     public void setPullRaw(double pwr){
         mPuller.set(ControlMode.PercentOutput, pwr);
-        System.out.println(pwr);
     }
 
     public void setBrakeMode(boolean brake){

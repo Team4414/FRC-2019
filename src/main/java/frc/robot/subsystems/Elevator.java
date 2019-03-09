@@ -2,8 +2,6 @@ package frc.robot.subsystems;
 
 import java.util.LinkedHashMap;
 
-import javax.swing.text.DefaultStyledDocument.ElementSpec;
-
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.InvertType;
