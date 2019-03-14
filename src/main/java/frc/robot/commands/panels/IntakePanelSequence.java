@@ -9,9 +9,9 @@ import frc.robot.commands.elevator.SafeElevatorMove;
 import frc.robot.subsystems.DustPan;
 import frc.robot.subsystems.DustPan.DustpanIntakeState;
 import frc.robot.subsystems.Elevator;
+import frc.robot.subsystems.PPintake;
 import frc.robot.subsystems.Elevator.Setpoint;
-import frc.robot.subsystems.Finger;
-import frc.robot.subsystems.Finger.FingerClapperState;
+import frc.robot.subsystems.PPintake.PPState;
 import frc.util.Limelight.LED_STATE;
 
 public class IntakePanelSequence extends CommandGroup{
@@ -29,8 +29,8 @@ public class IntakePanelSequence extends CommandGroup{
         });
         addSequential(DustPan.getInstance().deployCommand(true));
         addSequential(DustPan.getInstance().intakeCommand(DustpanIntakeState.ON));
-        addSequential(Finger.getInstance().setArmCommand(false));
-        addSequential(Finger.getInstance().setFingerCommand(false));
+        addSequential(PPintake.getInstance().setArmCommand(false));
+        addSequential(PPintake.getInstance().setPPCommand(PPState.OFF));
         addSequential(new SafeElevatorMove(Setpoint.FLOOR_INTAKE));
         addSequential(Elevator.getInstance().lockElevatorCommand(true));
         addSequential(new WaitCommand(0.5));
@@ -49,8 +49,8 @@ public class IntakePanelSequence extends CommandGroup{
     protected void interrupted() {
         DustPan.getInstance().deploy(false);
         DustPan.getInstance().intake(false);
-        Finger.getInstance().setFinger(FingerClapperState.HOLDING);
-        Finger.getInstance().setArm(false);
+        PPintake.getInstance().setPP(PPState.HOLDING);
+        PPintake.getInstance().setArm(false);
         Elevator.getInstance().lockElevator(false);
         Elevator.getInstance().setPosition(Setpoint.STOW);
         mInterrupted = true;
@@ -70,11 +70,11 @@ public class IntakePanelSequence extends CommandGroup{
     
             addSequential(Robot.limeBall.setLEDCommand(LED_STATE.BLINK));
             addSequential(Robot.limePanel.setLEDCommand(LED_STATE.BLINK));
+            addSequential(PPintake.getInstance().setPPCommand(PPState.INTAKE));
             addSequential(new WaitCommand(0.5));
             addSequential(DustPan.getInstance().deployCommand(false));
-            addSequential(new WaitCommand(1.5));
-            addSequential(Finger.getInstance().setFingerCommand(true));
-            addSequential(new WaitCommand(0.25));
+            addSequential(PPintake.getInstance().waitForPPCommand());
+            addSequential(PPintake.getInstance().setPPCommand(PPState.HOLDING));
             addSequential(Elevator.getInstance().lockElevatorCommand(false));
             addSequential(new SafeElevatorMove(Setpoint.FINGER_CLR));
             addSequential(DustPan.getInstance().intakeCommand(DustpanIntakeState.OFF));

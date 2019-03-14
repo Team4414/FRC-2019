@@ -5,12 +5,12 @@ import frc.robot.subsystems.DustPan;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.DustPan.DustpanIntakeState;
 import frc.robot.subsystems.Elevator.Setpoint;
-import frc.robot.subsystems.Finger;
-import frc.robot.subsystems.Finger.FingerClapperState;
 import frc.robot.subsystems.Hand;
 import frc.robot.subsystems.Hand.HandState;
 import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.PPintake;
 import frc.robot.subsystems.Intake.IntakeWheelState;
+import frc.robot.subsystems.PPintake.PPState;
 
 public class Unjam extends CommandGroup {
 
@@ -20,8 +20,8 @@ public class Unjam extends CommandGroup {
         addParallel(DustPan.getInstance().deployCommand(true));
         addParallel(Intake.getInstance().deployCommand(true));
         addParallel(Intake.getInstance().intakeCommand(IntakeWheelState.UNJAM));
-        addParallel(Finger.getInstance().setArmCommand(false));
-        addParallel(Finger.getInstance().setFingerCommand(false));
+        addParallel(PPintake.getInstance().setArmCommand(false));
+        addParallel(PPintake.getInstance().setPPCommand(PPState.UNJAM));
         addParallel(Hand.getInstance().setHandCommand(HandState.DROP));
     }
 
@@ -33,7 +33,7 @@ public class Unjam extends CommandGroup {
         DustPan.getInstance().deploy(false);
         Intake.getInstance().deploy(false);
         Intake.getInstance().intake(false);
-        Finger.getInstance().setFinger(FingerClapperState.HOLDING);
+        PPintake.getInstance().setPP(PPState.UNJAM);
         Hand.getInstance().set(HandState.OFF);
     }
 }

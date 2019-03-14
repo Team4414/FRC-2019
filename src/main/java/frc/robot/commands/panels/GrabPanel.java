@@ -9,7 +9,7 @@ import frc.robot.subsystems.Finger;
 import frc.robot.subsystems.DustPan.DustpanBoomState;
 import frc.robot.subsystems.DustPan.DustpanIntakeState;
 import frc.robot.subsystems.Elevator.Setpoint;
-import frc.robot.subsystems.Finger.FingerClapperState;
+import frc.robot.subsystems.Finger.PPState;
 
 public class GrabPanel extends CommandGroup{
 
@@ -30,7 +30,7 @@ public class GrabPanel extends CommandGroup{
         
             @Override
             protected boolean isFinished() {
-                Finger.getInstance().setFinger(FingerClapperState.HOLDING);
+                Finger.getInstance().setFinger(PPState.HOLDING);
                 return true;
             }
         });

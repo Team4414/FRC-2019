@@ -3,7 +3,8 @@ package frc.robot.commands.panels;
 import edu.wpi.first.wpilibj.command.CommandGroup;
 import edu.wpi.first.wpilibj.command.WaitCommand;
 import frc.robot.subsystems.Elevator;
-import frc.robot.subsystems.Finger;
+import frc.robot.subsystems.PPintake;
+import frc.robot.subsystems.PPintake.PPState;
 
 public class ScorePanel extends CommandGroup{
 
@@ -16,9 +17,9 @@ public class ScorePanel extends CommandGroup{
     }
 
     public ScorePanel(){
-        addSequential(Finger.getInstance().setArmCommand(true));
+        addSequential(PPintake.getInstance().setArmCommand(true));
         addSequential(new WaitCommand(0.5));
-        addSequential(Finger.getInstance().setFingerCommand(false));
+        addSequential(PPintake.getInstance().setPPCommand(PPState.SCORE));
         addSequential(new WaitCommand(0.25));
     }
 
@@ -30,11 +31,9 @@ public class ScorePanel extends CommandGroup{
 
     public class RetractFinger extends CommandGroup{
         public RetractFinger(){   
-            addSequential(Elevator.getInstance().dropElevatorABit(true));
-            addSequential(Finger.getInstance().setArmCommand(false));
+            addSequential(PPintake.getInstance().setArmCommand(false));
             addSequential(new WaitCommand(0.5));
-            addSequential(Finger.getInstance().setFingerCommand(true));
-            addSequential(Elevator.getInstance().dropElevatorABit(false));
+            addSequential(PPintake.getInstance().setPPCommand(PPState.OFF));
         }
     }
 

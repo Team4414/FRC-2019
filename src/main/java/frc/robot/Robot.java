@@ -14,9 +14,9 @@ import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.DustPan;
 import frc.robot.subsystems.Elevator;
-import frc.robot.subsystems.Finger;
 import frc.robot.subsystems.Hand;
 import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.PPintake;
 import frc.robot.subsystems.SignalLEDS;
 import frc.robot.subsystems.Elevator.Setpoint;
 import frc.robot.subsystems.SignalLEDS.LightPattern;
@@ -68,7 +68,7 @@ public class Robot extends TimedRobot {
     //Instantiate all subsystems
     Elevator.getInstance();
     Hand.getInstance();
-    Finger.getInstance();
+    PPintake.getInstance();
     DustPan.getInstance();
     Intake.getInstance();
     Drivetrain.getInstance().zeroSensor();
@@ -149,7 +149,7 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic(){
 
-    if (Timer.getMatchTime() < 120){
+    if (Timer.getMatchTime() < 30){
       SignalLEDS.getInstance().set(LightPattern.RED_STROBE);
     }else{
       SignalLEDS.getInstance().set(LightPattern.TEAL_SOLID);

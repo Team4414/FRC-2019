@@ -44,10 +44,8 @@ public class RobotMap{
         public static final int kPiston = 0;
     }
 
-    public static class FingerMap{
-        public static final int kFinger = 3;
+    public static class PPintakeMap{
+        public static final int kPP = 20;
         public static final int kArm = 2;
-
-        public static final int kSwitch = 2;
     }
 }
