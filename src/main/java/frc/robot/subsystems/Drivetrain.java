@@ -128,9 +128,7 @@ public class Drivetrain extends Subsystem implements ILoggable{
      */
     public void setRawSpeed(double left, double right){
         mLeftMaster.set(ControlMode.PercentOutput, left);
-        mRightMaster.set(ControlMode.PercentOutput, right);
-
-        System.out.println(Robot.pdp.getCurrent(leftPDPs[0]) + "\t\t" + Robot.pdp.getCurrent(leftPDPs[1]) + "\t\t" + Robot.pdp.getCurrent(leftPDPs[2]));
+        mRightMaster.set(ControlMode.PercentOutput, right); 
     }
 
     /**

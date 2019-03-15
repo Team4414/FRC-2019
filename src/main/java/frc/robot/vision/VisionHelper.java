@@ -13,18 +13,27 @@ import frc.util.Limelight.LED_STATE;
 public class VisionHelper{
 
     //---------- Constants ----------
-    private static final double kInPoint = 6;
-    private static final double kOutPoint = 1;
+
+    private static final double kPanelAutoScoreY = 3.5;
 
     private static final double kTrackingGain = 0.017;
     private static final double kDerivativeGain = -0.17;
+
+    private static final double kDriveGain = 0.07;
+    private static final double kDriveDerivGain = -0.7;
     //-------------------------------
 
     private static double mGyroTarget = 0;
+    private static double mDistTarg = 0;
+
+    private static double mDistError = 0;
+    private static double mDistPastError = 0;
+
     private static double mError = 0;
     private static double mPastError = 0;
     private static boolean hasLock = false;
     private static RollingAverage roller = new RollingAverage(3);
+    private static RollingAverage distRoller = new RollingAverage(5);
 
     private static Limelight mActiveCam = Robot.limePanel;
     
@@ -41,6 +50,30 @@ public class VisionHelper{
         return false;
     }
 
+    public static double throttleCorrection(){
+
+        mActiveCam.setTargetMode(Robot.targetMode);
+
+        if (!hasLock){
+            if (!grabVisionData()){
+                return 0; //check to make sure you have target
+            }else{
+                hasLock = true;
+            }
+        }else{
+            if (mActiveCam.hasTarget()){
+                distRoller.add(mActiveCam.tY());
+                mDistPastError = mDistError;
+                mDistError = mDistTarg - distRoller.getAverage();
+            }else{
+                return 0;
+            }
+        }
+
+        // return 0;
+        return (mDistPastError * kDriveGain) + ((mDistPastError - mDistError) * kDriveDerivGain);
+    }
+
     public static double turnCorrection(){
         
         mActiveCam.setTargetMode(Robot.targetMode);
@@ -52,14 +85,9 @@ public class VisionHelper{
                 hasLock = true;
             }
         }else{
-            if (mActiveCam.tArea() < 8){
-                if (mActiveCam.hasTarget()){
+            if (mActiveCam.hasTarget()){
                     roller.add(mActiveCam.tX());
                     mGyroTarget =  Drivetrain.getInstance().getGyroAngle()  - roller.getAverage();
-                }
-            }else{
-                mActiveCam.setLED(LED_STATE.OFF);
-                mActiveCam.setCamMode(CAM_MODE.DRIVER);
             }
         }
 
@@ -67,11 +95,6 @@ public class VisionHelper{
         mError = (mGyroTarget - Drivetrain.getInstance().getGyroAngle());
 
         return (mError * kTrackingGain) + ((mPastError - mError) * kDerivativeGain);
-        // if (mActiveCam.tArea() < 2){    
-        //     return (mActiveCam.tX() * -kTrackingGain);
-        // }else{
-        //     return 0;
-        // }
     }
 
     public static void resetLock(){
@@ -80,17 +103,8 @@ public class VisionHelper{
         mActiveCam.setCamMode(CAM_MODE.DRIVER);
     }
 
-    private static double getScaler(double dist){
-        //(out - in) - (distance - in)
-        //----------------------------
-        //        (out - in)
-
-        return 
-            Math.max(0, 
-            Math.min(1, 
-                (((kOutPoint - kInPoint) - (dist - kInPoint)) / (kOutPoint - kInPoint))
-            )
-            );
+    public static boolean isCloseToScore(){
+        return (mActiveCam.tY() < kPanelAutoScoreY);
     }
 
     public static void setActiveCam(Limelight cam){ mActiveCam = cam; }

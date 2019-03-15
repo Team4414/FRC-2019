@@ -5,11 +5,11 @@ import edu.wpi.first.wpilibj.command.CommandGroup;
 import edu.wpi.first.wpilibj.command.WaitCommand;
 import frc.robot.commands.elevator.SafeElevatorMove;
 import frc.robot.subsystems.DustPan;
-import frc.robot.subsystems.Finger;
+import frc.robot.subsystems.PPintake;
 import frc.robot.subsystems.DustPan.DustpanBoomState;
 import frc.robot.subsystems.DustPan.DustpanIntakeState;
 import frc.robot.subsystems.Elevator.Setpoint;
-import frc.robot.subsystems.Finger.PPState;
+import frc.robot.subsystems.PPintake.PPState;
 
 public class GrabPanel extends CommandGroup{
 
@@ -30,7 +30,7 @@ public class GrabPanel extends CommandGroup{
         
             @Override
             protected boolean isFinished() {
-                Finger.getInstance().setFinger(PPState.HOLDING);
+                PPintake.getInstance().setPP(PPState.HOLDING);;
                 return true;
             }
         });

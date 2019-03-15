@@ -3,7 +3,6 @@ package frc.robot.subsystems;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Subsystem;
@@ -13,12 +12,12 @@ import frc.util.talon.CTREFactory;
 
 public class PPintake extends Subsystem{
 
-    private static final double kHoldPwr = 2/13d;
+    private static final double kHoldPwr = 2.5d/12d;
     private static final double kIntakePwr = 1;
     private static final double kScorePower = -1;
     private static final double kUnJamPower = -0.2;
 
-    private static final double kPanelCurrentThreshold = 10;
+    private static final double kPanelCurrentThreshold = 15;
 
     public static enum ArmState{
         RETRACTED,
@@ -49,6 +48,8 @@ public class PPintake extends Subsystem{
     private PPintake(){
         mPP = CTREFactory.createVictor(RobotMap.PPintakeMap.kPP);
         mArm = new Solenoid(RobotMap.PPintakeMap.kArm);
+
+        mPP.setInverted(true);
 
         armState = ArmState.RETRACTED;
         ppState = PPState.OFF;
@@ -115,7 +116,7 @@ public class PPintake extends Subsystem{
 
     public boolean hasPanel(){
         return 
-            Robot.pdp.getCurrent(RobotMap.PPintakeMap.kPP - 1) > kPanelCurrentThreshold;
+            (Robot.pdp.getCurrent(RobotMap.PPintakeMap.kPP - 1) > kPanelCurrentThreshold);
     }
 
     public Command waitForPPCommand(){

@@ -179,7 +179,7 @@ public class OI {
         
             @Override
             public boolean get() {
-                return turnNub.getRawButton(kNubTopButton);
+                return turnNub.getRawButton(kNubTopButton) || Robot.autoPlace == true;
             }
 
         };

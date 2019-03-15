@@ -45,7 +45,7 @@ public class RobotMap{
     }
 
     public static class PPintakeMap{
-        public static final int kPP = 20;
+        public static final int kPP = 10;
         public static final int kArm = 2;
     }
 }

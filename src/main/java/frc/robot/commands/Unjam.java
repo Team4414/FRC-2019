@@ -33,7 +33,7 @@ public class Unjam extends CommandGroup {
         DustPan.getInstance().deploy(false);
         Intake.getInstance().deploy(false);
         Intake.getInstance().intake(false);
-        PPintake.getInstance().setPP(PPState.UNJAM);
+        PPintake.getInstance().setPP(PPState.OFF);
         Hand.getInstance().set(HandState.OFF);
     }
 }

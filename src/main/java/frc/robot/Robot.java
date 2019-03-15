@@ -7,9 +7,11 @@ import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj.Talon;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.commands.elevator.ZeroElevator;
+import frc.robot.commands.panels.ScorePanel;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.DustPan;
@@ -43,6 +45,8 @@ public class Robot extends TimedRobot {
   public static Side activeSide;
   public static boolean respectPerimeter;
   public static boolean isClimbing;
+  public static boolean doAutoPlace;
+  public static boolean autoPlace;
   
   public static PowerDistributionPanel pdp;
   //------------------------------------------
@@ -87,11 +91,14 @@ public class Robot extends TimedRobot {
     //Create Commands & Controllers
     drive = new CheesyDriveHelper();
     mZeroElevatorCommand = new ZeroElevator();
+    // mScorePanel = new ScorePanel();
 
     //Set all system wide variables
     activeSide = (Hand.getInstance().hasBall()) ? Side.BALL : Side.PANEL;
     respectPerimeter = false;
     isClimbing = false;
+    autoPlace = false;
+    doAutoPlace = true;
 
     mInitCalled = false;
     mTurnSignal = 0;
@@ -108,6 +115,9 @@ public class Robot extends TimedRobot {
     if (Elevator.getInstance().getSwitch()){
       Elevator.getInstance().zero();
     }
+
+    // System.out.println(Robot.pdp.getCurrent(RobotMap.PPintakeMap.kPP - 1));
+    // System.out.println(Elevator.getInstance().getPosition());
   }
 
   @Override
@@ -173,15 +183,25 @@ public class Robot extends TimedRobot {
       }
 
       mTurnSignal = VisionHelper.turnCorrection();
+
+      operatorSignal[0] = VisionHelper.throttleCorrection();
+      operatorSignal[1] = VisionHelper.throttleCorrection();
+
       operatorSignal[0] -= mTurnSignal;
       operatorSignal[1] += mTurnSignal;
 
+      if (activeSide == Side.PANEL && doAutoPlace && VisionHelper.isCloseToScore() && limePanel.hasTarget()){
+        System.out.println(limePanel.tY());
+        autoPlace = true;
+      }else{
+        autoPlace = false;
+      }
+      
     }else{
       VisionHelper.resetLock();
+      autoPlace = false;
       mTurnSignal = 0;
     }
-
-
 
     if (!isClimbing){
       Drivetrain.getInstance().setRawSpeed(operatorSignal);
