@@ -21,6 +21,8 @@ import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.PPintake;
 import frc.robot.subsystems.SignalLEDS;
 import frc.robot.subsystems.Elevator.Setpoint;
+import frc.robot.subsystems.PPintake.ArmState;
+import frc.robot.subsystems.PPintake.PPState;
 import frc.robot.subsystems.SignalLEDS.LightPattern;
 import frc.robot.vision.VisionHelper;
 import frc.util.CheesyDriveHelper;
@@ -45,7 +47,7 @@ public class Robot extends TimedRobot {
   public static Side activeSide;
   public static boolean respectPerimeter;
   public static boolean isClimbing;
-  public static boolean doAutoPlace;
+  public static boolean isStationGrab;
   public static boolean autoPlace;
   
   public static PowerDistributionPanel pdp;
@@ -63,6 +65,7 @@ public class Robot extends TimedRobot {
   private double mTurnSignal;
 
   private double[] operatorSignal;
+  private Command mAutoScore;
 
   @Override
   public void robotInit(){
@@ -98,7 +101,7 @@ public class Robot extends TimedRobot {
     respectPerimeter = false;
     isClimbing = false;
     autoPlace = false;
-    doAutoPlace = true;
+    isStationGrab = false;
 
     mInitCalled = false;
     mTurnSignal = 0;
@@ -116,7 +119,7 @@ public class Robot extends TimedRobot {
       Elevator.getInstance().zero();
     }
 
-    // System.out.println(Robot.pdp.getCurrent(RobotMap.PPintakeMap.kPP - 1));
+    System.out.println(Robot.pdp.getCurrent(RobotMap.PPintakeMap.kPP - 1));
     // System.out.println(Elevator.getInstance().getPosition());
   }
 
@@ -182,30 +185,46 @@ public class Robot extends TimedRobot {
         VisionHelper.setActiveCam(limePanel);
       }
 
-      mTurnSignal = VisionHelper.turnCorrection();
+      VisionHelper.grabVisionData();
 
-      operatorSignal[0] = VisionHelper.throttleCorrection();
-      operatorSignal[1] = VisionHelper.throttleCorrection();
+      // mTurnSignal = VisionHelper.turnCorrection();
 
-      operatorSignal[0] -= mTurnSignal;
-      operatorSignal[1] += mTurnSignal;
+      // operatorSignal[0] = VisionHelper.throttleCorrection();
+      // operatorSignal[1] = VisionHelper.throttleCorrection();
 
-      if (activeSide == Side.PANEL && doAutoPlace && VisionHelper.isCloseToScore() && limePanel.hasTarget()){
-        System.out.println(limePanel.tY());
-        autoPlace = true;
-      }else{
-        autoPlace = false;
+      // operatorSignal[0] -= mTurnSignal;
+      // operatorSignal[1] += mTurnSignal;
+
+      if (VisionHelper.getActiveCam().hasTarget()){
+        operatorSignal = VisionHelper.getDriveSignal();
+        VisionHelper.attemptAutoScore(); //attempt an automatic score
       }
       
+
+      // if (activeSide == Side.PANEL && doAutoPlace && limePanel.hasTarget()){
+      //   // mAutoScore.start();
+      //   autoPlace = true;
+      //   // VisionHelper.setTargetDist(6);
+      //   // PPintake.getInstance().setPP(PPState.SCORE);
+      // }else{
+      //   // mAutoScore.cancel();
+      //   autoPlace = false;
+      //   // VisionHelper.setTargetDist(0);
+      // }
+
     }else{
+      // PPintake.getInstance().setPP(PPState.OFF);
+      // PPintake.getInstance().setArm(ArmState.RETRACTED);
       VisionHelper.resetLock();
-      autoPlace = false;
+      // autoPlace = false;
       mTurnSignal = 0;
+
     }
 
-    if (!isClimbing){
+    if (!isClimbing && !autoPlace){
       Drivetrain.getInstance().setRawSpeed(operatorSignal);
     }
+
     Scheduler.getInstance().run();
   }
   

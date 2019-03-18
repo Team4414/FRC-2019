@@ -1,5 +1,6 @@
 package frc.robot.vision;
 
+import frc.robot.OI;
 import frc.robot.Robot;
 import frc.robot.subsystems.Drivetrain;
 import frc.util.Limelight;
@@ -14,7 +15,7 @@ public class VisionHelper{
 
     //---------- Constants ----------
 
-    private static final double kPanelAutoScoreY = 3.5;
+    private static final double kPanelAutoScoreY = 3;
 
     private static final double kTrackingGain = 0.017;
     private static final double kDerivativeGain = -0.17;
@@ -97,6 +98,27 @@ public class VisionHelper{
         return (mError * kTrackingGain) + ((mPastError - mError) * kDerivativeGain);
     }
 
+    public static double[] getDriveSignal(){
+        return new double[]{
+            VisionHelper.throttleCorrection() - VisionHelper.turnCorrection(),
+            VisionHelper.throttleCorrection() + VisionHelper.turnCorrection()
+        };
+    }
+
+    public static void attemptAutoScore(){
+
+        if (isCloseToScore()){
+            Robot.autoPlace = true;
+        }else{
+            Robot.autoPlace = false;
+        }
+
+    }
+
+    public static Limelight getActiveCam(){
+        return mActiveCam;
+    }
+
     public static void resetLock(){
         hasLock = false;
         mActiveCam.setLED(LED_STATE.OFF);
@@ -105,6 +127,10 @@ public class VisionHelper{
 
     public static boolean isCloseToScore(){
         return (mActiveCam.tY() < kPanelAutoScoreY);
+    }
+
+    public static void setTargetDist(double setPoint){
+        mDistTarg = setPoint;
     }
 
     public static void setActiveCam(Limelight cam){ mActiveCam = cam; }

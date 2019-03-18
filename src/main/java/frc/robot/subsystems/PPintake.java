@@ -17,7 +17,7 @@ public class PPintake extends Subsystem{
     private static final double kScorePower = -1;
     private static final double kUnJamPower = -0.2;
 
-    private static final double kPanelCurrentThreshold = 15;
+    private static final double kPanelCurrentThreshold = 25;
 
     public static enum ArmState{
         RETRACTED,

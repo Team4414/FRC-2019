@@ -17,6 +17,8 @@ import frc.robot.commands.panels.IntakePanelSequence;
 import frc.robot.commands.panels.StationGrab;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Elevator.Position;
+import frc.robot.vision.AutoDriveIn;
+import frc.robot.vision.AutoScoreCommand;
 import frc.util.Limelight;
 import frc.util.Limelight.TARGET_MODE;
 
@@ -58,6 +60,8 @@ public class OI {
     private Trigger score;
     private Trigger stationPanel;
     private Trigger stationBall;
+
+    private Trigger visionAutoScore;
 
     private Trigger climb;
     private Trigger releaseClimber;
@@ -179,7 +183,7 @@ public class OI {
         
             @Override
             public boolean get() {
-                return turnNub.getRawButton(kNubTopButton) || Robot.autoPlace == true;
+                return turnNub.getRawButton(kNubTopButton) || (Robot.autoPlace || !Robot.isStationGrab);
             }
 
         };
@@ -287,6 +291,7 @@ public class OI {
 
         Command stationGrab = new StationGrab();
         Command ballStation = new GrabStationBall();
+        Command autoDriveIn = new AutoDriveIn();
 
         stationPanel.whenActive(new Command(){
         
@@ -296,6 +301,12 @@ public class OI {
                     return true;
                 }else{
                     stationGrab.start();
+                }
+
+                if (getVision()){
+                    autoDriveIn.start();;
+                }else{
+                    autoDriveIn.cancel();
                 }
                 return true;
             }

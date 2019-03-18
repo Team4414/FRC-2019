@@ -71,7 +71,7 @@ public class IntakePanelSequence extends CommandGroup{
             addSequential(Robot.limeBall.setLEDCommand(LED_STATE.BLINK));
             addSequential(Robot.limePanel.setLEDCommand(LED_STATE.BLINK));
             addSequential(PPintake.getInstance().setPPCommand(PPState.INTAKE));
-            addSequential(new WaitCommand(0.5));
+            addSequential(new WaitCommand(1));
             addSequential(DustPan.getInstance().deployCommand(false));
             addSequential(PPintake.getInstance().waitForPPCommand());
             addSequential(PPintake.getInstance().setPPCommand(PPState.HOLDING));
@@ -82,6 +82,8 @@ public class IntakePanelSequence extends CommandGroup{
             addSequential(Robot.limeBall.setLEDCommand(LED_STATE.OFF));
             addSequential(Robot.limePanel.setLEDCommand(LED_STATE.OFF));
         }
+
+        
 
     }
 
