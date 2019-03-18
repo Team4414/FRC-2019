@@ -26,17 +26,17 @@ public class PeriodicLogger implements Runnable{
         allLogs = new ArrayList<Loggable>();
     }
 
-    public static void addLoggable(ILoggable loggable){
+    public void addLoggable(ILoggable loggable){
         allLogs.add(loggable.setupLogger());
     }
 
-    public static void clearAll(){
+    public void clearAll(){
         for (Loggable loggable : allLogs){
             loggable.clearLog();
         }
     }
 
-    public static void allToCSV(){
+    public void allToCSV(){
         for (Loggable loggable : allLogs){
             CSVLogger.logCSV(loggable.kFilePath, loggable.get());
         }

@@ -345,8 +345,9 @@ public class Elevator extends Subsystem implements ILoggable {
             @Override
             protected LogObject[] collectData() {
                 return new LogObject[]{
-                    new LogObject("Setpoint",  mMaster.getClosedLoopTarget()),
-                    new LogObject("Traj", mMaster.getSelectedSensorPosition())
+                    new LogObject("Target",  mMaster.getClosedLoopTarget()),
+                    new LogObject("Position", mMaster.getSelectedSensorPosition()),
+                    new LogObject("Error", mMaster.getClosedLoopError(0))
                 };
             }
         };

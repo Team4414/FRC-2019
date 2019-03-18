@@ -81,6 +81,8 @@ public class Robot extends TimedRobot {
     Drivetrain.getInstance().zeroSensor();
     Climber.getInstance();
 
+    PeriodicLogger.getInstance().addLoggable(Elevator.getInstance());
+
     limePanel.setUSBCam(true);
     limePanel.setLED(LED_STATE.ON);
     limePanel.setCamMode(CAM_MODE.DRIVER);
@@ -155,6 +157,8 @@ public class Robot extends TimedRobot {
     Drivetrain.getInstance().setBrakeMode(false);
 
     Climber.getInstance().deployPiston(false);
+
+    PeriodicLogger.getInstance().start();
 
     mInitCalled = true;
   }
