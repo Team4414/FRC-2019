@@ -56,7 +56,6 @@ public class StationGrab extends CommandGroup{
             addSequential(PPintake.getInstance().setPPCommand(PPState.HOLDING));
             addSequential(Robot.limeBall.setLEDCommand(LED_STATE.BLINK));
             addSequential(Robot.limePanel.setLEDCommand(LED_STATE.BLINK));
-            addSequential(PPintake.getInstance().setPPCommand(PPState.HOLDING));
             addSequential(PPintake.getInstance().setArmCommand(false));
             addSequential(new WaitCommand(0.5));
             addSequential(Robot.limeBall.setLEDCommand(LED_STATE.OFF));
