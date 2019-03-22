@@ -1,25 +1,30 @@
 package frc.robot.vision;
 
 import edu.wpi.first.wpilibj.command.Command;
-import frc.robot.Robot;
 import frc.robot.subsystems.Drivetrain;
+import frc.robot.subsystems.Elevator;
 
 public class AutoDriveIn extends Command{
 
+    private static final double kTargetYDist = 2.8;
+    private static final double kYDeadband = 1;
+    private static final double kXDeadband = 0.4;
+
     @Override
     protected void initialize() {
-        VisionHelper.setTargetDist(0);
+        VisionHelper.setTargetDist(kTargetYDist);
     }
 
     @Override
     protected void execute() {
-        Drivetrain.getInstance().setRawSpeed(VisionHelper.throttleCorrection() - VisionHelper.turnCorrection(),
-                                             VisionHelper.throttleCorrection() + VisionHelper.turnCorrection());
+        Drivetrain.getInstance().setRawSpeed(VisionHelper.getDriveSignal());
     }
 
     @Override
     protected boolean isFinished() {
-        return VisionHelper.isCloseToScore();
+        return Math.abs(VisionHelper.getActiveCam().tY() - kTargetYDist) <= kYDeadband
+              && Math.abs(VisionHelper.getActiveCam().tX()) <= kXDeadband
+              && Elevator.getInstance().isAtSetpoint();
     }
 
     @Override

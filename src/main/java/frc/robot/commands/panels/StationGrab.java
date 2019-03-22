@@ -5,15 +5,13 @@ import edu.wpi.first.wpilibj.command.CommandGroup;
 import edu.wpi.first.wpilibj.command.WaitCommand;
 import frc.robot.Robot;
 import frc.robot.commands.elevator.SafeElevatorMove;
-import frc.robot.subsystems.Drivetrain;
-import frc.robot.subsystems.PPintake;
 import frc.robot.subsystems.Elevator.Setpoint;
+import frc.robot.subsystems.Elevator;
+import frc.robot.subsystems.PPintake;
 import frc.robot.subsystems.PPintake.PPState;
-import frc.robot.vision.AutoDriveIn;
-import frc.robot.vision.VisionHelper;
 import frc.util.Limelight.LED_STATE;
 
-public class StationGrab extends CommandGroup{
+public class StationGrab extends CommandGroup {
 
     @Override
     protected void initialize() {
@@ -30,7 +28,7 @@ public class StationGrab extends CommandGroup{
             }
         });
         addSequential(PPintake.getInstance().setPPCommand(PPState.INTAKE));
-        addSequential(new SafeElevatorMove(Setpoint.STOW));
+        addSequential(new SafeElevatorMove(Setpoint.PANEL_GRAB));
         addSequential(PPintake.getInstance().setArmCommand(true));
         addSequential(new WaitCommand(0.5));
         addSequential(PPintake.getInstance().waitForPPCommand());
@@ -53,11 +51,13 @@ public class StationGrab extends CommandGroup{
     private class RetractPanel extends CommandGroup{
         public RetractPanel(){
             addSequential(new WaitCommand(0.25));
-            addSequential(PPintake.getInstance().setPPCommand(PPState.HOLDING));
+            addSequential(PPintake.getInstance().setPPCommand(PPState.INTAKE));
             addSequential(Robot.limeBall.setLEDCommand(LED_STATE.BLINK));
             addSequential(Robot.limePanel.setLEDCommand(LED_STATE.BLINK));
+            addSequential(PPintake.getInstance().setPPCommand(PPState.HOLDING));
             addSequential(PPintake.getInstance().setArmCommand(false));
             addSequential(new WaitCommand(0.5));
+            addSequential(Elevator.getInstance().jogElevatorCommand(Setpoint.STOW));
             addSequential(Robot.limeBall.setLEDCommand(LED_STATE.OFF));
             addSequential(Robot.limePanel.setLEDCommand(LED_STATE.OFF));
         }

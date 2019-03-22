@@ -3,11 +3,13 @@ package frc.robot.subsystems;
 import java.util.LinkedHashMap;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.InvertType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Subsystem;
 import frc.robot.Constants;
@@ -34,13 +36,14 @@ public class Elevator extends Subsystem implements ILoggable {
     // private static final double mConversionFactor = 17419d / 37797d;
     private static final double mConversionFactor = 1;
 
-    private static final double kP = 0.5 * mConversionFactor;
+    private static final double kP = 0.5 * mConversionFactor; //0.15
     private static final double kI = 0; 
-    private static final double kD = 0;
-    private static final double kF = 0.15 * mConversionFactor;
+    private static final double kD = 1.5; //0
+    private static final double kF = 0.06 * mConversionFactor; //0.15
+    private static final double kArbFF = 0.1944;
 
-    private static final int kMMacceleration = (int) (30000 * mConversionFactor);
-    private static final int kMMvelocity = (int) (12000 * mConversionFactor);
+    private static final int kMMacceleration = (int) (40000 * mConversionFactor); //45000
+    private static final int kMMvelocity = (int) (17000 * mConversionFactor); //17000
 
     private static final int kTopLimit = (int) (72387 * mConversionFactor);
 
@@ -90,15 +93,15 @@ public class Elevator extends Subsystem implements ILoggable {
 
 
     private Elevator(){
-        
+          
         heightSetpoints.put(Setpoint.BOTTOM,     0);
-        heightSetpoints.put(Setpoint.STOW,       1637); 
-        heightSetpoints.put(Setpoint.PANEL_GRAB,  5500);
+        heightSetpoints.put(Setpoint.STOW,       1200); 
+        heightSetpoints.put(Setpoint.PANEL_GRAB,  1979);
         heightSetpoints.put(Setpoint.FLOOR_INTAKE, 0);
         heightSetpoints.put(Setpoint.CARGO_SHIP, 33000);
         heightSetpoints.put(Setpoint.FUEL_STATION, 33000);
         heightSetpoints.put(Setpoint.FUEL_LOW,   16858);
-        heightSetpoints.put(Setpoint.HATCH_MID,  31900);
+        heightSetpoints.put(Setpoint.HATCH_MID,  29932);
         heightSetpoints.put(Setpoint.FUEL_MID,   42500);
         heightSetpoints.put(Setpoint.HATCH_HIGH, 57182);
         heightSetpoints.put(Setpoint.FUEL_HIGH,  71000);
@@ -155,12 +158,16 @@ public class Elevator extends Subsystem implements ILoggable {
         mMaster.config_kF(0, val);
     }
 
+    public LimitableSRX getMaster(){
+        return mMaster;
+    }
+
     public boolean setPosition(int position){
         if (mNeedsZero)
             return false;
         if (mLockElevator)
             return false;
-        mMaster.set(ControlMode.MotionMagic, (position *mConversionFactor) + mZeroOffset);
+        mMaster.set(ControlMode.MotionMagic, (position *mConversionFactor) + mZeroOffset, DemandType.ArbitraryFeedForward, kArbFF);
         return true;
     }
 
@@ -345,6 +352,7 @@ public class Elevator extends Subsystem implements ILoggable {
             @Override
             protected LogObject[] collectData() {
                 return new LogObject[]{
+                    new LogObject("Time", Timer.getFPGATimestamp()),
                     new LogObject("Target",  mMaster.getClosedLoopTarget()),
                     new LogObject("Position", mMaster.getSelectedSensorPosition()),
                     new LogObject("Error", mMaster.getClosedLoopError(0))

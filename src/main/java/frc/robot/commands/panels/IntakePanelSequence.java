@@ -31,7 +31,7 @@ public class IntakePanelSequence extends CommandGroup{
         addSequential(DustPan.getInstance().intakeCommand(DustpanIntakeState.ON));
         addSequential(PPintake.getInstance().setArmCommand(false));
         addSequential(PPintake.getInstance().setPPCommand(PPState.OFF));
-        addSequential(new SafeElevatorMove(Setpoint.FLOOR_INTAKE));
+        addSequential(new SafeElevatorMove(Setpoint.BOTTOM));
         addSequential(Elevator.getInstance().lockElevatorCommand(true));
         addSequential(new WaitCommand(0.5));
         addSequential(new WaitForPanel());

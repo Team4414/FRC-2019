@@ -9,15 +9,23 @@ public class JogElevator extends Command{
 
     private Command mMoveCommand;
     private Position mPos;
+    private boolean mWantsCargo;
 
     public JogElevator(Position pos){
         mPos = pos;
+        mWantsCargo = false;
+    }
+
+    public JogElevator(Position pos, boolean wantsToCargo){
+        mPos = pos;
+        mWantsCargo = wantsToCargo;
     }
 
     @Override
     protected void initialize() {
         mMoveCommand = new SafeElevatorMove(Elevator.getSignal(mPos, Robot.activeSide));
         mMoveCommand.start();
+        Robot.wantsToCargoOnScore = mWantsCargo;
     }
 
     @Override

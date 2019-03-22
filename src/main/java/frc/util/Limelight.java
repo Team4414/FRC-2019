@@ -77,6 +77,10 @@ public class Limelight{
         return get("tx");
     }
 
+    public double tS(){
+        return get("ts");
+    }
+
     public double tY(){
         return get("ty");
     }
@@ -138,7 +142,7 @@ public class Limelight{
 
     public double getSkew(){
         if (!hasTarget())
-            return 0;
+            return 2;
         Double[] xData = getArray("tcornx");
         Double[] yData = getArray("tcorny");
 

@@ -11,7 +11,6 @@ import com.ctre.phoenix.sensors.PigeonIMU;
 
 import edu.wpi.first.wpilibj.command.Subsystem;
 import frc.robot.Constants;
-import frc.robot.Robot;
 import frc.robot.RobotMap;
 import frc.util.logging.ILoggable;
 import frc.util.logging.Loggable;
@@ -64,8 +63,8 @@ public class Drivetrain extends Subsystem implements ILoggable{
 
         mGyro = new PigeonIMU(Climber.getInstance().mClimber);
 
-        mLeftMaster.configOpenloopRamp(0.00, Constants.kCTREtimeout);
-        mRightMaster.configOpenloopRamp(0.00, Constants.kCTREtimeout);
+        mLeftMaster.configOpenloopRamp(0.08, Constants.kCTREtimeout);
+        mRightMaster.configOpenloopRamp(0.08, Constants.kCTREtimeout);
 
         mLeftMaster.configVoltageCompSaturation(12, Constants.kCTREtimeout);
         mRightMaster.configVoltageCompSaturation(12, Constants.kCTREtimeout);

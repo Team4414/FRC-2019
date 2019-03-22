@@ -21,7 +21,7 @@ public class Hand extends Subsystem{
         DROP
     }
 
-    private static final double kHoldPwr = 0.40;
+    private static final double kHoldPwr = 0.2;
     private static final double kIntakePwr = 1;
     private static final double kDropPwr = -1;
 

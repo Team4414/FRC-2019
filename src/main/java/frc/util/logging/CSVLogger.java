@@ -19,7 +19,7 @@ public class CSVLogger {
     /**
      * The path to a directory where the logged csv files are to be stored in the filesystem.
      */
-    private static final String FILE_PATH = "/U/logs/";
+    private static final String FILE_PATH = "/media/sda1/";
     /**
      * Log CSV Method.
      *
@@ -32,6 +32,8 @@ public class CSVLogger {
      * @return True if operation is successful. False if operation has failed.
      */
     public static boolean logCSV(String fileName, Log input){
+
+        System.out.println("HHHE");
 
         //Make sure Log is not empty
         try{

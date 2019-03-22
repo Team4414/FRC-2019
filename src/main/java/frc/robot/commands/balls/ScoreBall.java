@@ -1,20 +1,45 @@
 package frc.robot.commands.balls;
 
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.CommandGroup;
+import frc.robot.Robot;
+import frc.robot.commands.elevator.JogElevator;
+import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Hand;
+import frc.robot.subsystems.Elevator.Position;
+import frc.robot.subsystems.Elevator.Setpoint;
 import frc.robot.subsystems.Hand.HandState;
 
 public class ScoreBall extends CommandGroup{
 
     public ScoreBall(){
+        addSequential(new Command(){
+        
+            @Override
+            protected boolean isFinished() {
+                if (Robot.wantsToCargoOnScore){
+                    Elevator.getInstance().setPosition(Setpoint.CARGO_SHIP);
+                }
+                return Elevator.getInstance().isAtSetpoint();
+            }
+        });
+        addSequential(new Command(){
+        
+            @Override
+            protected boolean isFinished() {
+                Robot.wantsToCargoOnScore = false;
+                return true;
+            }
+        });
         addSequential(Hand.getInstance().setHandCommand(HandState.DROP));
     }
 
+    // @SuppressWarnings("resource")
     @Override
     public synchronized void cancel() {
         Hand.getInstance().set(HandState.HOLDING);
-        new ReGrabBall().start();
+        // new ReGrabBall().start();
         super.cancel();
     }
 

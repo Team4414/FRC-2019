@@ -17,8 +17,6 @@ import frc.robot.commands.panels.IntakePanelSequence;
 import frc.robot.commands.panels.StationGrab;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Elevator.Position;
-import frc.robot.vision.AutoDriveIn;
-import frc.robot.vision.AutoScoreCommand;
 import frc.util.Limelight;
 import frc.util.Limelight.TARGET_MODE;
 
@@ -61,12 +59,11 @@ public class OI {
     private Trigger stationPanel;
     private Trigger stationBall;
 
-    private Trigger visionAutoScore;
-
     private Trigger climb;
     private Trigger releaseClimber;
     private Trigger retractClimb;
      
+    @SuppressWarnings("resource")
     private OI(){
 
         throttleNub = new Joystick(kThrottleNubID);
@@ -183,7 +180,7 @@ public class OI {
         
             @Override
             public boolean get() {
-                return turnNub.getRawButton(kNubTopButton) || (Robot.autoPlace || !Robot.isStationGrab);
+                return turnNub.getRawButton(kNubTopButton);
             }
 
         };
@@ -262,7 +259,7 @@ public class OI {
         jogLow.whenActive(new JogElevator(Position.LOW));
         jogMid.whenActive(new JogElevator(Position.MIDDLE));
         jogTop.whenActive(new JogElevator(Position.HIGH));
-        jogCrg.whenActive(new JogElevator(Position.SECOND));
+        jogCrg.whenActive(new JogElevator(Position.MIDDLE, true));
 
         reZero.whenActive(new ZeroElevator(true));
 
@@ -291,7 +288,6 @@ public class OI {
 
         Command stationGrab = new StationGrab();
         Command ballStation = new GrabStationBall();
-        Command autoDriveIn = new AutoDriveIn();
 
         stationPanel.whenActive(new Command(){
         
@@ -303,11 +299,6 @@ public class OI {
                     stationGrab.start();
                 }
 
-                if (getVision()){
-                    autoDriveIn.start();;
-                }else{
-                    autoDriveIn.cancel();
-                }
                 return true;
             }
         });
@@ -358,6 +349,10 @@ public class OI {
 
     public boolean getVision(){
         return throttleNub.getRawButton(kNubTopButton);
+    }
+
+    public boolean getStationButton(){
+        return xbox.getStickButton(Hand.kRight);
     }
 
     public Limelight.TARGET_MODE getVisionSwitcher(){
