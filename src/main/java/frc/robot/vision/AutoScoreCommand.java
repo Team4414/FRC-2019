@@ -8,8 +8,9 @@ import frc.robot.subsystems.PPintake.PPState;
 public class AutoScoreCommand extends CommandGroup{
 
     public AutoScoreCommand(){
-        addSequential(PPintake.getInstance().setArmCommand(true));
         addSequential(new AutoDriveIn());
+        addSequential(PPintake.getInstance().setArmCommand(true));
+        addSequential(new WaitCommand(0.2));
         addSequential(PPintake.getInstance().setPPCommand(PPState.SCORE));
         addSequential(new WaitCommand(0.5));
         addSequential(PPintake.getInstance().setArmCommand(false));

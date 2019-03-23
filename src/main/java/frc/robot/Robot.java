@@ -131,6 +131,10 @@ public class Robot extends TimedRobot {
       VisionHelper.setActiveCam(limePanel);
     }
 
+    if(Elevator.getInstance().getSwitch()){
+      Elevator.getInstance().zero();
+    }
+
     // System.out.println(Robot.pdp.getCurrent(RobotMap.PPintakeMap.kPP - 1));
     // System.out.println(limeBall.getSkew());
     System.out.println(Elevator.getInstance().getPosition());
@@ -163,6 +167,7 @@ public class Robot extends TimedRobot {
     limeBall.setCamMode(CAM_MODE.VISION);
 
     Elevator.getInstance().checkNeedsZero();
+    // Elevator.getInstance().zero();
     Elevator.getInstance().setRaw(0);
 
     Drivetrain.getInstance().setBrakeMode(false);
@@ -187,7 +192,6 @@ public class Robot extends TimedRobot {
 
     targetMode = OI.getInstance().getVisionSwitcher();
 
-
     if (!isClimbing){
       if (activeSide == Side.PANEL){
         //side is panel
@@ -197,7 +201,7 @@ public class Robot extends TimedRobot {
           VisionHelper.getActiveCam().setLED(LED_STATE.ON);
           VisionHelper.getActiveCam().setCamMode(CAM_MODE.VISION);
 
-          if (VisionHelper.getActiveCam().hasTarget()){
+          if (VisionHelper.hasTarget()){
             //drive command is running and vision sees target: auto score
             if (mDriveCommand.isRunning()){
               mDriveCommand.cancel();
@@ -288,15 +292,20 @@ public class Robot extends TimedRobot {
   
   @Override
   public void testInit() {
-    VisionHelper.setTargetDist(3);
+    mAutoDriveInCommand.start();
     //no-op
   }
 
   @Override
   public void testPeriodic() {
+    if (!mAutoDriveInCommand.isRunning()){
+      mAutoDriveInCommand.start();
+    }
+
+    Elevator.getInstance().setRaw(1);
     // Drivetrain.getInstance().setRawSpeed(VisionHelper.getDriveSignal());
     // Drivetrain.getInstance().setRawSpeed(VisionHelper.throttleCorrection(), VisionHelper.throttleCorrection());
-    System.out.println(VisionHelper.getActiveCam().tS());
+    // System.out.println(VisionHelper.getActiveCam().tS());
     //no-op
   }
 

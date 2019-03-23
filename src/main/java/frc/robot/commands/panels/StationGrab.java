@@ -19,24 +19,24 @@ public class StationGrab extends CommandGroup {
     }
 
     public StationGrab(){
-        addSequential(new Command(){
+        // addSequential(new Command(){
         
-            @Override
-            protected boolean isFinished() {
-                Robot.isStationGrab = false;
-                return true;
-            }
-        });
+        //     @Override
+        //     protected boolean isFinished() {
+        //         Robot.isStationGrab = true;
+        //         return true;
+        //     }
+        // });
+        addSequential(PPintake.getInstance().setArmCommand(true));
         addSequential(PPintake.getInstance().setPPCommand(PPState.INTAKE));
         addSequential(new SafeElevatorMove(Setpoint.PANEL_GRAB));
-        addSequential(PPintake.getInstance().setArmCommand(true));
         addSequential(new WaitCommand(0.5));
         addSequential(PPintake.getInstance().waitForPPCommand());
     }
 
     @Override
     protected void interrupted() {
-        this.end();
+        // this.end();
         PPintake.getInstance().setPP(PPState.OFF);
         PPintake.getInstance().setArm(false);
         Robot.isStationGrab = false;

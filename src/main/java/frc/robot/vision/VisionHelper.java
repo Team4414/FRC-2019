@@ -23,13 +23,15 @@ public class VisionHelper{
     private static final double kPanelAutoScoreY = 3; //3
     private static final double kBallAutoScoreY = 0.5;
 
-    private static final double kTrackingGain = 0.017;
-    private static final double kDerivativeGain = -0.17;
+    private static final double kTrackingGain = 0.025;
+    private static final double kDerivativeGain = -0.2;
 
     private static final double kDriveGain = 0.1;
     private static final double kDriveDerivGain = -0.15;
 
     private static final double kSkewGain = 0;
+
+    private static final double kHasTargetRollerThreshold = 0.8;
     //-------------------------------
 
     private static double mGyroTarget = 0;
@@ -44,6 +46,7 @@ public class VisionHelper{
     private static boolean alreadyScored = false;
     private static RollingAverage roller = new RollingAverage(3);
     private static RollingAverage distRoller = new RollingAverage(5);
+    private static RollingAverage hasTargetRoller = new RollingAverage(10);
 
     private static Limelight mActiveCam = Robot.limePanel;
     
@@ -81,7 +84,7 @@ public class VisionHelper{
         }
 
 
-        return Math.max(-0.5, Math.min(0.5, (mDistPastError * kDriveGain) + ((mDistPastError - mDistError) * kDriveDerivGain)));
+        return Math.max(-1, Math.min(1, (mDistPastError * kDriveGain) + ((mDistPastError - mDistError) * kDriveDerivGain)));
     }
 
     public static double turnCorrection(){
@@ -130,18 +133,11 @@ public class VisionHelper{
 
     public static double[] getDriveSignal(){
         double turnSigner = 1;
-        double skewSigner = 1;
         double turnSignal = VisionHelper.turnCorrection();
         if (Robot.activeSide == Side.BALL){
             turnSigner = -1;
         }else{
             turnSigner = 1;
-        }
-
-        if (turnSignal > 0){
-            skewSigner = -1;
-        }else{
-            skewSigner = 1;
         }
         
         return new double[]{
@@ -218,6 +214,11 @@ public class VisionHelper{
 
     public static void setTargetDist(double setPoint){
         mDistTarg = setPoint;
+    }
+
+    public static boolean hasTarget(){
+        hasTargetRoller.add( (mActiveCam.hasTarget()) ? 1 : 0);
+        return hasTargetRoller.getAverage() >= kHasTargetRollerThreshold;
     }
 
     public static void setActiveCam(Limelight cam){ mActiveCam = cam; }
