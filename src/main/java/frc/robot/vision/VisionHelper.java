@@ -20,15 +20,16 @@ public class VisionHelper{
 
     //---------- Constants ----------
 
-    private static final double kPanelAutoScoreY = 3; //3
+    private static final double kPanelAutoScoreY = 2.4; //3
     private static final double kBallAutoScoreY = 0.5;
 
-    private static final double kTrackingGain = 0.025;
+    private static final double kTrackingGain = 0.0225;
+    private static final double kTurnIGain = 0.0000;
+    // private static final double kTurnBallIGain = 0.0125;
     private static final double kDerivativeGain = -0.2;
 
     private static final double kDriveGain = 0.1;
-    private static final double kDriveDerivGain = -0.15;
-
+    private static final double kDriveDerivGain = -1.4;
     private static final double kSkewGain = 0;
 
     private static final double kHasTargetRollerThreshold = 0.8;
@@ -42,6 +43,8 @@ public class VisionHelper{
 
     private static double mError = 0;
     private static double mPastError = 0;
+    private static double mTurnErrorIAccum = 0;
+    private static final double kTurnIZone = 8;
     private static boolean hasLock = false;
     private static boolean alreadyScored = false;
     private static RollingAverage roller = new RollingAverage(3);
@@ -100,14 +103,21 @@ public class VisionHelper{
         }else{
             if (mActiveCam.hasTarget()){
                     roller.add(mActiveCam.tX());
-                    mGyroTarget =  Drivetrain.getInstance().getGyroAngle()  - roller.getAverage();
+
+                    if (Math.abs(roller.getAverage()) <= kTurnIZone){
+                        mTurnErrorIAccum += roller.getAverage();
+                    }else{
+                        mTurnErrorIAccum = 0;
+                    }
+
+                    mGyroTarget =  roller.getAverage();
             }
         }
 
         mPastError = mError;
-        mError = (mGyroTarget - Drivetrain.getInstance().getGyroAngle());
+        mError = (mGyroTarget);
 
-        return (mError * kTrackingGain) + ((mPastError - mError) * kDerivativeGain);
+        return (mError * -kTrackingGain) + ((mPastError - mError) * -kDerivativeGain) + (mTurnErrorIAccum * ((Robot.activeSide == Side.PANEL) ? kTurnIGain : -kTurnIGain));
     }
 
     public static double skewCorrection(){

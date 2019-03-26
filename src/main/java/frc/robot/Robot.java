@@ -302,7 +302,7 @@ public class Robot extends TimedRobot {
       mAutoDriveInCommand.start();
     }
 
-    Elevator.getInstance().setRaw(1);
+    // Elevator.getInstance().setRaw(1);
     // Drivetrain.getInstance().setRawSpeed(VisionHelper.getDriveSignal());
     // Drivetrain.getInstance().setRawSpeed(VisionHelper.throttleCorrection(), VisionHelper.throttleCorrection());
     // System.out.println(VisionHelper.getActiveCam().tS());

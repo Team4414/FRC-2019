@@ -47,7 +47,7 @@ public class Elevator extends Subsystem implements ILoggable {
 
     private static final int kTopLimit = (int) (72387 * mConversionFactor);
 
-    private static final int kElevatorTolerance = (int) (500 * mConversionFactor);
+    private static final int kElevatorTolerance = (int) (1000 * mConversionFactor);
     private static final int kDropForPanelClearDistance = (int) (700 * mConversionFactor);
 
     private static int mZeroOffset = 0;

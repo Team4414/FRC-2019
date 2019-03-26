@@ -6,9 +6,9 @@ import frc.robot.subsystems.Elevator;
 
 public class AutoDriveIn extends Command{
 
-    private static final double kTargetYDist = 1.8; //2.7
+    private static final double kTargetYDist = 2.4; //2.7
     private static final double kYDeadband = 1;
-    private static final double kXDeadband = 0.5;
+    private static final double kXDeadband = 1;
 
     @Override
     protected void initialize() {

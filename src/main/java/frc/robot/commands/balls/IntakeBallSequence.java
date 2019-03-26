@@ -63,6 +63,16 @@ public class IntakeBallSequence extends CommandGroup {
             addSequential(Robot.limeBall.setLEDCommand(LED_STATE.OFF));
         }
 
+        @Override
+        protected void interrupted() {
+            Intake.getInstance().deploy(false);
+            Intake.getInstance().intake(false);
+            Hand.getInstance().set(HandState.OFF);
+            Intake.getInstance().intake(IntakeWheelState.OFF);
+            Elevator.getInstance().lockElevator(false);
+            Elevator.getInstance().setPosition(Setpoint.STOW);
+        }
+
     }
 
 }
