@@ -5,7 +5,6 @@ package frc.util.kinematics.pos;
  * 
  * <p>A simple object to hold the position of a robot that can only be set, not modified.</p>
  */
-@Deprecated
 public class RobotPos{
 
     /**
@@ -43,6 +42,24 @@ public class RobotPos{
      */
     public RobotPos(RobotPos clone){
         this(clone.x, clone.y, clone.heading);
+    }
+
+    /**
+     * RobotPos Constructor
+     * 
+     * @param clone The RobotPos object to be cloned
+     */
+    public RobotPos(RobotPos clone, boolean invert){
+        if(invert){
+            this.x = -clone.x;
+            this.y = -clone.y;
+            this.heading = heading;
+            System.out.println("robotoisdidconstruct");
+        }else{
+            this.x = clone.x;
+            this.y = clone.y;
+            this.heading = clone.heading;
+        }
     }
 
     /**

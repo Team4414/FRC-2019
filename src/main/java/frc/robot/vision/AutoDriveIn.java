@@ -3,6 +3,7 @@ package frc.robot.vision;
 import edu.wpi.first.wpilibj.command.Command;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Elevator;
+import frc.robot.subsystems.PPintake;
 
 public class AutoDriveIn extends Command{
 
@@ -34,6 +35,13 @@ public class AutoDriveIn extends Command{
 
     @Override
     protected void interrupted() {
+    }
+
+    public static class AutoDriveInForPanel extends AutoDriveIn{
+        @Override
+        protected boolean isFinished() {
+            return super.isFinished() || PPintake.getInstance().hasPanel();
+        }
     }
 
 }

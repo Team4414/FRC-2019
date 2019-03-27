@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj.command.CommandGroup;
 import edu.wpi.first.wpilibj.command.WaitCommand;
 import frc.robot.subsystems.PPintake;
 import frc.robot.subsystems.PPintake.PPState;
+import frc.util.Limelight.LED_STATE;
 
 public class AutoScoreCommand extends CommandGroup{
 
@@ -30,6 +31,7 @@ public class AutoScoreCommand extends CommandGroup{
 
     @Override
     protected void end() {
+        VisionHelper.getActiveCam().setLED(LED_STATE.OFF);
     }
 }
 

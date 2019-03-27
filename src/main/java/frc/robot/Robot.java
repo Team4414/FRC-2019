@@ -1,5 +1,7 @@
 package frc.robot;
 
+import java.util.LinkedHashMap;
+
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
@@ -12,6 +14,10 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
 import frc.robot.commands.DriveManual;
+import frc.robot.commands.auton.MoveCommand;
+import frc.robot.commands.auton.PathLoader;
+import frc.robot.commands.auton.Ramsete;
+import frc.robot.commands.auton.TestAutons;
 import frc.robot.commands.elevator.ZeroElevator;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Drivetrain;
@@ -33,6 +39,7 @@ import frc.util.Limelight;
 import frc.util.Limelight.CAM_MODE;
 import frc.util.Limelight.LED_STATE;
 import frc.util.Limelight.TARGET_MODE;
+import jaci.pathfinder.Trajectory;
 
 public class Robot extends TimedRobot {
 
@@ -69,6 +76,10 @@ public class Robot extends TimedRobot {
   //------------------------------------
 
   private boolean mInitCalled;
+
+  //Map of all autonomous paths
+  public static LinkedHashMap<String, Trajectory> autonPaths;
+  Command autonCommand;
 
   private double[] operatorSignal;
 
@@ -119,6 +130,22 @@ public class Robot extends TimedRobot {
     wantsToCargoOnScore = false;
 
     mInitCalled = false;
+
+    Ramsete.getInstance();
+
+    //Import all autonomous paths from filesystem (time intensive)
+    autonPaths = PathLoader.loadPaths();
+
+    //select the autonomous command
+    //in competition this will likely be done in autonomousInit()
+    autonCommand = new TestAutons();
+
+    PeriodicLogger.getInstance();
+
+    PeriodicLogger.getInstance().addLoggable(Drivetrain.getInstance());
+    PeriodicLogger.getInstance().addLoggable(Ramsete.getInstance());
+
+    PeriodicLogger.getInstance().start();
   }
 
   @Override
@@ -137,19 +164,38 @@ public class Robot extends TimedRobot {
 
     // System.out.println(Robot.pdp.getCurrent(RobotMap.PPintakeMap.kPP - 1));
     // System.out.println(limeBall.getSkew());
-    System.out.println(Elevator.getInstance().getPosition());
+    // System.out.println(Elevator.getInstance().getPosition());
   }
 
   @Override
   public void autonomousInit() {
-    teleopInit(); //Just start teleop in sandstorm
+
+    Drivetrain.getInstance().setBrakeMode(false);
+    Drivetrain.getInstance().zeroSensor();
+    Drivetrain.getInstance().startOdometery(0.005);
+
+
+    // teleopInit(); //Just start teleop in sandstorm
     
-    Elevator.getInstance().setPosition(Setpoint.STOW);
+    // Elevator.getInstance().setPosition(Setpoint.STOW);
+
+    //Start the selected autonomous command.
+
+    Ramsete.getInstance().start();
+
+    autonCommand.start();
+
+    Scheduler.getInstance().run();
   }
 
   @Override
   public void autonomousPeriodic() {
-    teleopPeriodic();
+    // teleopPeriodic();
+    Scheduler.getInstance().run();
+
+    // System.out.println(Drivetrain.getInstance().getRobotPos().getHeading());
+
+    // System.out.println(Drivetrain.getInstance().getLeftMaster().getClosedLoopError() + "\t\t\t" + Drivetrain.getInstance().getRightMaster().getClosedLoopError());
   }
 
   @Override
@@ -171,6 +217,8 @@ public class Robot extends TimedRobot {
     Elevator.getInstance().setRaw(0);
 
     Drivetrain.getInstance().setBrakeMode(false);
+    Drivetrain.getInstance().zeroSensor();
+    Drivetrain.getInstance().startOdometery(0.005);
 
     Climber.getInstance().deployPiston(false);
 
@@ -292,15 +340,25 @@ public class Robot extends TimedRobot {
   
   @Override
   public void testInit() {
-    mAutoDriveInCommand.start();
+    // mAutoDriveInCommand.start();
     //no-op
+    Drivetrain.getInstance().startOdometery(0.005);
   }
 
   @Override
   public void testPeriodic() {
-    if (!mAutoDriveInCommand.isRunning()){
-      mAutoDriveInCommand.start();
-    }
+    // if (!mAutoDriveInCommand.isRunning()){
+    //   mAutoDriveInCommand.start();
+    // }
+
+      // Drivetrain.getInstance().setRawSpeed(0.1, 0.1);
+      // Drivetrain.getInstance().setVelocity(5, 5);
+      // System.out.println(Drivetrain.getInstance().getLeftSensorVelocity() + "\t\t\t\t" + Drivetrain.getInstance().getRightSensorVelocity());
+      // System.out.println(Drivetrain.getInstance().getLeftMaster().getSelectedSensorVelocity() + "\t\t\t" + Drivetrain.getInstance().getRightMaster().getSelectedSensorVelocity());
+      // System.out.println("X: " + Drivetrain.getInstance().getRobotPos().getX() + "\t\t Y:" + Drivetrain.getInstance().getRobotPos().getY() +"\t\t LEFTPOS:" +
+      // Drivetrain.getInstance().getLeftSensorPosition() + "\t\t Right: " + Drivetrain.getInstance().getRightSensorPosition());
+
+
 
     // Elevator.getInstance().setRaw(1);
     // Drivetrain.getInstance().setRawSpeed(VisionHelper.getDriveSignal());
@@ -324,9 +382,13 @@ public class Robot extends TimedRobot {
     Climber.getInstance().setBrakeMode(false);
     Elevator.getInstance().setPosition(0);
     Drivetrain.getInstance().setBrakeMode(false);
+    Drivetrain.getInstance().stopOdometery();
 
     PeriodicLogger.getInstance().stop();
     PeriodicLogger.getInstance().allToCSV();
+    PeriodicLogger.getInstance().clearAll();
+
+    Ramsete.getInstance().stop();
   }
 
   @Override

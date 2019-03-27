@@ -9,12 +9,15 @@ import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import com.ctre.phoenix.sensors.PigeonIMU;
 
+import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.command.Subsystem;
 import frc.robot.Constants;
 import frc.robot.RobotMap;
+import frc.util.kinematics.pos.RobotPos;
 import frc.util.logging.ILoggable;
 import frc.util.logging.Loggable;
 import frc.util.talon.CTREFactory;
+import jaci.pathfinder.Pathfinder;
 
 public class Drivetrain extends Subsystem implements ILoggable{
 
@@ -42,6 +45,12 @@ public class Drivetrain extends Subsystem implements ILoggable{
     private double mLeftZeroOffset = 0;
     private double mRightZeroOffset = 0;
     private double mGyroOffset = 0;
+
+    //Odometery variables:
+    private double mLastPos, mCurrentPos, mDeltaPos;
+    double x, y, theta;
+    private Notifier odometery;
+    private static final double kOdometeryFix = 0.973;
 
     //Drive Gains: 
     private double kP = 0.4;
@@ -114,6 +123,20 @@ public class Drivetrain extends Subsystem implements ILoggable{
         mRightSlaveB.setInverted(InvertType.FollowMaster);
 
         setupLogger();
+
+        //Zero Odometery:
+        x = 0;
+        y = 0;
+        theta = 0;
+
+        odometery = new Notifier(() ->{
+            mCurrentPos = (getLeftSensorPosition() + getRightSensorPosition())/2.0;
+            mDeltaPos = mCurrentPos - mLastPos;
+            theta = getGyroAngle();
+            x +=  kOdometeryFix * Math.cos(Pathfinder.d2r((theta))) * mDeltaPos;
+            y +=  kOdometeryFix * Math.sin(Pathfinder.d2r((theta))) * mDeltaPos;
+            mLastPos = mCurrentPos;
+        });
     }
 
     @Override
@@ -150,6 +173,13 @@ public class Drivetrain extends Subsystem implements ILoggable{
         mRightMaster.set(ControlMode.Velocity, right * Constants.kFPS2NativeU, DemandType.ArbitraryFeedForward, kFriction);
     }
 
+    public TalonSRX getLeftMaster(){
+        return mLeftMaster;
+    }
+    public TalonSRX getRightMaster(){
+        return mRightMaster;
+    }
+
     /**
      * Zero Sensor
      * 
@@ -159,6 +189,22 @@ public class Drivetrain extends Subsystem implements ILoggable{
         mLeftZeroOffset = mLeftMaster.getSelectedSensorPosition(Constants.kCTREpidIDX);
         mRightZeroOffset = mRightMaster.getSelectedSensorPosition(Constants.kCTREpidIDX);
         mGyroOffset = mGyro.getFusedHeading();
+
+        x = 0;
+        y = 0;
+        theta = 0;
+
+        mCurrentPos = 0;
+        mDeltaPos = 0;
+        mLastPos = 0;
+    }
+
+    public void setOdometery(RobotPos pos){
+        x = pos.getX();
+        y = pos.getY();
+        theta = pos.getHeading();
+        // mGyroOffset = (mGyro.getFusedHeading() + pos.getHeading());
+        mGyroOffset = (mGyro.getFusedHeading() - pos.getHeading());
     }
 
     public void zeroGyro(){
@@ -183,6 +229,35 @@ public class Drivetrain extends Subsystem implements ILoggable{
     public void setBrakeMode(boolean brake){
         mLeftMaster.setNeutralMode((brake) ? NeutralMode.Brake : NeutralMode.Coast);
         mRightMaster.setNeutralMode((brake) ? NeutralMode.Brake : NeutralMode.Coast);
+    }
+
+    /**
+     * Start Odometery Method
+     * 
+     * <p> Starts tracking the robot position </p>
+     * 
+     * @param period timestep to update at.
+     */
+    public void startOdometery(double period){
+        odometery.startPeriodic(period);
+    }
+
+    /**
+     * Stop Odometery Method
+     * 
+     * <p> Stops tracking the robot position </p>
+     */
+    public void stopOdometery(){
+        odometery.stop();
+    }
+
+    /**
+     * Get Robot Position Method.
+     * 
+     * @return The position of the robot.
+     */
+    public RobotPos getRobotPos(){
+        return new RobotPos(x, y, theta);
     }
 
     /**
@@ -220,7 +295,12 @@ public class Drivetrain extends Subsystem implements ILoggable{
             protected LogObject[] collectData() {
                 return new LogObject[]{
                     new LogObject("LeftVel",  getLeftSensorVelocity()),
-                    new LogObject("RightVel", getRightSensorVelocity())
+                    new LogObject("RightVel", getRightSensorVelocity()),
+
+                    new LogObject("Type", "R"),
+                    new LogObject("XPos", x  * Constants.kFeet2Meters),
+                    new LogObject("YPos", y  * Constants.kFeet2Meters),
+                    new LogObject("Heading", theta)
                 };
             }
         };
