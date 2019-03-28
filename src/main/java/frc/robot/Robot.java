@@ -139,6 +139,7 @@ public class Robot extends TimedRobot {
 
     //Import all autonomous paths from filesystem (time intensive)
     autonPaths = PathLoader.loadPaths();
+    autonCommand = new TestAutons(FieldSide.LEFT);
 
     //select the autonomous command
     //in competition this will likely be done in autonomousInit()
