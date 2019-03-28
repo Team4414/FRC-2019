@@ -40,7 +40,7 @@ public class AutoDriveIn extends Command{
     public static class AutoDriveInForPanel extends AutoDriveIn{
         @Override
         protected boolean isFinished() {
-            return super.isFinished() || PPintake.getInstance().hasPanel();
+            return PPintake.getInstance().hasPanel();
         }
     }
 

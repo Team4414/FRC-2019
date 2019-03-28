@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Subsystem;
 import frc.robot.Robot;
 import frc.robot.RobotMap;
+import frc.util.RollingAverage;
 import frc.util.talon.CTREFactory;
 
 public class PPintake extends Subsystem{
@@ -17,7 +18,7 @@ public class PPintake extends Subsystem{
     private static final double kScorePower = -1;
     private static final double kUnJamPower = -0.2;
 
-    private static final double kPanelCurrentThreshold = 30;
+    private static final double kPanelCurrentThreshold = 40;
 
     public static enum ArmState{
         RETRACTED,
@@ -37,6 +38,7 @@ public class PPintake extends Subsystem{
     
     public static ArmState armState;
     public static PPState ppState;
+    private RollingAverage currentRoller;
 
     private static PPintake instance;
     public static PPintake getInstance(){
@@ -50,6 +52,8 @@ public class PPintake extends Subsystem{
         mArm = new Solenoid(RobotMap.PPintakeMap.kArm);
 
         mPP.setInverted(true);
+
+        currentRoller = new RollingAverage(5);
 
         armState = ArmState.RETRACTED;
         ppState = PPState.OFF;
@@ -115,8 +119,9 @@ public class PPintake extends Subsystem{
     }
 
     public boolean hasPanel(){
+        currentRoller.add(Robot.pdp.getCurrent(RobotMap.PPintakeMap.kPP - 1));
         return 
-            (Robot.pdp.getCurrent(RobotMap.PPintakeMap.kPP - 1) > kPanelCurrentThreshold);
+            currentRoller.getAverage() > kPanelCurrentThreshold;
     }
 
     public Command waitForPPCommand(){

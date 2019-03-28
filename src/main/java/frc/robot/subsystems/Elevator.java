@@ -34,21 +34,21 @@ public class Elevator extends Subsystem implements ILoggable {
 
     
     // private static final double mConversionFactor = 17419d / 37797d;
-    private static final double mConversionFactor = 1;
+    private static final double mConversionFactor = 1d/1.38d;
 
     private static final double kP = 0.5 * mConversionFactor; //0.15
     private static final double kI = 0; 
     private static final double kD = 1.5; //0
     private static final double kF = 0.06 * mConversionFactor; //0.15
-    private static final double kArbFF = 0.125; //0.1944
+    private static final double kArbFF = 0.1944; //0.1944
 
-    private static final int kMMacceleration = (int) (25000 * mConversionFactor); //45000
-    private static final int kMMvelocity = (int) (17000 * mConversionFactor); //17000
+    private static final int kMMacceleration = (int) (45000); //45000
+    private static final int kMMvelocity = (int) (9000); //17000
 
-    private static final int kTopLimit = (int) (72387 * mConversionFactor);
+    private static final int kTopLimit = (int) (72387);
 
-    private static final int kElevatorTolerance = (int) (1000 * mConversionFactor);
-    private static final int kDropForPanelClearDistance = (int) (700 * mConversionFactor);
+    private static final int kElevatorTolerance = (int) (1000);
+    private static final int kDropForPanelClearDistance = (int) (700);
 
     private static int mZeroOffset = 0;
     private static boolean mNeedsZero; 
@@ -167,7 +167,7 @@ public class Elevator extends Subsystem implements ILoggable {
             return false;
         if (mLockElevator)
             return false;
-        mMaster.set(ControlMode.MotionMagic, (position *mConversionFactor) + mZeroOffset, DemandType.ArbitraryFeedForward, kArbFF);
+        mMaster.set(ControlMode.MotionMagic, (position) + mZeroOffset, DemandType.ArbitraryFeedForward, kArbFF);
         return true;
     }
 
@@ -273,7 +273,7 @@ public class Elevator extends Subsystem implements ILoggable {
     }
 
     public double getError(){
-        return (mMaster.getClosedLoopTarget() - mMaster.getSelectedSensorPosition()) * mConversionFactor;
+        return (mMaster.getClosedLoopTarget() - mMaster.getSelectedSensorPosition());
     }
 
     public boolean isAtSetpoint(){

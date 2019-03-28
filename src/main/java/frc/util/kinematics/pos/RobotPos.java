@@ -50,16 +50,16 @@ public class RobotPos{
      * @param clone The RobotPos object to be cloned
      */
     public RobotPos(RobotPos clone, boolean invert){
-        if(invert){
-            this.x = -clone.x;
-            this.y = -clone.y;
-            this.heading = heading;
-            System.out.println("robotoisdidconstruct");
-        }else{
+        // if(invert){
+        //     this.x = -clone.x;
+        //     this.y = -clone.y;
+        //     this.heading = heading;
+        //     System.out.println("robotoisdidconstruct");
+        // }else{
             this.x = clone.x;
             this.y = clone.y;
             this.heading = clone.heading;
-        }
+        // }
     }
 
     /**

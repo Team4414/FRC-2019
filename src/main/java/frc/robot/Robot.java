@@ -131,7 +131,7 @@ public class Robot extends TimedRobot {
 
     mInitCalled = false;
 
-    Ramsete.getInstance();
+    // Ramsete.getInstance().start();
 
     //Import all autonomous paths from filesystem (time intensive)
     autonPaths = PathLoader.loadPaths();
@@ -172,7 +172,9 @@ public class Robot extends TimedRobot {
 
     Drivetrain.getInstance().setBrakeMode(false);
     Drivetrain.getInstance().zeroSensor();
+    Drivetrain.getInstance().zeroGyro();
     Drivetrain.getInstance().startOdometery(0.005);
+    Elevator.getInstance().checkNeedsZero();
 
 
     // teleopInit(); //Just start teleop in sandstorm
@@ -203,6 +205,8 @@ public class Robot extends TimedRobot {
     if (mInitCalled)
       return;
       
+
+    autonCommand.cancel();
     mZeroElevatorCommand.start();
 
     limePanel.setUSBCam(true);
@@ -224,6 +228,7 @@ public class Robot extends TimedRobot {
 
     PeriodicLogger.getInstance().start();
 
+    Ramsete.getInstance().stop();
     mInitCalled = true;
   }
 

@@ -25,6 +25,7 @@ public class VisionHelper{
 
     private static final double kTrackingGain = 0.0225;
     private static final double kTurnIGain = 0.0000;
+    private static final double kTrackingMuliplier = 1;
     // private static final double kTurnBallIGain = 0.0125;
     private static final double kDerivativeGain = -0.2;
 
@@ -117,7 +118,9 @@ public class VisionHelper{
         mPastError = mError;
         mError = (mGyroTarget);
 
-        return (mError * -kTrackingGain) + ((mPastError - mError) * -kDerivativeGain) + (mTurnErrorIAccum * ((Robot.activeSide == Side.PANEL) ? kTurnIGain : -kTurnIGain));
+        return (mError * -kTrackingGain) * (isCloseToScore() ? kTrackingMuliplier : 1) 
+        + ((mPastError - mError) * -kDerivativeGain) * (isCloseToScore() ? kTrackingMuliplier : 1)
+        + (mTurnErrorIAccum * ((Robot.activeSide == Side.PANEL) ? kTurnIGain : -kTurnIGain));
     }
 
     public static double skewCorrection(){

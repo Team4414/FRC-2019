@@ -2,6 +2,7 @@ package frc.robot.commands.auton;
 
 import edu.wpi.first.wpilibj.command.Command;
 import frc.robot.Robot;
+import frc.robot.Robot.Side;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.vision.VisionHelper;
 import frc.util.RamseteUtil.Status;
@@ -11,33 +12,55 @@ import jaci.pathfinder.Trajectory;
 
 public class MoveCommand extends Command{
 
-    private Trajectory mPath;
-    private boolean mInvertPath;
-    private boolean mLookForVision;
-    private boolean mIsFirstPath;
-
-    private static boolean lastPathInverted = false;
-
-    public MoveCommand(Trajectory path){
-        this(path, false, false);
+    public enum FieldSide{
+        LEFT,
+        RIGHT
     }
 
-    public MoveCommand(Trajectory path, boolean invertPath, boolean lookForVision){
+    public enum VisionCancel{
+        CANCEL_ON_VISION,
+        RUN_FULL_PATH
+    }
+
+    public enum ZeroOdometeryMode{
+        FIRST_PATH,
+        NO_ZERO
+    }
+
+    private Trajectory mPath;
+    private boolean mInvertPath;
+    private VisionCancel mLookForVision;
+    private boolean mIsFirstPath;
+    private FieldSide mIsRightPath;
+
+    private static Side lastPathInverted = Side.BALL;
+
+    public MoveCommand(Trajectory path){
+        this(path, Side.BALL, VisionCancel.RUN_FULL_PATH);
+    }
+
+    public MoveCommand(Trajectory path, Side invertPath, VisionCancel lookForVision){
         mPath = path;
-        if(lastPathInverted != invertPath){
+        if(invertPath == Side.PANEL){
             mInvertPath = true;
-            System.out.println("Pathnasdf");
         }else{
             mInvertPath = false;
         }
         mIsFirstPath = false;
+        mIsRightPath = FieldSide.LEFT;
         lastPathInverted = invertPath;
         mLookForVision = lookForVision;
     }
 
-    public MoveCommand(Trajectory path, boolean invertPath, boolean lookForVision, boolean isFirstPath){
+    public MoveCommand(Trajectory path, Side invertPath, VisionCancel lookForVision, ZeroOdometeryMode isFirstPath){
         this(path, invertPath, lookForVision);
-        mIsFirstPath = isFirstPath;
+        mIsFirstPath = (isFirstPath == ZeroOdometeryMode.FIRST_PATH);
+    }
+
+    public MoveCommand(Trajectory path, Side invertPath, VisionCancel lookForVision, ZeroOdometeryMode isFirstPath, FieldSide fieldSide){
+        this(path, invertPath, lookForVision);
+        mIsRightPath = fieldSide;
+        mIsFirstPath = (isFirstPath == ZeroOdometeryMode.FIRST_PATH);
     }
 
     @Override
@@ -47,9 +70,9 @@ public class MoveCommand extends Command{
         // System.out.println(((mInvertPath) ? -1 : 1) * mPath.get(0).x +"\t\t\t\t" + ((mInvertPath) ? 1 : 1) * mPath.get(0).y + "\t\t\t\t" + (mInvertPath ? -1 : 1) *  Pathfinder.r2d(mPath.get(0).heading));
         // Drivetrain.getInstance().zeroSensor();
         if(mIsFirstPath){
-            Drivetrain.getInstance().setOdometery(new RobotPos(((mInvertPath) ? -1 : 1) * mPath.get(0).x, ((mInvertPath) ? 1 : -1) * mPath.get(0).y, (mInvertPath ? -1 : -1) *  Pathfinder.r2d(mPath.get(0).heading)));
+            Drivetrain.getInstance().setOdometery(new RobotPos(mPath.get(0).x, ((mIsRightPath == FieldSide.LEFT) ? -1 : 1) * mPath.get(0).y, ((mInvertPath) ? 180 : 0) + (((mIsRightPath == FieldSide.LEFT) ? -1 : 1) * Pathfinder.r2d(mPath.get(0).heading))));
         }else{
-            Drivetrain.getInstance().setOdometery(new RobotPos(Drivetrain.getInstance().getRobotPos(), mInvertPath));
+            // Drivetrain.getInstance().setOdometery(new RobotPos(Drivetrain.getInstance().getRobotPos(), mInvertPath));
         }
 
         System.out.println("INITIAL POSIIION:\t\t" + Drivetrain.getInstance().getRobotPos().getX() + "\t\t\t" + Drivetrain.getInstance().getRobotPos().getY() + "\t\t\t\t" + Drivetrain.getInstance().getRobotPos().getHeading());
@@ -71,7 +94,7 @@ public class MoveCommand extends Command{
 
     @Override
     protected boolean isFinished() {
-        return Ramsete.getStatus() == Status.STANDBY || (mLookForVision && Robot.limePanel.hasTarget());
+        return Ramsete.getStatus() == Status.STANDBY || ((mLookForVision == VisionCancel.CANCEL_ON_VISION) && Robot.limePanel.hasTarget());
     }
 
     @Override

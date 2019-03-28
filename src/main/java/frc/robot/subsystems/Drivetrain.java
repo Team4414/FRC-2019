@@ -53,10 +53,10 @@ public class Drivetrain extends Subsystem implements ILoggable{
     private static final double kOdometeryFix = 0.973;
 
     //Drive Gains: 
-    private double kP = 0.4;
+    private double kP = 0.1; //0.4
     private double kI = 0;
-    private double kD = 0;
-    private double kF = 0.17;
+    private double kD = 1;
+    private double kF = 0.225;//0.17
 
     private double kFriction = 0; //0.1
 

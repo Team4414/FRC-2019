@@ -2,18 +2,23 @@ package frc.robot.vision;
 
 import edu.wpi.first.wpilibj.command.CommandGroup;
 import edu.wpi.first.wpilibj.command.WaitCommand;
+import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.PPintake;
 import frc.robot.subsystems.PPintake.PPState;
 import frc.util.Limelight.LED_STATE;
 
 public class AutoScoreCommand extends CommandGroup{
 
+    @Override
+    protected void initialize() {
+    }
+
     public AutoScoreCommand(){
         addSequential(new AutoDriveIn());
         addSequential(PPintake.getInstance().setArmCommand(true));
         addSequential(new WaitCommand(0.2));
         addSequential(PPintake.getInstance().setPPCommand(PPState.SCORE));
-        addSequential(new WaitCommand(0.5));
+        addSequential(new WaitCommand(0.07));
         addSequential(PPintake.getInstance().setArmCommand(false));
         addSequential(PPintake.getInstance().setPPCommand(PPState.OFF));
     }
@@ -32,6 +37,7 @@ public class AutoScoreCommand extends CommandGroup{
     @Override
     protected void end() {
         VisionHelper.getActiveCam().setLED(LED_STATE.OFF);
+        Drivetrain.getInstance().setBrakeMode(false);
     }
 }
 

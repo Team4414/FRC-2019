@@ -1,5 +1,6 @@
 package frc.util;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
 import frc.util.DriveSignal;
 import frc.util.kinematics.pos.RobotPos;
@@ -22,8 +23,10 @@ import jaci.pathfinder.Trajectory;
 public abstract class RamseteUtil {
 
     private final double kTimestep;
-    private static final double kZeta = 0.96;    //Damper (0.96)
-    private static final double kBeta = 5.65;    //Agressiveness (5.65)
+    private static final double kZeta = 0.05;    //Damper (0.96)
+    private static final double kBeta = 6.00;    //Agressiveness (5.65)
+
+    private static final double kDistanceKill = 0.5;
 
     public enum Status{
         STANDBY,    //Robot is finished following a path and waiting for a new one.
@@ -35,7 +38,7 @@ public abstract class RamseteUtil {
     private static Status status = Status.STANDBY;
     private static boolean invertPath = false;
 
-    private double mConstant, mAngleError, ramv, ramw;
+    private double mConstant, mAngleError, ramv, ramw, mInitMod;
 
     private double gX, gY, gTheta, gTheta_Last,
                    rX, rY, rTheta,
@@ -63,13 +66,27 @@ public abstract class RamseteUtil {
             return;
         }
 
+        forceStateUpdate();
+
         //otherwise you are tracking so update your values.
         status = Status.TRACKING;
 
+        // if( (path.get(mSegCount).heading + mInitMod + (invertPath ? Math.PI : 0)) - gTheta_Last >= Math.PI) {
+        //     mInitMod -= (path.get(mSegCount).heading + mInitMod + (invertPath ? Math.PI : 0)) - gTheta_Last;
+        // }
+        
+
         //Ramsete Math:
-        gX = (invertPath ? -1 : 1) * path.get(mSegCount).x * Constants.kFeet2Meters;
-        gY = ((invertPath) ? 1 : -1) * path.get(mSegCount).y * Constants.kFeet2Meters;
-        gTheta = ((invertPath) ? -1 : -1) * path.get(mSegCount).heading;
+        gX = path.get(mSegCount).x * Constants.kFeet2Meters; //(invertPath ? -1 : 1) * 
+        gY = -path.get(mSegCount).y * Constants.kFeet2Meters;//((invertPath) ? 1 : -1) * 
+        gTheta = -(((invertPath ? Math.PI : 0) + mInitMod + ((path.get(mSegCount).heading))));
+
+        if(Math.abs(gTheta - gTheta_Last) > 5.5){
+            mInitMod -= gTheta_Last-gTheta;
+            gTheta = -(((invertPath ? Math.PI : 0) + mInitMod + ((path.get(mSegCount).heading))));
+            // gTheta += mInitMod;
+            System.out.println("RUNNUNG FLIPPUY");
+        }
 
         rX = getPose2d().getX() * Constants.kFeet2Meters;
         rY = getPose2d().getY() * Constants.kFeet2Meters;
@@ -86,7 +103,9 @@ public abstract class RamseteUtil {
         else
             sinThetaErrOverThetaErr = Math.sin(mAngleError) / (mAngleError);
 
-        System.out.println("R " + "\t\t\t\t" + rTheta + "\t\t\t\tG " + gTheta + "\t\t\t\tThetaError: " + mAngleError);
+        // System.out.println("R " + "\t\t\t\t" + rTheta + "\t\t\t\tG " + gTheta + "\t\t\t\tThetaError: " + mAngleError);
+        SmartDashboard.putNumber("GTheta", gTheta);
+        SmartDashboard.putNumber("RTheta", rTheta);
 
         //Constant Equation from the paper.
         mConstant = 2.0 * kZeta *
@@ -118,6 +137,8 @@ public abstract class RamseteUtil {
         this.path = path;
         mSegCount = 0;
         forceStateUpdate();
+
+        // mInitMod = (double) Math.round((rTheta - (path.get(0).heading + (invertPath ? Math.PI : 0))) / ((2*Math.PI))*2*Math.PI);
     }
 
     /**
@@ -130,6 +151,9 @@ public abstract class RamseteUtil {
         mSegCount = 0;
         forceStateUpdate();
         invertPath = invert;
+        gTheta_Last = gTheta;
+
+        // mInitMod = (double) Math.round((rTheta - (path.get(0).heading + (invertPath ? Math.PI : 0))) / ((2*Math.PI))*2*Math.PI);
     }
 
     /**
@@ -142,9 +166,23 @@ public abstract class RamseteUtil {
         if (path == null || mSegCount >= path.length()){
             prepareForStandby();    
             status = Status.STANDBY;
+            return;
         }else{
             status = Status.TRACKING;
         }
+
+        if(
+            
+        
+        Math.sqrt((path.get(path.length() - 1).x - rX)*((path.get(path.length() - 1).x - rX)) 
+        + ((path.get(path.length() - 1).y - rY)*((path.get(path.length() - 1).y - rY)))) < kDistanceKill){
+            System.out.println("KILLED");
+            prepareForStandby();    
+            status = Status.STANDBY;
+        }
+
+        // System.out.println(Math.sqrt((path.get(path.length() - 1).x - rX)*((path.get(path.length() - 1).x - rX)) 
+        //     + ((path.get(path.length() - 1).y - rY)*((path.get(path.length() - 1).y - rY)))));
     }
 
     /**
