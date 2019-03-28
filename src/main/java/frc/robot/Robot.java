@@ -223,9 +223,6 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
-    if (mInitCalled)
-      return;
-      
 
     autonCommand.cancel();
     mZeroElevatorCommand.start();
@@ -237,16 +234,20 @@ public class Robot extends TimedRobot {
     limeBall.setLED(LED_STATE.OFF);
     limeBall.setCamMode(CAM_MODE.VISION);
 
-    Elevator.getInstance().checkNeedsZero();
-    // Elevator.getInstance().zero();
-    Elevator.getInstance().setRaw(0);
-
     Drivetrain.getInstance().setBrakeMode(false);
     Drivetrain.getInstance().zeroSensor();
 
     Climber.getInstance().deployPiston(false);
 
     Ramsete.getInstance().stop();
+
+    if (mInitCalled)
+      return;
+
+    Elevator.getInstance().checkNeedsZero();
+    // Elevator.getInstance().zero();
+    Elevator.getInstance().setRaw(0);
+
     mInitCalled = true;
   }
 
