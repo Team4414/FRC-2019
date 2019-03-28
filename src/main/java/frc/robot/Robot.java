@@ -13,11 +13,14 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.commands.DriveManual;
 import frc.robot.commands.auton.MoveCommand;
 import frc.robot.commands.auton.PathLoader;
 import frc.robot.commands.auton.Ramsete;
 import frc.robot.commands.auton.TestAutons;
+import frc.robot.commands.auton.MoveCommand.FieldSide;
 import frc.robot.commands.elevator.ZeroElevator;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Drivetrain;
@@ -76,12 +79,13 @@ public class Robot extends TimedRobot {
   //------------------------------------
 
   private boolean mInitCalled;
+  private boolean mAutoCancelled;
 
   //Map of all autonomous paths
   public static LinkedHashMap<String, Trajectory> autonPaths;
   Command autonCommand;
 
-  private double[] operatorSignal;
+  private SendableChooser<FieldSide> mFieldSideChooser;
 
   @Override
   public void robotInit(){
@@ -138,14 +142,17 @@ public class Robot extends TimedRobot {
 
     //select the autonomous command
     //in competition this will likely be done in autonomousInit()
-    autonCommand = new TestAutons();
+    mFieldSideChooser = new SendableChooser<FieldSide>();
+    mFieldSideChooser.setDefaultOption("LeftSide", FieldSide.LEFT);
+    mFieldSideChooser.addOption("RightSide", FieldSide.RIGHT);
+    // autonCommand = new TestAutons();
 
-    PeriodicLogger.getInstance();
+    // PeriodicLogger.getInstance();
 
-    PeriodicLogger.getInstance().addLoggable(Drivetrain.getInstance());
-    PeriodicLogger.getInstance().addLoggable(Ramsete.getInstance());
+    // PeriodicLogger.getInstance().addLoggable(Drivetrain.getInstance());
+    // PeriodicLogger.getInstance().addLoggable(Ramsete.getInstance());
 
-    PeriodicLogger.getInstance().start();
+    // PeriodicLogger.getInstance().start();
   }
 
   @Override
@@ -169,6 +176,8 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
+
+    autonCommand = new TestAutons((FieldSide) mFieldSideChooser.getSelected());
 
     Drivetrain.getInstance().setBrakeMode(false);
     Drivetrain.getInstance().zeroSensor();
@@ -194,6 +203,18 @@ public class Robot extends TimedRobot {
   public void autonomousPeriodic() {
     // teleopPeriodic();
     Scheduler.getInstance().run();
+
+    if(Math.abs(OI.getInstance().getForward()) > 0.2){
+      autonCommand.cancel();
+      mAutoCancelled = true;
+    }
+
+    if(mAutoCancelled){
+      teleopInit();
+      if(mInitCalled){
+        teleopPeriodic();
+      }
+    }
 
     // System.out.println(Drivetrain.getInstance().getRobotPos().getHeading());
 
@@ -222,11 +243,8 @@ public class Robot extends TimedRobot {
 
     Drivetrain.getInstance().setBrakeMode(false);
     Drivetrain.getInstance().zeroSensor();
-    Drivetrain.getInstance().startOdometery(0.005);
 
     Climber.getInstance().deployPiston(false);
-
-    PeriodicLogger.getInstance().start();
 
     Ramsete.getInstance().stop();
     mInitCalled = true;
@@ -234,8 +252,6 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopPeriodic(){
-
-    PeriodicLogger.getInstance().run();
 
     if (Timer.getMatchTime() < 30){
       SignalLEDS.getInstance().set(LightPattern.RED_STROBE);
@@ -375,6 +391,8 @@ public class Robot extends TimedRobot {
   @Override
   public void disabledInit() {
 
+    mAutoCancelled = false;
+
     limePanel.setLED(LED_STATE.OFF);
     limeBall.setLED(LED_STATE.OFF);
     limePanel.setUSBCam(true); 
@@ -389,9 +407,9 @@ public class Robot extends TimedRobot {
     Drivetrain.getInstance().setBrakeMode(false);
     Drivetrain.getInstance().stopOdometery();
 
-    PeriodicLogger.getInstance().stop();
-    PeriodicLogger.getInstance().allToCSV();
-    PeriodicLogger.getInstance().clearAll();
+    // PeriodicLogger.getInstance().stop();
+    // PeriodicLogger.getInstance().allToCSV();
+    // PeriodicLogger.getInstance().clearAll();
 
     Ramsete.getInstance().stop();
   }

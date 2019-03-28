@@ -20,7 +20,8 @@ import frc.robot.vision.VisionHelper;
 import frc.util.Limelight.LED_STATE;
 
 public class TestAutons extends CommandGroup{
-    public TestAutons(){
+
+    public TestAutons(FieldSide fieldSide){
 
         // addSequential(new YeetBot(-0.75, 1.25));
         // addSequential(new WaitCommand(0.5));
@@ -30,10 +31,10 @@ public class TestAutons extends CommandGroup{
         addParallel(new DelayedLimelightCommand(2.5));
         addParallel(PPintake.getInstance().setPPCommand(PPState.HOLDING));
         addParallel(new DelayedCommand(Elevator.getInstance().jogElevatorCommand(Setpoint.HATCH_MID), 1));
-        addSequential(new MoveCommand(Robot.autonPaths.get("HabToRocket_L"), Side.PANEL, VisionCancel.CANCEL_ON_VISION, ZeroOdometeryMode.FIRST_PATH));
+        addSequential(new MoveCommand(Robot.autonPaths.get("HabToRocket_L"), Side.PANEL, VisionCancel.CANCEL_ON_VISION, ZeroOdometeryMode.FIRST_PATH, fieldSide));
         addSequential(new AutoScoreCommand());
         addSequential(Robot.limePanel.setLEDCommand(LED_STATE.OFF));
-        addSequential(new MoveCommand(Robot.autonPaths.get("RocketToTurn_L"), Side.BALL, VisionCancel.RUN_FULL_PATH, ZeroOdometeryMode.NO_ZERO));
+        addSequential(new MoveCommand(Robot.autonPaths.get("RocketToTurn_L"), Side.BALL, VisionCancel.RUN_FULL_PATH, ZeroOdometeryMode.NO_ZERO, fieldSide));
         addParallel(Elevator.getInstance().jogElevatorCommand(Setpoint.STOW));
         addParallel(new DelayedLimelightCommand(1));
         addSequential(new TurnToVision(false));
@@ -41,7 +42,7 @@ public class TestAutons extends CommandGroup{
         addParallel(new AutoDriveIn.AutoDriveInForPanel());
         addSequential(new StationGrab());
         addParallel(new DelayedCommand( Elevator.getInstance().jogElevatorCommand(Setpoint.HATCH_MID), 2));
-        addSequential(new MoveCommand(Robot.autonPaths.get("FeedertoBR"), Side.BALL, VisionCancel.RUN_FULL_PATH, ZeroOdometeryMode.FIRST_PATH));
+        addSequential(new MoveCommand(Robot.autonPaths.get("FeedertoBR"), Side.BALL, VisionCancel.RUN_FULL_PATH, ZeroOdometeryMode.FIRST_PATH, fieldSide));
         addSequential(new DelayedLimelightCommand(0.7));
         addSequential(new TurnToVision(true));
         addSequential(new AutoScoreCommand());
