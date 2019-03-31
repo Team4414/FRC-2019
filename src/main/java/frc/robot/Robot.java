@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.commands.DriveManual;
 import frc.robot.commands.auton.MoveCommand;
+import frc.robot.commands.auton.PIDTurn;
 import frc.robot.commands.auton.PathLoader;
 import frc.robot.commands.auton.Ramsete;
 import frc.robot.commands.auton.TestAutons;
@@ -91,8 +92,8 @@ public class Robot extends TimedRobot {
   public void robotInit(){
 
     UsbCamera driverCam = CameraServer.getInstance().startAutomaticCapture(0);
-    driverCam.setResolution(320,240);
-    driverCam.setFPS(15);
+    driverCam.setResolution(160,120);
+    driverCam.setFPS(10);
 
     pdp = new PowerDistributionPanel();
 
@@ -105,7 +106,7 @@ public class Robot extends TimedRobot {
     Drivetrain.getInstance().zeroSensor();
     Climber.getInstance();
 
-    PeriodicLogger.getInstance().addLoggable(Elevator.getInstance());
+    // PeriodicLogger.getInstance().addLoggable(Elevator.getInstance());
 
     limePanel.setUSBCam(true);
     limePanel.setLED(LED_STATE.ON);
@@ -138,14 +139,14 @@ public class Robot extends TimedRobot {
     // Ramsete.getInstance().start();
 
     //Import all autonomous paths from filesystem (time intensive)
-    autonPaths = PathLoader.loadPaths();
-    autonCommand = new TestAutons(FieldSide.LEFT);
+    // autonPaths = PathLoader.loadPaths();
+    // autonCommand = new TestAutons(FieldSide.LEFT);
 
     //select the autonomous command
     //in competition this will likely be done in autonomousInit()
-    mFieldSideChooser = new SendableChooser<FieldSide>();
-    mFieldSideChooser.setDefaultOption("LeftSide", FieldSide.LEFT);
-    mFieldSideChooser.addOption("RightSide", FieldSide.RIGHT);
+    // mFieldSideChooser = new SendableChooser<FieldSide>();
+    // mFieldSideChooser.setDefaultOption("LeftSide", FieldSide.LEFT);
+    // mFieldSideChooser.addOption("RightSide", FieldSide.RIGHT);
     // autonCommand = new TestAutons();
 
     // PeriodicLogger.getInstance();
@@ -154,6 +155,8 @@ public class Robot extends TimedRobot {
     // PeriodicLogger.getInstance().addLoggable(Ramsete.getInstance());
 
     // PeriodicLogger.getInstance().start();
+    
+    // autonCommand = new PIDTurn(90, 10);
   }
 
   @Override
@@ -166,56 +169,64 @@ public class Robot extends TimedRobot {
       VisionHelper.setActiveCam(limePanel);
     }
 
-    if(Elevator.getInstance().getSwitch()){
-      Elevator.getInstance().zero();
-    }
+    // System.out.println(pdp.getCurrent(RobotMap.DustpanMap.kIntake - 1));
+
+    // if(Elevator.getInstance().getSwitch()){
+    //   Elevator.getInstance().zero();
+    // }
+
+
 
     // System.out.println(Robot.pdp.getCurrent(RobotMap.PPintakeMap.kPP - 1));
     // System.out.println(limeBall.getSkew());
     // System.out.println(Elevator.getInstance().getPosition());
+    
   }
 
   @Override
   public void autonomousInit() {
 
-    autonCommand = new TestAutons((FieldSide) mFieldSideChooser.getSelected());
 
-    Drivetrain.getInstance().setBrakeMode(false);
-    Drivetrain.getInstance().zeroSensor();
-    Drivetrain.getInstance().zeroGyro();
-    Drivetrain.getInstance().startOdometery(0.005);
-    Elevator.getInstance().checkNeedsZero();
+    // Drivetrain.getInstance().setBrakeMode(false);
+    // Drivetrain.getInstance().zeroSensor();
+    // Drivetrain.getInstance().zeroGyro();
+    // Drivetrain.getInstance().startOdometery(0.005);
+    // Elevator.getInstance().checkNeedsZero();
 
 
-    // teleopInit(); //Just start teleop in sandstorm
+    teleopInit(); //Just start teleop in sandstorm
     
     // Elevator.getInstance().setPosition(Setpoint.STOW);
 
     //Start the selected autonomous command.
 
-    Ramsete.getInstance().start();
+    // Ramsete.getInstance().start();
 
-    autonCommand.start();
+    // autonCommand.start();
 
     Scheduler.getInstance().run();
+
+    
+    // teleopInit();
   }
 
   @Override
   public void autonomousPeriodic() {
+    ///
     // teleopPeriodic();
+    teleopPeriodic();
     Scheduler.getInstance().run();
 
-    if(Math.abs(OI.getInstance().getForward()) > 0.2){
-      autonCommand.cancel();
-      mAutoCancelled = true;
-    }
+    // if(Math.abs(OI.getInstance().getForward()) > 0.2){
+    //   autonCommand.cancel();
+    //   mAutoCancelled = true;
+    // }
 
-    if(mAutoCancelled){
-      teleopInit();
-      if(mInitCalled){
-        teleopPeriodic();
-      }
-    }
+    // if(mAutoCancelled){
+      // if(mInitCalled){
+        // teleopPeriodic();
+      // }
+    // }
 
     // System.out.println(Drivetrain.getInstance().getRobotPos().getHeading());
 
@@ -225,8 +236,8 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopInit() {
 
-    autonCommand.cancel();
-    mZeroElevatorCommand.start();
+    Ramsete.getInstance().stop();
+    Drivetrain.getInstance().stopOdometery();
 
     limePanel.setUSBCam(true);
     limePanel.setLED(LED_STATE.OFF);
@@ -235,23 +246,32 @@ public class Robot extends TimedRobot {
     limeBall.setLED(LED_STATE.OFF);
     limeBall.setCamMode(CAM_MODE.VISION);
 
+    if (mInitCalled)
+      return;
+
+      
+    PPintake.getInstance().setPP(PPState.HOLDING);
+    
+    // autonCommand.cancel();
+    mZeroElevatorCommand.start();
+
     Drivetrain.getInstance().setBrakeMode(false);
     Drivetrain.getInstance().zeroSensor();
 
     Climber.getInstance().deployPiston(false);
 
-    Ramsete.getInstance().stop();
-
-    if (mInitCalled)
-      return;
+    
 
     Elevator.getInstance().checkNeedsZero();
     // Elevator.getInstance().zero();
-    Elevator.getInstance().setRaw(0);
+    // Elevator.getInstance().setRaw(0);
 
     mInitCalled = true;
   }
 
+  
+  boolean alreadyScored = false;
+  
   @Override
   public void teleopPeriodic(){
 
@@ -289,8 +309,9 @@ public class Robot extends TimedRobot {
               if (mAutoDriveInCommand.isRunning()){
                 mAutoDriveInCommand.cancel();
               }
-              if (!mAutoScoreCommand.isRunning()){
+              if (!mAutoScoreCommand.isRunning() && !alreadyScored){
                 mAutoScoreCommand.start();
+                alreadyScored = true;
               }
             }
           } else {
@@ -317,6 +338,8 @@ public class Robot extends TimedRobot {
           if (!mDriveCommand.isRunning()){
             mDriveCommand.start();
           }
+
+          alreadyScored = false;
         }
       } else {
         //side is ball: cancel autoscore and manual drive

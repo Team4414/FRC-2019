@@ -14,23 +14,25 @@ public class PIDTurn extends PIDCommand{
     private double mGyroOffset;
 	
     public PIDTurn(double desiredAngle, double timeInMillis) {
-    	super( 0.0225,0,-0.225);
+    	super( 0.00125,0,-0.125);
     	
         angle = desiredAngle;
         finalTime = timeInMillis;
     }
 
     protected void initialize() {
-    	mGyroOffset = Drivetrain.getInstance().getGyroAngle();
-    	startTime = Timer.getFPGATimestamp();
-        System.out.println("GyroTurnStarted");
-        Ramsete.getInstance().stop();
+    	mGyroOffset = getGyroHeading();
+    	// startTime = Timer.getFPGATimestamp();
+        // System.out.println("GyroTurnStarted");
+		// Ramsete.getInstance().stop();
+		super.setSetpoint(angle);
     }
 	
     protected void execute() {
-    	super.setSetpoint(angle * getSmoothingFunction(Timer.getFPGATimestamp(), startTime + finalTime));
+    	// super.setSetpoint(angle);
     	// System.out.println("Gyro: " + getGyroHeading() + "\tSetpoint = " + super.getSetpoint());
 //    	System.out.println(Gyro.getInstance().getFusedHeading());
+		System.out.println(super.getPIDController().getError());
     }
 
     protected boolean isFinished() {
@@ -38,8 +40,8 @@ public class PIDTurn extends PIDCommand{
 //    	return (startTime + finalTime >= Timer.getFPGATimestamp() && 
 //    			(Math.abs(DriveTrain.getInstance().getRightSpeed()) + Math.abs(DriveTrain.getInstance().getLeftSpeed())
 //    			< RIOConfigs.getInstance().getConfigOrAdd("DRIVETRAIN_DRIVE_COMMAND_THRESHOLD", 0.05)));
-    	return (Math.abs(super.getPIDController().getError()) < THRESHOLD_ERROR);
-//    	return false;
+    	// return (Math.abs(super.getPIDController().getError()) < THRESHOLD_ERROR);
+   		return false;
     }
 
     protected void end() {
@@ -52,11 +54,12 @@ public class PIDTurn extends PIDCommand{
     
     @Override
 	protected double returnPIDInput() {
-		return (-getGyroHeading());
+		// System.out.println(getGyroHeading() - mGyroOffset);
+		return (getGyroHeading() - mGyroOffset);
 	}
 	@Override
 	protected void usePIDOutput(double output) {
-		Drivetrain.getInstance().setRawSpeed(output, -output);
+		Drivetrain.getInstance().setRawSpeed(-output, output);
 	}
 	
 	private double getSmoothingFunction(double currentTime, double finalTime) {
@@ -76,6 +79,7 @@ public class PIDTurn extends PIDCommand{
 		// 	finalAngle = heading - 360;
 		// }
 		// return finalAngle;
-		return Pathfinder.boundHalfDegrees(Drivetrain.getInstance().getGyroAngle());
+		// return Pathfinder.boundHalfDegrees(Drivetrain.getInstance().getGyroAngle());
+		return Drivetrain.getInstance().getGyroAngle();
 	}
 }

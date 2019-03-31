@@ -27,9 +27,10 @@ public class StationGrab extends CommandGroup {
         //         return true;
         //     }
         // });
+        
+        addSequential(new SafeElevatorMove(Setpoint.PANEL_GRAB));
         addSequential(PPintake.getInstance().setArmCommand(true));
         addSequential(PPintake.getInstance().setPPCommand(PPState.INTAKE));
-        addSequential(new SafeElevatorMove(Setpoint.PANEL_GRAB));
         addSequential(new WaitCommand(0.5));
         addSequential(PPintake.getInstance().waitForPPCommand());
     }

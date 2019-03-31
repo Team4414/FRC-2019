@@ -16,10 +16,11 @@ public class AutoScoreCommand extends CommandGroup{
     public AutoScoreCommand(){
         addSequential(new AutoDriveIn());
         addSequential(PPintake.getInstance().setArmCommand(true));
-        addSequential(new WaitCommand(0.2));
+        addSequential(new WaitCommand(0.35));
         addSequential(PPintake.getInstance().setPPCommand(PPState.SCORE));
-        addSequential(new WaitCommand(0.07));
+        addSequential(new WaitCommand(0.2));
         addSequential(PPintake.getInstance().setArmCommand(false));
+        addSequential(new WaitCommand(0.2));
         addSequential(PPintake.getInstance().setPPCommand(PPState.OFF));
     }
 

@@ -121,7 +121,7 @@ public class PPintake extends Subsystem{
     public boolean hasPanel(){
         currentRoller.add(Robot.pdp.getCurrent(RobotMap.PPintakeMap.kPP - 1));
         return 
-            currentRoller.getAverage() > kPanelCurrentThreshold;
+            Robot.pdp.getCurrent(RobotMap.PPintakeMap.kPP - 1) > kPanelCurrentThreshold;
     }
 
     public Command waitForPPCommand(){

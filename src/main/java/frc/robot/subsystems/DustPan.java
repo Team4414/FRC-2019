@@ -13,7 +13,7 @@ import frc.util.talon.CTREFactory;
 public class DustPan extends Subsystem{
 
     private static final int kPDPport = RobotMap.DustpanMap.kIntake - 1;
-    private static final double kCurrentThreshold = 10;
+    private static final double kCurrentThreshold = 20;
 
     public static enum DustpanBoomState{
         EXTENDED,
