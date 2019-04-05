@@ -3,6 +3,7 @@ package frc.robot.subsystems;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
+import com.ctre.phoenix.motorcontrol.FollowerType;
 import com.ctre.phoenix.motorcontrol.InvertType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
@@ -53,10 +54,21 @@ public class Drivetrain extends Subsystem implements ILoggable{
     private static final double kOdometeryFix = 0.973;
 
     //Drive Gains: 
-    private double kP = 0.1; //0.4
-    private double kI = 0;
-    private double kD = 1;
-    private double kF = 0.225;//0.17
+    private int kDriveSlot = 0;
+    private double kDriveP = 0.1; //0.4
+    private double kDriveI = 0;
+    private double kDriveD = 1;
+    private double kDriveF = 0.225;//0.17
+
+    private int kDriveMMaccel = (int) (Constants.kFeet2Ticks * 0.1 * 7);
+    private int kDriveMMvel = (int) (Constants.kFeet2Ticks * 0.1 * 10);
+
+    //Turn Gains: 
+    private int kTurnSlot = 1;
+    private double kTurnP = 0.0225; //0.4
+    private double kTurnI = 0;
+    private double kTurnD = 0.25;
+    private double kTurnF = 0.225;//0.17
 
     private double kFriction = 0; //0.1
 
@@ -84,15 +96,31 @@ public class Drivetrain extends Subsystem implements ILoggable{
         mLeftMaster.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, Constants.kCTREpidIDX, Constants.kCTREtimeout);
         mRightMaster.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, Constants.kCTREpidIDX, Constants.kCTREtimeout);
 
-        mLeftMaster.config_kP(0, kP, Constants.kCTREtimeout);
-        mLeftMaster.config_kI(0, kI, Constants.kCTREtimeout);
-        mLeftMaster.config_kD(0, kD, Constants.kCTREtimeout);
-        mLeftMaster.config_kF(0, kF, Constants.kCTREtimeout);
+        //PIDF Gains for Distance Servo
+        mLeftMaster.config_kP(kDriveSlot, kDriveP, Constants.kCTREtimeout);
+        mLeftMaster.config_kI(kDriveSlot, kDriveI, Constants.kCTREtimeout);
+        mLeftMaster.config_kD(kDriveSlot, kDriveD, Constants.kCTREtimeout);
+        mLeftMaster.config_kF(kDriveSlot, kDriveF, Constants.kCTREtimeout);
 
-        mRightMaster.config_kP(0, kP, Constants.kCTREtimeout);
-        mRightMaster.config_kI(0, kI, Constants.kCTREtimeout);
-        mRightMaster.config_kD(0, kP, Constants.kCTREtimeout);
-        mRightMaster.config_kF(0, kF, Constants.kCTREtimeout);
+        mRightMaster.config_kP(kDriveSlot, kDriveP, Constants.kCTREtimeout);
+        mRightMaster.config_kI(kDriveSlot, kDriveI, Constants.kCTREtimeout);
+        mRightMaster.config_kD(kDriveSlot, kDriveD, Constants.kCTREtimeout);
+        mRightMaster.config_kF(kDriveSlot, kDriveF, Constants.kCTREtimeout);
+
+        //PIDF Gains for Turn Servo
+        mLeftMaster.config_kP(kTurnSlot, kTurnP, Constants.kCTREtimeout);
+        mLeftMaster.config_kI(kTurnSlot, kTurnI, Constants.kCTREtimeout);
+        mLeftMaster.config_kD(kTurnSlot, kTurnD, Constants.kCTREtimeout);
+        mLeftMaster.config_kF(kTurnSlot, kTurnF, Constants.kCTREtimeout);
+
+        mRightMaster.config_kP(kTurnSlot, kTurnP, Constants.kCTREtimeout);
+        mRightMaster.config_kI(kTurnSlot, kTurnI, Constants.kCTREtimeout);
+        mRightMaster.config_kD(kTurnSlot, kTurnD, Constants.kCTREtimeout);
+        mRightMaster.config_kF(kTurnSlot, kTurnF, Constants.kCTREtimeout);
+
+        mLeftMaster.configAuxPIDPolarity(true);
+        mLeftMaster.configMotionAcceleration(kDriveMMaccel);
+        mLeftMaster.configMotionCruiseVelocity(kDriveMMvel);
 
         mLeftMaster.configPeakOutputForward(1);
         mLeftSlaveA.configPeakOutputForward(1);
@@ -160,6 +188,11 @@ public class Drivetrain extends Subsystem implements ILoggable{
      */
     public void setRawSpeed(double[] speeds){
         setRawSpeed(speeds[0], speeds[1]);
+    }
+
+    public void setMotionMagicDrive(double driveDemand, double gyroSetpoint){
+        mLeftMaster.set(ControlMode.MotionMagic, driveDemand, DemandType.AuxPID, gyroSetpoint);
+        mRightMaster.follow(mLeftMaster, FollowerType.AuxOutput1);
     }
 
     /**

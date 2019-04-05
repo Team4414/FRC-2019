@@ -1,7 +1,5 @@
 package frc.robot.vision;
 
-import org.opencv.photo.AlignExposures;
-
 import frc.robot.OI;
 import frc.robot.Robot;
 import frc.robot.Robot.Side;
@@ -15,6 +13,8 @@ import frc.util.Limelight;
 import frc.util.RollingAverage;
 import frc.util.Limelight.CAM_MODE;
 import frc.util.Limelight.LED_STATE;
+import frc.util.interpolation.InterpolatingDouble;
+import frc.util.interpolation.InterpolatingTreeMap;
 
 public class VisionHelper{
 
@@ -52,7 +52,13 @@ public class VisionHelper{
     private static RollingAverage distRoller = new RollingAverage(5);
     private static RollingAverage hasTargetRoller = new RollingAverage(10);
 
+    private static InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> distanceLookup = new InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble>();
+
     private static Limelight mActiveCam = Robot.limePanel;
+
+    public static void buildLookupTable(){
+        distanceLookup.put(new InterpolatingDouble(0d), new InterpolatingDouble(0d));
+    }
     
     public static boolean grabVisionData(){
         mActiveCam.setCamMode(CAM_MODE.VISION);
@@ -157,6 +163,10 @@ public class VisionHelper{
             (turnSigner * VisionHelper.throttleCorrection()) - turnSignal, //- (skewSigner * VisionHelper.skewCorrection()),
             (turnSigner * VisionHelper.throttleCorrection()) + turnSignal  //+ (skewSigner * VisionHelper.skewCorrection())
         };
+    }
+
+    public static void doDriveIn(){
+        // Drivetrain.getInstance().
     }
 
     public static void attemptAutoScore(){
