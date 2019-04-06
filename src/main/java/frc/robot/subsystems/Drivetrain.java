@@ -6,6 +6,8 @@ import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.FollowerType;
 import com.ctre.phoenix.motorcontrol.InvertType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.RemoteSensorSource;
+import com.ctre.phoenix.motorcontrol.SensorTerm;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import com.ctre.phoenix.sensors.PigeonIMU;
@@ -96,6 +98,22 @@ public class Drivetrain extends Subsystem implements ILoggable{
         mLeftMaster.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, Constants.kCTREpidIDX, Constants.kCTREtimeout);
         mRightMaster.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, Constants.kCTREpidIDX, Constants.kCTREtimeout);
 
+        //set the left drive encoder as a remote sensor to the right encoder
+        mRightMaster.configRemoteFeedbackFilter(mLeftMaster.getDeviceID(), RemoteSensorSource.TalonSRX_SelectedSensor, 0);
+
+        //set the pigeon to the other remote sensor slot on the right encoder
+        mRightMaster.configRemoteFeedbackFilter(mGyro.getDeviceID(), RemoteSensorSource.Pigeon_Yaw, 1);
+
+        //sets up right talon to sum both values
+        mRightMaster.configSensorTerm(SensorTerm.Sum0, FeedbackDevice.RemoteSensor0);
+        mRightMaster.configSensorTerm(SensorTerm.Sum1, FeedbackDevice.CTRE_MagEncoder_Relative);
+        
+        mRightMaster.configSelectedFeedbackSensor(FeedbackDevice.SensorSum);
+        mRightMaster.configSelectedFeedbackCoefficient(0.5, kDriveSlot, 0);
+
+        mRightMaster.configSelectedFeedbackSensor(FeedbackDevice.RemoteSensor1, kTurnSlot, 0);
+        mRightMaster.configSelectedFeedbackCoefficient(0.5, kTurnSlot, 0);
+
         //PIDF Gains for Distance Servo
         mLeftMaster.config_kP(kDriveSlot, kDriveP, Constants.kCTREtimeout);
         mLeftMaster.config_kI(kDriveSlot, kDriveI, Constants.kCTREtimeout);
@@ -118,9 +136,9 @@ public class Drivetrain extends Subsystem implements ILoggable{
         mRightMaster.config_kD(kTurnSlot, kTurnD, Constants.kCTREtimeout);
         mRightMaster.config_kF(kTurnSlot, kTurnF, Constants.kCTREtimeout);
 
-        mLeftMaster.configAuxPIDPolarity(true);
-        mLeftMaster.configMotionAcceleration(kDriveMMaccel);
-        mLeftMaster.configMotionCruiseVelocity(kDriveMMvel);
+        mRightMaster.configAuxPIDPolarity(false);
+        mRightMaster.configMotionAcceleration(kDriveMMaccel);
+        mRightMaster.configMotionCruiseVelocity(kDriveMMvel);
 
         mLeftMaster.configPeakOutputForward(1);
         mLeftSlaveA.configPeakOutputForward(1);
