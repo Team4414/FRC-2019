@@ -22,7 +22,7 @@ public class Intake extends Subsystem{
         UNJAM
     }
 
-    private static final double kIntakePwr = 1;
+    private static final double kIntakePwr = 0.75;
 
     private Solenoid mPiston;
     private VictorSPX mIntake;

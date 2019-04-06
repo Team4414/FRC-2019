@@ -35,7 +35,7 @@ public class ScoreBall extends CommandGroup{
             }
         });
         addSequential(Hand.getInstance().setArmCommand(HandArmState.EXTENDED));
-        addSequential(new WaitCommand(0.5));
+        addSequential(new WaitCommand(0.2));
         addSequential(Hand.getInstance().setHandCommand(HandState.DROP));
     }
 

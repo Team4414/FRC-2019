@@ -30,7 +30,7 @@ public class Hand extends Subsystem{
 
     private static final double kHoldPwr = 0.2;
     private static final double kIntakePwr = 1;
-    private static final double kDropPwr = -1;
+    private static final double kDropPwr = -0.5;
 
     private VictorSPX mHolder;
     private Solenoid mArm;

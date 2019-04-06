@@ -167,9 +167,11 @@ public class VisionHelper{
 
     public static void doDriveIn(){
         grabVisionData();
-        Drivetrain.getInstance().setMotionMagicDrive(
-            distanceLookup.getInterpolated(new InterpolatingDouble(mActiveCam.tY())).value,
-            Drivetrain.getInstance().getGyroAngle() + mActiveCam.tX());
+        // Drivetrain.getInstance().setMotionMagicDrive(
+        //     distanceLookup.getInterpolated(new InterpolatingDouble(mActiveCam.tY())).value,
+        //     Drivetrain.getInstance().getGyroAngle() + mActiveCam.tX());
+
+        Drivetrain.getInstance().setMotionMagicDrive(2, 0);
     }
 
     public static void attemptAutoScore(){

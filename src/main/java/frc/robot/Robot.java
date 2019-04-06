@@ -187,6 +187,7 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
 
+    Drivetrain.getInstance().zeroSensor();
 
     // Drivetrain.getInstance().setBrakeMode(false);
     // Drivetrain.getInstance().zeroSensor();
@@ -195,7 +196,7 @@ public class Robot extends TimedRobot {
     // Elevator.getInstance().checkNeedsZero();
 
 
-    teleopInit(); //Just start teleop in sandstorm
+    // teleopInit(); //Just start teleop in sandstorm
     
     // Elevator.getInstance().setPosition(Setpoint.STOW);
 
@@ -207,15 +208,17 @@ public class Robot extends TimedRobot {
 
     Scheduler.getInstance().run();
 
+    // VisionHelper.doDriveIn();
     
     // teleopInit();
   }
 
   @Override
   public void autonomousPeriodic() {
+    VisionHelper.doDriveIn();
     ///
     // teleopPeriodic();
-    teleopPeriodic();
+    // teleopPeriodic();
     Scheduler.getInstance().run();
 
     // if(Math.abs(OI.getInstance().getForward()) > 0.2){

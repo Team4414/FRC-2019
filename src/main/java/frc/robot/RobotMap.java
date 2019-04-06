@@ -30,7 +30,7 @@ public class RobotMap{
 
     public static class HandMap{
         public static final int kHand = 6;
-        public static final int kArm = 9;
+        public static final int kArm = 3;
 
         public static final int kSensorPort = 0;
     }

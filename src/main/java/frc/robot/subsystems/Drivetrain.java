@@ -57,7 +57,7 @@ public class Drivetrain extends Subsystem implements ILoggable{
 
     //Drive Gains: 
     private int kDriveSlot = 0;
-    private double kDriveP = 0.1; //0.4
+    private double kDriveP = 0.1; //0.1
     private double kDriveI = 0;
     private double kDriveD = 1;
     private double kDriveF = 0.225;//0.17
@@ -95,24 +95,24 @@ public class Drivetrain extends Subsystem implements ILoggable{
         mLeftMaster.enableVoltageCompensation(false);
         mRightMaster.enableVoltageCompensation(false);
 
-        mLeftMaster.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, Constants.kCTREpidIDX, Constants.kCTREtimeout);
-        mRightMaster.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, Constants.kCTREpidIDX, Constants.kCTREtimeout);
+        mLeftMaster.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, kDriveSlot, Constants.kCTREtimeout);
+        // mRightMaster.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, Constants.kCTREpidIDX, Constants.kCTREtimeout);
 
-        //set the left drive encoder as a remote sensor to the right encoder
-        mRightMaster.configRemoteFeedbackFilter(mLeftMaster.getDeviceID(), RemoteSensorSource.TalonSRX_SelectedSensor, 0);
+        //set the left drive encoder as a remote sensor to the right talon
+        mRightMaster.configRemoteFeedbackFilter(RobotMap.DrivetrainMap.kLeftMaster, RemoteSensorSource.TalonSRX_SelectedSensor, 0);
 
-        //set the pigeon to the other remote sensor slot on the right encoder
+        //set the pigeon to the other remote sensor slot on the right talon
         mRightMaster.configRemoteFeedbackFilter(mGyro.getDeviceID(), RemoteSensorSource.Pigeon_Yaw, 1);
 
         //sets up right talon to sum both values
         mRightMaster.configSensorTerm(SensorTerm.Sum0, FeedbackDevice.RemoteSensor0);
         mRightMaster.configSensorTerm(SensorTerm.Sum1, FeedbackDevice.CTRE_MagEncoder_Relative);
         
-        mRightMaster.configSelectedFeedbackSensor(FeedbackDevice.SensorSum);
+        mRightMaster.configSelectedFeedbackSensor(FeedbackDevice.SensorSum, kDriveSlot, 0);
         mRightMaster.configSelectedFeedbackCoefficient(0.5, kDriveSlot, 0);
 
         mRightMaster.configSelectedFeedbackSensor(FeedbackDevice.RemoteSensor1, kTurnSlot, 0);
-        mRightMaster.configSelectedFeedbackCoefficient(0.5, kTurnSlot, 0);
+        mRightMaster.configSelectedFeedbackCoefficient(1, kTurnSlot, 0);
 
         //PIDF Gains for Distance Servo
         mLeftMaster.config_kP(kDriveSlot, kDriveP, Constants.kCTREtimeout);
@@ -155,7 +155,6 @@ public class Drivetrain extends Subsystem implements ILoggable{
         mRightMaster.configPeakOutputReverse(-1);
         mRightSlaveA.configPeakOutputReverse(-1);
         mRightSlaveB.configPeakOutputReverse(-1);
-
 
         mLeftMaster.setSensorPhase(true);
         mRightMaster.setSensorPhase(true);
@@ -209,8 +208,9 @@ public class Drivetrain extends Subsystem implements ILoggable{
     }
 
     public void setMotionMagicDrive(double driveDemand, double gyroSetpoint){
-        mLeftMaster.set(ControlMode.MotionMagic, driveDemand, DemandType.AuxPID, gyroSetpoint);
-        mRightMaster.follow(mLeftMaster, FollowerType.AuxOutput1);
+        mRightMaster.set(ControlMode.MotionMagic, (driveDemand + mRightZeroOffset) * Constants.kFeet2Ticks + mRightZeroOffset, DemandType.AuxPID, gyroSetpoint);
+        System.out.println((driveDemand * Constants.kFeet2Ticks) + mRightZeroOffset);
+        mLeftMaster.follow(mLeftMaster, FollowerType.AuxOutput1);
     }
 
     /**
