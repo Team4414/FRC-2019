@@ -87,8 +87,8 @@ public class Drivetrain extends Subsystem implements ILoggable{
         mLeftMaster.configOpenloopRamp(0.08, Constants.kCTREtimeout);
         mRightMaster.configOpenloopRamp(0.08, Constants.kCTREtimeout);
 
-        mLeftMaster.configVoltageCompSaturation(12, Constants.kCTREtimeout);
-        mRightMaster.configVoltageCompSaturation(12, Constants.kCTREtimeout);
+        mLeftMaster.configVoltageCompSaturation(12.5, Constants.kCTREtimeout);
+        mRightMaster.configVoltageCompSaturation(12.5, Constants.kCTREtimeout);
 
         mLeftMaster.enableVoltageCompensation(false);
         mRightMaster.enableVoltageCompensation(false);

@@ -3,12 +3,14 @@ package frc.robot.commands.balls;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.CommandGroup;
+import edu.wpi.first.wpilibj.command.WaitCommand;
 import frc.robot.Robot;
 import frc.robot.commands.elevator.JogElevator;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Hand;
 import frc.robot.subsystems.Elevator.Position;
 import frc.robot.subsystems.Elevator.Setpoint;
+import frc.robot.subsystems.Hand.HandArmState;
 import frc.robot.subsystems.Hand.HandState;
 
 public class ScoreBall extends CommandGroup{
@@ -32,6 +34,8 @@ public class ScoreBall extends CommandGroup{
                 return true;
             }
         });
+        addSequential(Hand.getInstance().setArmCommand(HandArmState.EXTENDED));
+        addSequential(new WaitCommand(0.5));
         addSequential(Hand.getInstance().setHandCommand(HandState.DROP));
     }
 
@@ -39,6 +43,7 @@ public class ScoreBall extends CommandGroup{
     @Override
     public synchronized void cancel() {
         Hand.getInstance().set(HandState.HOLDING);
+        Hand.getInstance().setArm(HandArmState.RETRACTED);
         // new ReGrabBall().start();
         super.cancel();
     }
