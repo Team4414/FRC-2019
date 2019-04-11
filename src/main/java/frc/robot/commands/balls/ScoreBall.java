@@ -44,8 +44,19 @@ public class ScoreBall extends CommandGroup{
     public synchronized void cancel() {
         Hand.getInstance().set(HandState.HOLDING);
         Hand.getInstance().setArm(HandArmState.RETRACTED);
+        Elevator.getInstance().lockElevator(true);
         // new ReGrabBall().start();
+        new WaitForClaw().start();
         super.cancel();
+    }
+
+    private class WaitForClaw extends CommandGroup{
+
+        public WaitForClaw(){
+            addSequential(new WaitCommand(0.25));
+            addSequential(Elevator.getInstance().lockElevatorCommand(false));
+        }
+
     }
 
     private class ReGrabBall extends GrabBall{

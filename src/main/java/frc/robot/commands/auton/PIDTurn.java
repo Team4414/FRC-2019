@@ -2,6 +2,7 @@ package frc.robot.commands.auton;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.command.PIDCommand;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.subsystems.Drivetrain;
 import jaci.pathfinder.Pathfinder;
 
@@ -11,13 +12,17 @@ public class PIDTurn extends PIDCommand{
 	private double angle;
 	private double zeroGyro;
     private double finalTime, startTime;
-    private double mGyroOffset;
+	private double mGyroOffset;
+	private double mOutput;
 	
     public PIDTurn(double desiredAngle, double timeInMillis) {
-    	super( 0.00125,0,-0.125);
+		// super( 0.00125,0, 0.125);
+		super(0.015, 0, 0.03);
+		// super(1, 0, 0);
     	
         angle = desiredAngle;
-        finalTime = timeInMillis;
+		finalTime = timeInMillis;
+		mOutput = 100;
     }
 
     protected void initialize() {
@@ -31,8 +36,9 @@ public class PIDTurn extends PIDCommand{
     protected void execute() {
     	// super.setSetpoint(angle);
     	// System.out.println("Gyro: " + getGyroHeading() + "\tSetpoint = " + super.getSetpoint());
-//    	System.out.println(Gyro.getInstance().getFusedHeading());
+   	// System.out.println(Gyro.getInstance().getFusedHeading());
 		System.out.println(super.getPIDController().getError());
+		// System.out.println();
     }
 
     protected boolean isFinished() {
@@ -41,7 +47,8 @@ public class PIDTurn extends PIDCommand{
 //    			(Math.abs(DriveTrain.getInstance().getRightSpeed()) + Math.abs(DriveTrain.getInstance().getLeftSpeed())
 //    			< RIOConfigs.getInstance().getConfigOrAdd("DRIVETRAIN_DRIVE_COMMAND_THRESHOLD", 0.05)));
     	// return (Math.abs(super.getPIDController().getError()) < THRESHOLD_ERROR);
-   		return false;
+		   return false;
+		// return (Math.abs(super.getPIDController().getError()) < 3) || (Math.abs(mOutput) < 0.2);
     }
 
     protected void end() {
@@ -59,7 +66,11 @@ public class PIDTurn extends PIDCommand{
 	}
 	@Override
 	protected void usePIDOutput(double output) {
+		// System.out.println("OUTPUT:\t\t" + output);
+		// SmartDashboard.putNumber("PIDTURNOUTPUT", output);
+		// SmartDashboard.putNumber("PIDTURNERROR", super.getPIDController().getError());
 		Drivetrain.getInstance().setRawSpeed(-output, output);
+		mOutput = output;
 	}
 	
 	private double getSmoothingFunction(double currentTime, double finalTime) {

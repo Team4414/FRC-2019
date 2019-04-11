@@ -7,7 +7,7 @@ import frc.robot.subsystems.PPintake;
 
 public class AutoDriveIn extends Command{
 
-    private static final double kTargetYDist = 2.4; //2.7
+    private static final double kTargetYDist = 2; //2.7
     private static final double kYDeadband = 1;
     private static final double kXDeadband = 1;
 

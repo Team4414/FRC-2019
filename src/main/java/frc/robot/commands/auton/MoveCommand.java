@@ -33,7 +33,7 @@ public class MoveCommand extends Command{
     private boolean mIsFirstPath;
     private FieldSide mIsRightPath;
 
-    private static Side lastPathInverted = Side.BALL;
+    private static boolean lastPathInverted = false;
 
     public MoveCommand(Trajectory path){
         this(path, Side.BALL, VisionCancel.RUN_FULL_PATH);
@@ -41,6 +41,7 @@ public class MoveCommand extends Command{
 
     public MoveCommand(Trajectory path, Side invertPath, VisionCancel lookForVision){
         mPath = path;
+        lastPathInverted = mInvertPath;
         if(invertPath == Side.PANEL){
             mInvertPath = true;
         }else{
@@ -48,7 +49,7 @@ public class MoveCommand extends Command{
         }
         mIsFirstPath = false;
         mIsRightPath = FieldSide.LEFT;
-        lastPathInverted = invertPath;
+        // lastPathInverted = invertPath;
         mLookForVision = lookForVision;
     }
 
@@ -69,14 +70,19 @@ public class MoveCommand extends Command{
         // System.out.println("INITIAL POSIIION:\t\t" + Drivetrain.getInstance().getRobotPos().getX() + "\t\t\t" + Drivetrain.getInstance().getRobotPos().getY());
         // System.out.println(((mInvertPath) ? -1 : 1) * mPath.get(0).x +"\t\t\t\t" + ((mInvertPath) ? 1 : 1) * mPath.get(0).y + "\t\t\t\t" + (mInvertPath ? -1 : 1) *  Pathfinder.r2d(mPath.get(0).heading));
         // Drivetrain.getInstance().zeroSensor();
+        System.out.println("BEFORE: " + Drivetrain.getInstance().getRobotPos().getHeading());
         if(mIsFirstPath){
-            Drivetrain.getInstance().setOdometery(new RobotPos(mPath.get(0).x, ((mIsRightPath == FieldSide.LEFT) ? -1 : 1) * mPath.get(0).y, ((mInvertPath) ? 180 : 0) + (((mIsRightPath == FieldSide.LEFT) ? -1 : 1) * Pathfinder.r2d(mPath.get(0).heading))));
+            Drivetrain.getInstance().setOdometery(new RobotPos(mPath.get(0).x, ((mIsRightPath == FieldSide.LEFT) ? -1 : 1) * mPath.get(0).y, 180 + (((mIsRightPath == FieldSide.LEFT) ? -1 : 1) * Pathfinder.r2d(mPath.get(0).heading))));
         }else{
+            // Drivetrain.getInstance().addHeading(-360);
             // Drivetrain.getInstance().setOdometery(new RobotPos(Drivetrain.getInstance().getRobotPos(), mInvertPath));
         }
+        
+        System.out.println("RPOS: " + Drivetrain.getInstance().getRobotPos().getHeading());
+        System.out.println("GPOS: " + Pathfinder.r2d(-mPath.get(0).heading));
 
         System.out.println("INITIAL POSIIION:\t\t" + Drivetrain.getInstance().getRobotPos().getX() + "\t\t\t" + Drivetrain.getInstance().getRobotPos().getY() + "\t\t\t\t" + Drivetrain.getInstance().getRobotPos().getHeading());
-        System.out.println(((mInvertPath) ? -1 : 1) * mPath.get(0).x +"\t\t\t\t" + ((mInvertPath) ? 1 : 1) * mPath.get(0).y + "\t\t\t\t" + (mInvertPath ? -1 : 1) *  Pathfinder.r2d(mPath.get(0).heading));
+        System.out.println(mPath.get(0).x +"\t\t\t\t" + -mPath.get(0).y + "\t\t\t\t" + -Pathfinder.r2d(mPath.get(0).heading));
 
         if (!Ramsete.isRunning()){
             System.out.println("!!!!!!!!!! Attempted to start movement without starting Ramsete Controller !!!!!!!!!!");
@@ -89,6 +95,8 @@ public class MoveCommand extends Command{
 
     @Override
     protected void execute() {
+        System.out.println("RPOS: " + Drivetrain.getInstance().getRobotPos().getHeading());
+        System.out.println("GPOS: " + Pathfinder.r2d(-mPath.get(0).heading));
         // System.out.println("RObotX:" + Drivetrain.getInstance().getRobotPos().getX() + "\t\t\tROBOT Y:" + Drivetrain.getInstance().getRobotPos().getY());
     }
 

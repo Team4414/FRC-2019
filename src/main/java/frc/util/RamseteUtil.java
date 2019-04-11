@@ -2,6 +2,7 @@ package frc.util;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
+import frc.robot.commands.auton.MoveCommand.FieldSide;
 import frc.util.DriveSignal;
 import frc.util.kinematics.pos.RobotPos;
 import jaci.pathfinder.Pathfinder;
@@ -37,6 +38,7 @@ public abstract class RamseteUtil {
     public int mSegCount;
     private static Status status = Status.STANDBY;
     private static boolean invertPath = false;
+    private static boolean isLeftSide = false;
 
     private double mConstant, mAngleError, ramv, ramw, mInitMod;
 
@@ -78,22 +80,23 @@ public abstract class RamseteUtil {
 
         //Ramsete Math:
         gX = path.get(mSegCount).x * Constants.kFeet2Meters; //(invertPath ? -1 : 1) * 
-        gY = -path.get(mSegCount).y * Constants.kFeet2Meters;//((invertPath) ? 1 : -1) * 
-        gTheta = -(((invertPath ? Math.PI : 0) + mInitMod + ((path.get(mSegCount).heading))));
+        gY = (isLeftSide? -1 : 1) * path.get(mSegCount).y * Constants.kFeet2Meters;//((invertPath) ? 1 : -1) * 
+        gTheta = (isLeftSide? -1 : 1) * ((mInitMod + ((path.get(mSegCount).heading))));
 
-        if(Math.abs(gTheta - gTheta_Last) > 5.5){
-            mInitMod -= gTheta_Last-gTheta;
-            gTheta = -(((invertPath ? Math.PI : 0) + mInitMod + ((path.get(mSegCount).heading))));
-            // gTheta += mInitMod;
-            System.out.println("RUNNUNG FLIPPUY");
-        }
+        // if(Math.abs(gTheta - gTheta_Last) > 5.5){
+        //     mInitMod -= gTheta_Last-gTheta;
+        //     gTheta = -((mInitMod + ((path.get(mSegCount).heading))));
+        //     // gTheta += mInitMod;
+        //     System.out.println("RUNNUNG FLIPPUY");
+        // }
+        mInitMod = 0;
 
         rX = getPose2d().getX() * Constants.kFeet2Meters;
         rY = getPose2d().getY() * Constants.kFeet2Meters;
-        rTheta = Pathfinder.d2r(getPose2d().getHeading());
+        rTheta = (invertPath ? Math.PI : 0) + Pathfinder.d2r(getPose2d().getHeading());
 
         gW = (gTheta - gTheta_Last) / kTimestep;
-        gV = (invertPath ? -1 : 1) * path.get(mSegCount).velocity * Constants.kFeet2Meters;
+        gV = path.get(mSegCount).velocity * Constants.kFeet2Meters;
 
         mAngleError = Pathfinder.d2r(Pathfinder.boundHalfDegrees(Pathfinder.r2d(gTheta - rTheta)));
 
@@ -157,6 +160,22 @@ public abstract class RamseteUtil {
     }
 
     /**
+     * Track Path Method.
+     *
+     * @param path The desired trajectory for the robot to follow.
+     */
+    public void trackPath(Trajectory path, boolean invert, boolean isLeftField){
+        this.path = path;
+        mSegCount = 0;
+        forceStateUpdate();
+        invertPath = invert;
+        gTheta_Last = gTheta;
+        this.isLeftSide = isLeftField;
+
+        // mInitMod = (double) Math.round((rTheta - (path.get(0).heading + (invertPath ? Math.PI : 0))) / ((2*Math.PI))*2*Math.PI);
+    }
+
+    /**
      * Force Update State Method.
      *
      * <p>Forces an update of state</p>
@@ -172,8 +191,6 @@ public abstract class RamseteUtil {
         }
 
         if(
-            
-        
         Math.sqrt((path.get(path.length() - 1).x - rX)*((path.get(path.length() - 1).x - rX)) 
         + ((path.get(path.length() - 1).y - rY)*((path.get(path.length() - 1).y - rY)))) < kDistanceKill){
             System.out.println("KILLED");
@@ -191,10 +208,15 @@ public abstract class RamseteUtil {
      * @return A Velocity DriveSignal to apply to the drivetrain.
      */
     public DriveSignal getVels(){
+        
+        System.out.println((invertPath ? -1 : 1) + "\t\t\t" + ((invertPath ? -1 : 1) * ramv - ramw * (kWheelBase * Constants.kFeet2Meters) / 2));
+        
         return new DriveSignal(
-                Constants.kMeters2Feet * (ramv - ramw * (kWheelBase * Constants.kFeet2Meters) / 2),
-                Constants.kMeters2Feet * (ramv + ramw * (kWheelBase * Constants.kFeet2Meters) / 2)
+                Constants.kMeters2Feet * ((invertPath ? -1 : 1) * ramv - ramw * (kWheelBase * Constants.kFeet2Meters) / 2),
+                Constants.kMeters2Feet * ((invertPath ? -1 : 1) * ramv + ramw * (kWheelBase * Constants.kFeet2Meters) / 2)
         );
+
+        // return new DriveSignal(-3, -3);
     }
 
     /**
@@ -209,6 +231,8 @@ public abstract class RamseteUtil {
         ramv = 0;
         ramw = 0;
         mSegCount = -1;
+        gTheta_Last = 0;
+        gTheta = 0;
     }
 
     /**

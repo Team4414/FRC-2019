@@ -36,11 +36,11 @@ public class Elevator extends Subsystem implements ILoggable {
     // private static final double mConversionFactor = 17419d / 37797d;
     private static final double mConversionFactor = 1d/1.38d;
 
-    private static final double kP = 0.5 * mConversionFactor; //0.15
+    private static final double kP = 0.5 * mConversionFactor; //0.5
     private static final double kI = 0; 
-    private static final double kD = 1.5; //0
-    private static final double kF = 0.06 * mConversionFactor; //0.15
-    private static final double kArbFF = 0.1944; //0.1944
+    private static final double kD = 0; //1.5
+    private static final double kF = 0.06 * mConversionFactor; //0.06
+    private static final double kArbFF = 0.1; //0.1944 1780
 
     private static final int kMMacceleration = (int) (45000); //45000
     private static final int kMMvelocity = (int) (9000); //17000
@@ -154,10 +154,6 @@ public class Elevator extends Subsystem implements ILoggable {
         mMaster.set(ControlMode.PercentOutput, percent);
     }
 
-    public void setF(double val){
-        mMaster.config_kF(0, val);
-    }
-
     public LimitableSRX getMaster(){
         return mMaster;
     }
@@ -168,6 +164,15 @@ public class Elevator extends Subsystem implements ILoggable {
         if (mLockElevator)
             return false;
         mMaster.set(ControlMode.MotionMagic, (position) + mZeroOffset, DemandType.ArbitraryFeedForward, kArbFF);
+        return true;
+    }
+
+    public boolean setPosition(int position, double arbFF){
+        // if (mNeedsZero)
+        //     return false;
+        // if (mLockElevator)
+        //     return false;
+        mMaster.set(ControlMode.MotionMagic, (position) + mZeroOffset, DemandType.ArbitraryFeedForward, arbFF);
         return true;
     }
 

@@ -27,6 +27,13 @@ public class DriveSignal {
         return mLeftMotor;
     }
 
+    public void setLeft(double val){
+        mLeftMotor = val;
+    }
+    public void setRight(double val){
+        mRightMotor = val;
+    }
+
     public double getRight() {
         return mRightMotor;
     }

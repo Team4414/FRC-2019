@@ -3,11 +3,8 @@ package frc.robot.subsystems;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
-import com.ctre.phoenix.motorcontrol.FollowerType;
 import com.ctre.phoenix.motorcontrol.InvertType;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
-import com.ctre.phoenix.motorcontrol.RemoteSensorSource;
-import com.ctre.phoenix.motorcontrol.SensorTerm;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import com.ctre.phoenix.sensors.PigeonIMU;
@@ -56,21 +53,10 @@ public class Drivetrain extends Subsystem implements ILoggable{
     private static final double kOdometeryFix = 0.973;
 
     //Drive Gains: 
-    private int kDriveSlot = 0;
-    private double kDriveP = 0.1; //0.1
-    private double kDriveI = 0;
-    private double kDriveD = 1;
-    private double kDriveF = 0.225;//0.17
-
-    private int kDriveMMaccel = (int) (Constants.kFeet2Ticks * 0.1 * 7);
-    private int kDriveMMvel = (int) (Constants.kFeet2Ticks * 0.1 * 10);
-
-    //Turn Gains: 
-    private int kTurnSlot = 1;
-    private double kTurnP = 0.0225; //0.4
-    private double kTurnI = 0;
-    private double kTurnD = 0.25;
-    private double kTurnF = 0.225;//0.17
+    private double kP = 0.1; //0.4
+    private double kI = 0;
+    private double kD = 1;
+    private double kF = 0.225;//0.17
 
     private double kFriction = 0; //0.1
 
@@ -89,56 +75,24 @@ public class Drivetrain extends Subsystem implements ILoggable{
         mLeftMaster.configOpenloopRamp(0.08, Constants.kCTREtimeout);
         mRightMaster.configOpenloopRamp(0.08, Constants.kCTREtimeout);
 
-        mLeftMaster.configVoltageCompSaturation(12.5, Constants.kCTREtimeout);
-        mRightMaster.configVoltageCompSaturation(12.5, Constants.kCTREtimeout);
+        mLeftMaster.configVoltageCompSaturation(12, Constants.kCTREtimeout);
+        mRightMaster.configVoltageCompSaturation(12, Constants.kCTREtimeout);
 
         mLeftMaster.enableVoltageCompensation(false);
         mRightMaster.enableVoltageCompensation(false);
 
-        mLeftMaster.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, kDriveSlot, Constants.kCTREtimeout);
-        // mRightMaster.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, Constants.kCTREpidIDX, Constants.kCTREtimeout);
+        mLeftMaster.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, Constants.kCTREpidIDX, Constants.kCTREtimeout);
+        mRightMaster.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative, Constants.kCTREpidIDX, Constants.kCTREtimeout);
 
-        //set the left drive encoder as a remote sensor to the right talon
-        mRightMaster.configRemoteFeedbackFilter(RobotMap.DrivetrainMap.kLeftMaster, RemoteSensorSource.TalonSRX_SelectedSensor, 0);
+        mLeftMaster.config_kP(0, kP, Constants.kCTREtimeout);
+        mLeftMaster.config_kI(0, kI, Constants.kCTREtimeout);
+        mLeftMaster.config_kD(0, kD, Constants.kCTREtimeout);
+        mLeftMaster.config_kF(0, kF, Constants.kCTREtimeout);
 
-        //set the pigeon to the other remote sensor slot on the right talon
-        mRightMaster.configRemoteFeedbackFilter(mGyro.getDeviceID(), RemoteSensorSource.Pigeon_Yaw, 1);
-
-        //sets up right talon to sum both values
-        mRightMaster.configSensorTerm(SensorTerm.Sum0, FeedbackDevice.RemoteSensor0);
-        mRightMaster.configSensorTerm(SensorTerm.Sum1, FeedbackDevice.CTRE_MagEncoder_Relative);
-        
-        mRightMaster.configSelectedFeedbackSensor(FeedbackDevice.SensorSum, kDriveSlot, 0);
-        mRightMaster.configSelectedFeedbackCoefficient(0.5, kDriveSlot, 0);
-
-        mRightMaster.configSelectedFeedbackSensor(FeedbackDevice.RemoteSensor1, kTurnSlot, 0);
-        mRightMaster.configSelectedFeedbackCoefficient(1, kTurnSlot, 0);
-
-        //PIDF Gains for Distance Servo
-        mLeftMaster.config_kP(kDriveSlot, kDriveP, Constants.kCTREtimeout);
-        mLeftMaster.config_kI(kDriveSlot, kDriveI, Constants.kCTREtimeout);
-        mLeftMaster.config_kD(kDriveSlot, kDriveD, Constants.kCTREtimeout);
-        mLeftMaster.config_kF(kDriveSlot, kDriveF, Constants.kCTREtimeout);
-
-        mRightMaster.config_kP(kDriveSlot, kDriveP, Constants.kCTREtimeout);
-        mRightMaster.config_kI(kDriveSlot, kDriveI, Constants.kCTREtimeout);
-        mRightMaster.config_kD(kDriveSlot, kDriveD, Constants.kCTREtimeout);
-        mRightMaster.config_kF(kDriveSlot, kDriveF, Constants.kCTREtimeout);
-
-        //PIDF Gains for Turn Servo
-        mLeftMaster.config_kP(kTurnSlot, kTurnP, Constants.kCTREtimeout);
-        mLeftMaster.config_kI(kTurnSlot, kTurnI, Constants.kCTREtimeout);
-        mLeftMaster.config_kD(kTurnSlot, kTurnD, Constants.kCTREtimeout);
-        mLeftMaster.config_kF(kTurnSlot, kTurnF, Constants.kCTREtimeout);
-
-        mRightMaster.config_kP(kTurnSlot, kTurnP, Constants.kCTREtimeout);
-        mRightMaster.config_kI(kTurnSlot, kTurnI, Constants.kCTREtimeout);
-        mRightMaster.config_kD(kTurnSlot, kTurnD, Constants.kCTREtimeout);
-        mRightMaster.config_kF(kTurnSlot, kTurnF, Constants.kCTREtimeout);
-
-        mRightMaster.configAuxPIDPolarity(false);
-        mRightMaster.configMotionAcceleration(kDriveMMaccel);
-        mRightMaster.configMotionCruiseVelocity(kDriveMMvel);
+        mRightMaster.config_kP(0, kP, Constants.kCTREtimeout);
+        mRightMaster.config_kI(0, kI, Constants.kCTREtimeout);
+        mRightMaster.config_kD(0, kP, Constants.kCTREtimeout);
+        mRightMaster.config_kF(0, kF, Constants.kCTREtimeout);
 
         mLeftMaster.configPeakOutputForward(1);
         mLeftSlaveA.configPeakOutputForward(1);
@@ -155,6 +109,7 @@ public class Drivetrain extends Subsystem implements ILoggable{
         mRightMaster.configPeakOutputReverse(-1);
         mRightSlaveA.configPeakOutputReverse(-1);
         mRightSlaveB.configPeakOutputReverse(-1);
+
 
         mLeftMaster.setSensorPhase(true);
         mRightMaster.setSensorPhase(true);
@@ -207,12 +162,6 @@ public class Drivetrain extends Subsystem implements ILoggable{
         setRawSpeed(speeds[0], speeds[1]);
     }
 
-    public void setMotionMagicDrive(double driveDemand, double gyroSetpoint){
-        mRightMaster.set(ControlMode.MotionMagic, (driveDemand + mRightZeroOffset) * Constants.kFeet2Ticks + mRightZeroOffset, DemandType.AuxPID, gyroSetpoint);
-        System.out.println((driveDemand * Constants.kFeet2Ticks) + mRightZeroOffset);
-        mLeftMaster.follow(mLeftMaster, FollowerType.AuxOutput1);
-    }
-
     /**
      * Set Velocity Method
      * 
@@ -256,6 +205,12 @@ public class Drivetrain extends Subsystem implements ILoggable{
         theta = pos.getHeading();
         // mGyroOffset = (mGyro.getFusedHeading() + pos.getHeading());
         mGyroOffset = (mGyro.getFusedHeading() - pos.getHeading());
+    }
+
+    public void addHeading(double hdg){
+        theta = Pathfinder.boundHalfDegrees(theta + hdg);
+        
+        mGyroOffset = (mGyro.getFusedHeading() - theta);
     }
 
     public void zeroGyro(){

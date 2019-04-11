@@ -27,7 +27,7 @@ public class Ramsete extends RamseteUtil implements Runnable, ILoggable{
     private final double kTimestep;
 
     public Ramsete(double timestep){
-        super(Constants.kWheelBase, timestep);
+        super(Constants.kWheelBase, kRamseteTimestep);
         mNotifier = new Notifier(this);
         setupLogger();
         kTimestep = timestep;

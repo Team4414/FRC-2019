@@ -136,18 +136,20 @@ public class Robot extends TimedRobot {
 
     mInitCalled = false;
 
-    // Ramsete.getInstance().start();
+    Ramsete.getInstance().start();
 
     //Import all autonomous paths from filesystem (time intensive)
-    // autonPaths = PathLoader.loadPaths();
-    // autonCommand = new TestAutons(FieldSide.LEFT);
+    autonPaths = PathLoader.loadPaths();
+    autonCommand = new TestAutons(FieldSide.LEFT);
+
+    // autonCommand = Te;
 
     //select the autonomous command
     //in competition this will likely be done in autonomousInit()
     // mFieldSideChooser = new SendableChooser<FieldSide>();
     // mFieldSideChooser.setDefaultOption("LeftSide", FieldSide.LEFT);
     // mFieldSideChooser.addOption("RightSide", FieldSide.RIGHT);
-    // autonCommand = new TestAutons();
+    // autonCommand = new TestAutons(FieldSide.RIGHT);
 
     // PeriodicLogger.getInstance();
 
@@ -184,16 +186,20 @@ public class Robot extends TimedRobot {
     
   }
 
+  // double dder;
+
   @Override
   public void autonomousInit() {
 
     Drivetrain.getInstance().zeroSensor();
 
-    // Drivetrain.getInstance().setBrakeMode(false);
-    // Drivetrain.getInstance().zeroSensor();
-    // Drivetrain.getInstance().zeroGyro();
-    // Drivetrain.getInstance().startOdometery(0.005);
-    // Elevator.getInstance().checkNeedsZero();
+
+
+    Drivetrain.getInstance().setBrakeMode(false);
+    Drivetrain.getInstance().zeroSensor();
+    Drivetrain.getInstance().zeroGyro();
+    Drivetrain.getInstance().startOdometery(0.02);
+    Elevator.getInstance().checkNeedsZero();
 
 
     // teleopInit(); //Just start teleop in sandstorm
@@ -204,18 +210,27 @@ public class Robot extends TimedRobot {
 
     // Ramsete.getInstance().start();
 
-    // autonCommand.start();
+    autonCommand.start();
 
     Scheduler.getInstance().run();
 
     // VisionHelper.doDriveIn();
     
+    // dder = 0.10;
     // teleopInit();
+    // Drivetrain.getInstance().configureForVelocityMode();
   }
 
   @Override
   public void autonomousPeriodic() {
-    VisionHelper.doDriveIn();
+
+    
+    // Elevator.getInstance().setPosition(2000);
+    // dder += 0.001;
+    // System.out.println(dder);
+
+
+    // VisionHelper.doDriveIn();
     ///
     // teleopPeriodic();
     // teleopPeriodic();
@@ -275,9 +290,12 @@ public class Robot extends TimedRobot {
 
   
   boolean alreadyScored = false;
+
+  double adder = 0;
   
   @Override
   public void teleopPeriodic(){
+
 
     if (Timer.getMatchTime() < 30){
       SignalLEDS.getInstance().set(LightPattern.RED_STROBE);

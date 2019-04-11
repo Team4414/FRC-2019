@@ -160,8 +160,8 @@ public class VisionHelper{
         }
         
         return new double[]{
-            (turnSigner * VisionHelper.throttleCorrection()) - turnSignal, //- (skewSigner * VisionHelper.skewCorrection()),
-            (turnSigner * VisionHelper.throttleCorrection()) + turnSignal  //+ (skewSigner * VisionHelper.skewCorrection())
+            (turnSigner * (VisionHelper.throttleCorrection())) - turnSignal, //- (skewSigner * VisionHelper.skewCorrection()),
+            (turnSigner * (VisionHelper.throttleCorrection())) + turnSignal  //+ (skewSigner * VisionHelper.skewCorrection())
         };
     }
 
@@ -171,7 +171,7 @@ public class VisionHelper{
         //     distanceLookup.getInterpolated(new InterpolatingDouble(mActiveCam.tY())).value,
         //     Drivetrain.getInstance().getGyroAngle() + mActiveCam.tX());
 
-        Drivetrain.getInstance().setMotionMagicDrive(2, 0);
+        // Drivetrain.getInstance().setMotionMagicDrive(2, 0);
     }
 
     public static void attemptAutoScore(){

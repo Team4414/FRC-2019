@@ -19,6 +19,7 @@ public class PathLoader{
         paths.put("RocketToTurn_L", getTraj("FR_To_FRTurn_B"));
         paths.put("TurntoFeeder_L", getTraj("FRTurn_To_Feeder_F"));
         paths.put("FeedertoBR", getTraj("Feeder_To_BR_B"));
+        paths.put("TestPath", getTraj("Unnamed"));
 
         return paths;
     }
