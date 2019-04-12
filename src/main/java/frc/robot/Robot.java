@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.Scheduler;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.commands.DriveManual;
@@ -159,6 +160,8 @@ public class Robot extends TimedRobot {
     // PeriodicLogger.getInstance().start();
     
     // autonCommand = new PIDTurn(90, 10);
+    
+    // SmartDashboard.putNumber("VisionDriveGain", 0);
   }
 
   @Override
@@ -182,8 +185,13 @@ public class Robot extends TimedRobot {
     // System.out.println(Robot.pdp.getCurrent(RobotMap.PPintakeMap.kPP - 1));
     // System.out.println(limeBall.getSkew());
     // System.out.println(Elevator.getInstance().getPosition());
-    SmartDashboard.putNumber("ElevatorPosition", Elevator.getInstance().getPosition());
-    
+    // SmartDashboard.putNumber("ElevatorPosition", Elevator.getInstance().getPosition());
+    // VisionHelper.debugMessage();
+    // SmartDashboard.putNumber("TEET", (SmartDashboard.getNumber("VisionDriveGain", 0)));
+    // // VisionHelper.throttleCorrection();
+    // System.out.println(Hand.getInstance().getSensorVoltage());
+
+    // VisionHelper.kDriveGain = SmartDashboard.getNumber("VisionDriveGain", 0);
   }
 
   // double dder;

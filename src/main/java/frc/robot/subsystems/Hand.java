@@ -12,7 +12,7 @@ import frc.util.talon.CTREFactory;
 
 public class Hand extends Subsystem{
 
-    private static final double kDetectThreshold = 1.5;
+    private static final double kDetectThreshold = 1.2;
 
     public static HandState handState;
     public static enum HandState{   

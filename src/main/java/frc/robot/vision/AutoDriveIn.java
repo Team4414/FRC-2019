@@ -7,7 +7,7 @@ import frc.robot.subsystems.PPintake;
 
 public class AutoDriveIn extends Command{
 
-    private static final double kTargetYDist = 2; //2.7
+    private static final double kTargetYDist = 6.5; //2.7
     private static final double kYDeadband = 1;
     private static final double kXDeadband = 1;
 
@@ -23,7 +23,7 @@ public class AutoDriveIn extends Command{
 
     @Override
     protected boolean isFinished() {
-        return Math.abs(VisionHelper.getActiveCam().tY() - kTargetYDist) <= kYDeadband
+        return VisionHelper.getActiveCam().tArea() >= kTargetYDist
               && Math.abs(VisionHelper.getActiveCam().tX()) <= kXDeadband;
             //   && Elevator.getInstance().isAtSetpoint();
     }
