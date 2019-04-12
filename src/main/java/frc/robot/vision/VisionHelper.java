@@ -23,11 +23,11 @@ public class VisionHelper{
     private static final double kPanelAutoScoreY = 2.4; //3
     private static final double kBallAutoScoreY = 0.5;
 
-    private static final double kTrackingGain = 0.0225;
+    private static final double kTrackingGain = 0.6667; //0.0225
     private static final double kTurnIGain = 0.0000;
     private static final double kTrackingMuliplier = 1;
     // private static final double kTurnBallIGain = 0.0125;
-    private static final double kDerivativeGain = -0.2;
+    private static final double kDerivativeGain = 0; //-0.2
 
     private static final double kDriveGain = 0.1;
     private static final double kDriveDerivGain = -1.4;
@@ -85,7 +85,7 @@ public class VisionHelper{
             }
         }else{
             if (mActiveCam.hasTarget()){
-                distRoller.add(mActiveCam.tY());
+                distRoller.add( 1 / mActiveCam.tArea());
                 mDistPastError = mDistError;
                 mDistError = mDistTarg - distRoller.getAverage();
             }else{
@@ -94,7 +94,7 @@ public class VisionHelper{
         }
 
 
-        return Math.max(-1, Math.min(1, (mDistPastError * kDriveGain) + ((mDistPastError - mDistError) * kDriveDerivGain)));
+        return Math.max(-1, Math.min(-0.2, (mDistPastError * kDriveGain) + ((mDistPastError - mDistError) * kDriveDerivGain)));
     }
 
     public static double turnCorrection(){
