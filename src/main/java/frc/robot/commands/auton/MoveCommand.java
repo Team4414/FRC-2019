@@ -4,7 +4,6 @@ import edu.wpi.first.wpilibj.command.Command;
 import frc.robot.Robot;
 import frc.robot.Robot.Side;
 import frc.robot.subsystems.Drivetrain;
-import frc.robot.vision.VisionHelper;
 import frc.util.RamseteUtil.Status;
 import frc.util.kinematics.pos.RobotPos;
 import jaci.pathfinder.Pathfinder;

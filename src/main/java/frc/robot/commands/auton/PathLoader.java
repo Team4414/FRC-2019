@@ -9,7 +9,7 @@ import jaci.pathfinder.Trajectory;
 
 public class PathLoader{
 
-    private static String kPathLocation = "/home/lvuser/deploy/output/output/";
+    private static String kPathLocation = "/home/lvuser/deploy/output/output/output/";
     private static String kPathSuffix = ".pf1.csv";
 
     public static LinkedHashMap<String, Trajectory> loadPaths(){
@@ -20,6 +20,10 @@ public class PathLoader{
         paths.put("TurntoFeeder_L", getTraj("FRTurn_To_Feeder_F"));
         paths.put("FeedertoBR", getTraj("Feeder_To_BR_B"));
         paths.put("TestPath", getTraj("Unnamed"));
+
+        paths.put("HabToBCS", getTraj("HAB_To_BCS_F"));
+        paths.put("BCSTurnToFeeder", getTraj("BCSTurn_To_Feeder_F"));
+        paths.put("FeederToMCS", getTraj("Feeder_To_MCSTurn_B"));
 
         return paths;
     }

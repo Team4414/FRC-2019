@@ -38,7 +38,7 @@ public class AutoScoreCommand extends CommandGroup{
     @Override
     protected void end() {
         VisionHelper.getActiveCam().setLED(LED_STATE.OFF);
-        Drivetrain.getInstance().setBrakeMode(false);
+        // Drivetrain.getInstance().setBrakeMode(false);
     }
 }
 

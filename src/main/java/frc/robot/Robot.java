@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.commands.DriveManual;
+import frc.robot.commands.auton.CargoShip;
 import frc.robot.commands.auton.MoveCommand;
 import frc.robot.commands.auton.PIDTurn;
 import frc.robot.commands.auton.PathLoader;
@@ -141,7 +142,7 @@ public class Robot extends TimedRobot {
 
     //Import all autonomous paths from filesystem (time intensive)
     autonPaths = PathLoader.loadPaths();
-    autonCommand = new TestAutons(FieldSide.LEFT);
+    autonCommand = new CargoShip(FieldSide.LEFT);
 
     // autonCommand = Te;
 
