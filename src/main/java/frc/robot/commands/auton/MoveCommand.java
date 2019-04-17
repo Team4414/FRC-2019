@@ -4,6 +4,8 @@ import edu.wpi.first.wpilibj.command.Command;
 import frc.robot.Robot;
 import frc.robot.Robot.Side;
 import frc.robot.subsystems.Drivetrain;
+import frc.robot.vision.VisionHelper;
+import frc.util.Limelight.LED_STATE;
 import frc.util.RamseteUtil.Status;
 import frc.util.kinematics.pos.RobotPos;
 import jaci.pathfinder.Pathfinder;
@@ -31,6 +33,7 @@ public class MoveCommand extends Command{
     private VisionCancel mLookForVision;
     private boolean mIsFirstPath;
     private FieldSide mIsRightPath;
+    private double mMaxDist;
 
     private static boolean lastPathInverted = false;
 
@@ -69,7 +72,7 @@ public class MoveCommand extends Command{
         // System.out.println("INITIAL POSIIION:\t\t" + Drivetrain.getInstance().getRobotPos().getX() + "\t\t\t" + Drivetrain.getInstance().getRobotPos().getY());
         // System.out.println(((mInvertPath) ? -1 : 1) * mPath.get(0).x +"\t\t\t\t" + ((mInvertPath) ? 1 : 1) * mPath.get(0).y + "\t\t\t\t" + (mInvertPath ? -1 : 1) *  Pathfinder.r2d(mPath.get(0).heading));
         // Drivetrain.getInstance().zeroSensor();
-        System.out.println("BEFORE: " + Drivetrain.getInstance().getRobotPos().getHeading());
+        // System.out.println("BEFORE: " + Drivetrain.getInstance().getRobotPos().getHeading());
         if(mIsFirstPath){
             Drivetrain.getInstance().setOdometery(new RobotPos(mPath.get(0).x, ((mIsRightPath == FieldSide.LEFT) ? -1 : 1) * mPath.get(0).y, 180 + (((mIsRightPath == FieldSide.LEFT) ? -1 : 1) * Pathfinder.r2d(mPath.get(0).heading))));
         }else{
@@ -77,11 +80,11 @@ public class MoveCommand extends Command{
             // Drivetrain.getInstance().setOdometery(new RobotPos(Drivetrain.getInstance().getRobotPos(), mInvertPath));
         }
         
-        System.out.println("RPOS: " + Drivetrain.getInstance().getRobotPos().getHeading());
-        System.out.println("GPOS: " + Pathfinder.r2d(-mPath.get(0).heading));
+        // System.out.println("RPOS: " + Drivetrain.getInstance().getRobotPos().getHeading());
+        // System.out.println("GPOS: " + Pathfinder.r2d(-mPath.get(0).heading));
 
-        System.out.println("INITIAL POSIIION:\t\t" + Drivetrain.getInstance().getRobotPos().getX() + "\t\t\t" + Drivetrain.getInstance().getRobotPos().getY() + "\t\t\t\t" + Drivetrain.getInstance().getRobotPos().getHeading());
-        System.out.println(mPath.get(0).x +"\t\t\t\t" + -mPath.get(0).y + "\t\t\t\t" + -Pathfinder.r2d(mPath.get(0).heading));
+        // System.out.println("INITIAL POSIIION:\t\t" + Drivetrain.getInstance().getRobotPos().getX() + "\t\t\t" + Drivetrain.getInstance().getRobotPos().getY() + "\t\t\t\t" + Drivetrain.getInstance().getRobotPos().getHeading());
+        // System.out.println(mPath.get(0).x +"\t\t\t\t" + -mPath.get(0).y + "\t\t\t\t" + -Pathfinder.r2d(mPath.get(0).heading));
 
         if (!Ramsete.isRunning()){
             System.out.println("!!!!!!!!!! Attempted to start movement without starting Ramsete Controller !!!!!!!!!!");
@@ -90,10 +93,19 @@ public class MoveCommand extends Command{
         }
         System.out.println("Starting Move");
         Ramsete.getInstance().forceStateUpdate();
+
+        mMaxDist = Ramsete.getInstance().getCurrentDist();
     }
 
     @Override
     protected void execute() {
+
+        if (mLookForVision == VisionCancel.CANCEL_ON_VISION){
+            if (mMaxDist - Ramsete.getInstance().getCurrentDist() < 3){
+                VisionHelper.getActiveCam().setLED(LED_STATE.ON);
+            }
+        }
+        
         System.out.println("RPOS: " + Drivetrain.getInstance().getRobotPos().getHeading());
         System.out.println("GPOS: " + Pathfinder.r2d(-mPath.get(0).heading));
         // System.out.println("RObotX:" + Drivetrain.getInstance().getRobotPos().getX() + "\t\t\tROBOT Y:" + Drivetrain.getInstance().getRobotPos().getY());

@@ -209,6 +209,8 @@ public class Robot extends TimedRobot {
     Drivetrain.getInstance().zeroGyro();
     Drivetrain.getInstance().startOdometery(0.02);
     Elevator.getInstance().checkNeedsZero();
+    limePanel.setLED(LED_STATE.OFF);
+    limeBall.setLED(LED_STATE.OFF);
 
 
     // teleopInit(); //Just start teleop in sandstorm

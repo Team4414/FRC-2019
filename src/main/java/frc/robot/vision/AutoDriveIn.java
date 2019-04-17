@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj.command.Command;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.PPintake;
+import frc.util.Limelight.LED_STATE;
 
 public class AutoDriveIn extends Command{
 
@@ -13,6 +14,7 @@ public class AutoDriveIn extends Command{
 
     @Override
     protected void initialize() {
+        VisionHelper.getActiveCam().setLED(LED_STATE.ON);
         VisionHelper.setTargetDist(kTargetYDist);
     }
 
@@ -31,6 +33,7 @@ public class AutoDriveIn extends Command{
     @Override
     protected void end() {
         Drivetrain.getInstance().setRawSpeed(0, 0);
+        VisionHelper.getActiveCam().setLED(LED_STATE.OFF);
     }
 
     @Override

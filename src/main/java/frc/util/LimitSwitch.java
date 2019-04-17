@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.buttons.Trigger;
 import frc.util.talon.LimitableSRX;
 
+@Deprecated
 public class LimitSwitch extends Trigger{
 
     private final DigitalInput mSwitch;

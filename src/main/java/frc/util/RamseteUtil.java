@@ -81,7 +81,7 @@ public abstract class RamseteUtil {
         //Ramsete Math:
         gX = path.get(mSegCount).x * Constants.kFeet2Meters; //(invertPath ? -1 : 1) * 
         gY = (isLeftSide? -1 : 1) * path.get(mSegCount).y * Constants.kFeet2Meters;//((invertPath) ? 1 : -1) * 
-        gTheta = (isLeftSide? -1 : 1) * ((mInitMod + ((path.get(mSegCount).heading))));
+        gTheta = (isLeftSide? -1 : 1) * (( (invertPath ? 180 : 0) + mInitMod + ((path.get(mSegCount).heading))));
 
         // if(Math.abs(gTheta - gTheta_Last) > 5.5){
         //     mInitMod -= gTheta_Last-gTheta;
@@ -93,10 +93,10 @@ public abstract class RamseteUtil {
 
         rX = getPose2d().getX() * Constants.kFeet2Meters;
         rY = getPose2d().getY() * Constants.kFeet2Meters;
-        rTheta = (invertPath ? Math.PI : 0) + Pathfinder.d2r(getPose2d().getHeading());
+        rTheta = (invertPath ? 180 : 0) + Pathfinder.d2r(getPose2d().getHeading());
 
         gW = (gTheta - gTheta_Last) / kTimestep;
-        gV = path.get(mSegCount).velocity * Constants.kFeet2Meters;
+        gV = (invertPath ? -1 : 1) * path.get(mSegCount).velocity * Constants.kFeet2Meters;
 
         mAngleError = Pathfinder.d2r(Pathfinder.boundHalfDegrees(Pathfinder.r2d(gTheta - rTheta)));
 
@@ -120,8 +120,8 @@ public abstract class RamseteUtil {
         //Eq. 5.12!
         ramv =  gV * Math.cos(mAngleError) +
                 mConstant * (Math.cos(rTheta) * 
-                (gX - rX)) +
-                Math.sin(rTheta) * (gY - rY);
+                (gX - rX) +
+                Math.sin(rTheta) * (gY - rY));
 
         ramw =  gW + kBeta * gV *
                 (sinThetaErrOverThetaErr) * (Math.cos(rTheta) *
@@ -233,6 +233,22 @@ public abstract class RamseteUtil {
         mSegCount = -1;
         gTheta_Last = 0;
         gTheta = 0;
+    }
+
+    public double getMaxDist(){
+        if (status == Status.TRACKING){
+            return path.get(path.length() - 1).position;
+        }else{
+            return 0;
+        }
+    }
+
+    public double getCurrentDist(){
+        if (status == Status.TRACKING){
+            return path.get(mSegCount).position;
+        }else{
+            return 0;
+        }
     }
 
     /**
