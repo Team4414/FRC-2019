@@ -89,6 +89,8 @@ public class Robot extends TimedRobot {
   Command autonCommand;
 
   private SendableChooser<FieldSide> mFieldSideChooser;
+  
+  private SendableChooser<FieldSide> autoChooser = new SendableChooser<FieldSide>();
 
   @Override
   public void robotInit(){
@@ -142,7 +144,11 @@ public class Robot extends TimedRobot {
 
     //Import all autonomous paths from filesystem (time intensive)
     autonPaths = PathLoader.loadPaths();
-    autonCommand = new CargoShip(FieldSide.LEFT);
+    autoChooser.setDefaultOption("LEFT CARGO", FieldSide.LEFT);
+    autoChooser.addOption("RIGHT CARGO", FieldSide.RIGHT);
+    
+    
+    // autonCommand = new PIDTurn(180, 0);
 
     // autonCommand = Te;
 
@@ -168,6 +174,7 @@ public class Robot extends TimedRobot {
   @Override
   public void robotPeriodic() {
     if(Hand.getInstance().hasBall()){
+      // if (true){
       activeSide = Side.BALL;
       VisionHelper.setActiveCam(limeBall);
     }else{
@@ -199,6 +206,8 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
+
+    autonCommand = new CargoShip(autoChooser.getSelected());
 
     Drivetrain.getInstance().zeroSensor();
 
@@ -247,16 +256,16 @@ public class Robot extends TimedRobot {
     // teleopPeriodic();
     Scheduler.getInstance().run();
 
-    // if(Math.abs(OI.getInstance().getForward()) > 0.2){
-    //   autonCommand.cancel();
-    //   mAutoCancelled = true;
-    // }
+    if(Math.abs(OI.getInstance().getForward()) > 0.2){
+      autonCommand.cancel();
+      mAutoCancelled = true;
+    }
 
-    // if(mAutoCancelled){
-      // if(mInitCalled){
-        // teleopPeriodic();
-      // }
-    // }
+    if(mAutoCancelled){
+      if(mInitCalled){
+        teleopPeriodic();
+      }
+    }
 
     // System.out.println(Drivetrain.getInstance().getRobotPos().getHeading());
 
@@ -268,6 +277,7 @@ public class Robot extends TimedRobot {
 
     Ramsete.getInstance().stop();
     Drivetrain.getInstance().stopOdometery();
+    // autonCommand.cancel();
 
     limePanel.setUSBCam(true);
     limePanel.setLED(LED_STATE.OFF);

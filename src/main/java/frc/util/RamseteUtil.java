@@ -24,8 +24,8 @@ import jaci.pathfinder.Trajectory;
 public abstract class RamseteUtil {
 
     private final double kTimestep;
-    private static final double kZeta = 0.05;    //Damper (0.96)
-    private static final double kBeta = 6.00;    //Agressiveness (5.65)
+    private static final double kZeta = 0.7;    //Damper (0.05)
+    private static final double kBeta = 2.00;    //Agressiveness (6)
 
     private static final double kDistanceKill = 0.5;
 
@@ -81,7 +81,10 @@ public abstract class RamseteUtil {
         //Ramsete Math:
         gX = path.get(mSegCount).x * Constants.kFeet2Meters; //(invertPath ? -1 : 1) * 
         gY = (isLeftSide? -1 : 1) * path.get(mSegCount).y * Constants.kFeet2Meters;//((invertPath) ? 1 : -1) * 
-        gTheta = (isLeftSide? -1 : 1) * (( (invertPath ? 180 : 0) + mInitMod + ((path.get(mSegCount).heading))));
+        gTheta = (isLeftSide? -1 : 1) * (( (invertPath ? Math.PI : 0) + ((path.get(mSegCount).heading))));
+
+        System.out.println(gX + "\t\t" + gY + "\t\t" + gTheta + "\nROB\t\t" + rX + "\t\t" + rY + "\t\t" + rTheta);
+        // System.out.println(isLeftSide);
 
         // if(Math.abs(gTheta - gTheta_Last) > 5.5){
         //     mInitMod -= gTheta_Last-gTheta;
@@ -93,7 +96,7 @@ public abstract class RamseteUtil {
 
         rX = getPose2d().getX() * Constants.kFeet2Meters;
         rY = getPose2d().getY() * Constants.kFeet2Meters;
-        rTheta = (invertPath ? 180 : 0) + Pathfinder.d2r(getPose2d().getHeading());
+        rTheta = Pathfinder.d2r(getPose2d().getHeading());
 
         gW = (gTheta - gTheta_Last) / kTimestep;
         gV = (invertPath ? -1 : 1) * path.get(mSegCount).velocity * Constants.kFeet2Meters;
@@ -107,8 +110,8 @@ public abstract class RamseteUtil {
             sinThetaErrOverThetaErr = Math.sin(mAngleError) / (mAngleError);
 
         // System.out.println("R " + "\t\t\t\t" + rTheta + "\t\t\t\tG " + gTheta + "\t\t\t\tThetaError: " + mAngleError);
-        SmartDashboard.putNumber("GTheta", gTheta);
-        SmartDashboard.putNumber("RTheta", rTheta);
+        // SmartDashboard.putNumber("GTheta", gTheta);
+        // SmartDashboard.putNumber("RTheta", rTheta);
 
         //Constant Equation from the paper.
         mConstant = 2.0 * kZeta *
@@ -181,8 +184,8 @@ public abstract class RamseteUtil {
      * <p>Forces an update of state</p>
      */
     public void forceStateUpdate(){
-        status = (path == null || mSegCount >= path.length()) ? Status.STANDBY : Status.TRACKING;
-        if (path == null || mSegCount >= path.length()){
+        status = (path == null || mSegCount >= path.length() + 5) ? Status.STANDBY : Status.TRACKING;
+        if (path == null || mSegCount >= path.length() + 5){
             prepareForStandby();    
             status = Status.STANDBY;
             return;
@@ -209,11 +212,11 @@ public abstract class RamseteUtil {
      */
     public DriveSignal getVels(){
         
-        System.out.println((invertPath ? -1 : 1) + "\t\t\t" + ((invertPath ? -1 : 1) * ramv - ramw * (kWheelBase * Constants.kFeet2Meters) / 2));
+        // System.out.println((invertPath ? -1 : 1) + "\t\t\t" + ((invertPath ? -1 : 1) * ramv - ramw * (kWheelBase * Constants.kFeet2Meters) / 2));
         
         return new DriveSignal(
-                Constants.kMeters2Feet * ((invertPath ? -1 : 1) * ramv - ramw * (kWheelBase * Constants.kFeet2Meters) / 2),
-                Constants.kMeters2Feet * ((invertPath ? -1 : 1) * ramv + ramw * (kWheelBase * Constants.kFeet2Meters) / 2)
+                Constants.kMeters2Feet * (ramv - ramw * (kWheelBase * Constants.kFeet2Meters) / 2),
+                Constants.kMeters2Feet * (ramv + ramw * (kWheelBase * Constants.kFeet2Meters) / 2)
         );
 
         // return new DriveSignal(-3, -3);
@@ -233,6 +236,10 @@ public abstract class RamseteUtil {
         mSegCount = -1;
         gTheta_Last = 0;
         gTheta = 0;
+    }
+
+    public boolean getCommandedVel(){
+        return path.get(mSegCount).velocity < 1;
     }
 
     public double getMaxDist(){

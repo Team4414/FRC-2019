@@ -44,7 +44,7 @@ public class TestAutons extends CommandGroup{
         // addSequential(new DelayedLimelightCommand(0.7));
         // addSequential(new TurnToVision(true));
         // addSequential(new AutoScoreCommand());
-        // // addSequential(new MoveCommand(Robot.autonPaths.get("TestPath"), true));
+        
         // // addSequential(new MoveCommand(Robot.autonPaths.get("OtherPath"), true));
 
         // addSequential(new PIDTurn(90, 10));

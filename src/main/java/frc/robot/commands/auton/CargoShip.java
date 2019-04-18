@@ -19,10 +19,14 @@ import frc.util.Limelight.LED_STATE;
 
 public class CargoShip extends CommandGroup{
     public CargoShip(FieldSide side){
+        addSequential(VisionHelper.getActiveCam().setLEDCommand(LED_STATE.OFF));
+        // addSequential(new MoveCommand(Robot.autonPaths.get("TestPath"), Side.BALL, VisionCancel.RUN_FULL_PATH, ZeroOdometeryMode.FIRST_PATH, FieldSide.RIGHT));
         addParallel(new ZeroElevator());
         addParallel(PPintake.getInstance().setPPCommand(PPState.HOLDING));
         addParallel(new DelayedCommand(Elevator.getInstance().jogElevatorCommand(Setpoint.STOW), 1));
+        addParallel(new DelayedLimelightCommand(3));
         addSequential(new MoveCommand(Robot.autonPaths.get("HabToBCS"), Side.PANEL, VisionCancel.CANCEL_ON_VISION, ZeroOdometeryMode.FIRST_PATH, side));
+        addSequential(new PIDTurn(((side == FieldSide.LEFT) ? -90 : 90), 0), 1);
         addSequential(new AutoScoreCommand());
         addSequential(new MoveCommand(Robot.autonPaths.get("BCSTurnToFeeder"), Side.BALL, VisionCancel.RUN_FULL_PATH, ZeroOdometeryMode.NO_ZERO, side));
         addParallel(Elevator.getInstance().jogElevatorCommand(Setpoint.PANEL_GRAB));

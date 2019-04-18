@@ -26,6 +26,7 @@ public class ScoreBall extends CommandGroup{
                 return Elevator.getInstance().isAtSetpoint();
             }
         });
+        addSequential(Elevator.getInstance().lockElevatorCommand(true));
         addSequential(new Command(){
         
             @Override
@@ -37,6 +38,11 @@ public class ScoreBall extends CommandGroup{
         addSequential(Hand.getInstance().setArmCommand(HandArmState.EXTENDED));
         addSequential(new WaitCommand(0.2));
         addSequential(Hand.getInstance().setHandCommand(HandState.DROP));
+    }
+
+    @Override
+    protected void end() {
+        super.end();
     }
 
     // @SuppressWarnings("resource")
@@ -53,7 +59,7 @@ public class ScoreBall extends CommandGroup{
     private class WaitForClaw extends CommandGroup{
 
         public WaitForClaw(){
-            addSequential(new WaitCommand(0.25));
+            addSequential(new WaitCommand(1));
             addSequential(Elevator.getInstance().lockElevatorCommand(false));
         }
 

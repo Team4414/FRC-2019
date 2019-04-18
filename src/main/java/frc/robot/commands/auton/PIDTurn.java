@@ -17,7 +17,7 @@ public class PIDTurn extends PIDCommand{
 	
     public PIDTurn(double desiredAngle, double timeInMillis) {
 		// super( 0.00125,0, 0.125);
-		super(0.015, 0, 0.03);
+		super(0.018, 0, 0.07);
 		// super(1, 0, 0);
     	
         angle = desiredAngle;
@@ -41,18 +41,24 @@ public class PIDTurn extends PIDCommand{
 		// System.out.println();
     }
 
+	double lastHdg;
+	double hdg;
     protected boolean isFinished() {
+		lastHdg = hdg;
+		hdg = Drivetrain.getInstance().getGyroAngle();
+		System.out.println(hdg-lastHdg);
     	//Time >= AllottedTime && DriveTrain Speeds < Threshold
 //    	return (startTime + finalTime >= Timer.getFPGATimestamp() && 
 //    			(Math.abs(DriveTrain.getInstance().getRightSpeed()) + Math.abs(DriveTrain.getInstance().getLeftSpeed())
 //    			< RIOConfigs.getInstance().getConfigOrAdd("DRIVETRAIN_DRIVE_COMMAND_THRESHOLD", 0.05)));
     	// return (Math.abs(super.getPIDController().getError()) < THRESHOLD_ERROR);
-		   return false;
-		// return (Math.abs(super.getPIDController().getError()) < 3) || (Math.abs(mOutput) < 0.2);
+		//    return false;
+		return (Math.abs(super.getPIDController().getError()) < 3) && (Math.abs(hdg - lastHdg) < 0.5);
     }
 
     protected void end() {
-    	Drivetrain.getInstance().setRawSpeed(0, 0);
+		Drivetrain.getInstance().setRawSpeed(0, 0);
+		System.out.println("DONE");
     }
 
     protected void interrupted() {

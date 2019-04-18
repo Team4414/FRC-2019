@@ -74,8 +74,9 @@ public class MoveCommand extends Command{
         // Drivetrain.getInstance().zeroSensor();
         // System.out.println("BEFORE: " + Drivetrain.getInstance().getRobotPos().getHeading());
         if(mIsFirstPath){
-            Drivetrain.getInstance().setOdometery(new RobotPos(mPath.get(0).x, ((mIsRightPath == FieldSide.LEFT) ? -1 : 1) * mPath.get(0).y, 180 + (((mIsRightPath == FieldSide.LEFT) ? -1 : 1) * Pathfinder.r2d(mPath.get(0).heading))));
+            Drivetrain.getInstance().setOdometery(new RobotPos(mPath.get(0).x, ((mIsRightPath == FieldSide.LEFT) ? -1 : 1) * mPath.get(0).y, (mInvertPath ? 180 : 0) + (((mIsRightPath == FieldSide.LEFT) ? -1 : 1) * Pathfinder.r2d(mPath.get(0).heading))));
         }else{
+            System.out.println("WASNTEZERO");
             // Drivetrain.getInstance().addHeading(-360);
             // Drivetrain.getInstance().setOdometery(new RobotPos(Drivetrain.getInstance().getRobotPos(), mInvertPath));
         }
@@ -89,7 +90,7 @@ public class MoveCommand extends Command{
         if (!Ramsete.isRunning()){
             System.out.println("!!!!!!!!!! Attempted to start movement without starting Ramsete Controller !!!!!!!!!!");
         }else{
-            Ramsete.getInstance().trackPath(mPath, mInvertPath);
+            Ramsete.getInstance().trackPath(mPath, mInvertPath, mIsRightPath == FieldSide.LEFT);
         }
         System.out.println("Starting Move");
         Ramsete.getInstance().forceStateUpdate();
@@ -100,14 +101,14 @@ public class MoveCommand extends Command{
     @Override
     protected void execute() {
 
-        if (mLookForVision == VisionCancel.CANCEL_ON_VISION){
-            if (mMaxDist - Ramsete.getInstance().getCurrentDist() < 3){
-                VisionHelper.getActiveCam().setLED(LED_STATE.ON);
-            }
-        }
+        // if (mLookForVision == VisionCancel.CANCEL_ON_VISION){
+        //     if (mMaxDist - Ramsete.getInstance().getCurrentDist() < 3){
+        //         VisionHelper.getActiveCam().setLED(LED_STATE.ON);
+        //     }
+        // }
         
-        System.out.println("RPOS: " + Drivetrain.getInstance().getRobotPos().getHeading());
-        System.out.println("GPOS: " + Pathfinder.r2d(-mPath.get(0).heading));
+        // System.out.println("RPOS: " + Drivetrain.getInstance().getRobotPos().getHeading());
+        // System.out.println("GPOS: " + Pathfinder.r2d(-mPath.get(0).heading));
         // System.out.println("RObotX:" + Drivetrain.getInstance().getRobotPos().getX() + "\t\t\tROBOT Y:" + Drivetrain.getInstance().getRobotPos().getY());
     }
 

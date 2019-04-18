@@ -3,6 +3,8 @@ package frc.robot.vision;
 import edu.wpi.first.wpilibj.command.CommandGroup;
 import edu.wpi.first.wpilibj.command.WaitCommand;
 import frc.robot.Robot;
+import frc.robot.commands.auton.DelayedLimelightCommand;
+import frc.robot.commands.auton.Ramsete;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.PPintake;
 import frc.robot.subsystems.PPintake.PPState;
@@ -12,6 +14,7 @@ public class AutoScoreCommand extends CommandGroup{
 
     @Override
     protected void initialize() {
+        Ramsete.getInstance().stop();
         Robot.limePanel.setLED(LED_STATE.ON);
     }
 
