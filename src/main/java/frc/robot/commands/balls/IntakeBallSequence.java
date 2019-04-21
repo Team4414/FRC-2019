@@ -16,7 +16,7 @@ import frc.util.Limelight.LED_STATE;
 public class IntakeBallSequence extends CommandGroup {
 
     public IntakeBallSequence() {
-        addSequential(new SafeElevatorMove(Setpoint.BOTTOM));
+        addSequential(new SafeElevatorMove(Setpoint.STOW));
         addSequential(Elevator.getInstance().lockElevatorCommand(true));
         addSequential(Intake.getInstance().intakeCommand(IntakeWheelState.ON));
         addSequential(Intake.getInstance().deployCommand(true));
@@ -33,7 +33,7 @@ public class IntakeBallSequence extends CommandGroup {
     @Override
     protected void interrupted() {
         Intake.getInstance().deploy(false);
-        Intake.getInstance().intake(false);
+        Intake.getInstance().intake(IntakeWheelState.CLEAR);
         Hand.getInstance().set(HandState.OFF);
         Intake.getInstance().intake(IntakeWheelState.OFF);
         Elevator.getInstance().lockElevator(false);
@@ -58,7 +58,7 @@ public class IntakeBallSequence extends CommandGroup {
             addSequential(Elevator.getInstance().lockElevatorCommand(false));
             addSequential(new SafeElevatorMove(Setpoint.FUEL_LOW));
             addSequential(Intake.getInstance().deployCommand(false));
-            addSequential(Intake.getInstance().intakeCommand(IntakeWheelState.OFF));
+            addSequential(Intake.getInstance().intakeCommand(IntakeWheelState.CLEAR));
             addSequential(Robot.limePanel.setLEDCommand(LED_STATE.OFF));
             addSequential(Robot.limeBall.setLEDCommand(LED_STATE.OFF));
         }
@@ -66,7 +66,7 @@ public class IntakeBallSequence extends CommandGroup {
         @Override
         protected void interrupted() {
             Intake.getInstance().deploy(false);
-            Intake.getInstance().intake(false);
+            Intake.getInstance().intake(IntakeWheelState.CLEAR);
             Hand.getInstance().set(HandState.OFF);
             Intake.getInstance().intake(IntakeWheelState.OFF);
             Elevator.getInstance().lockElevator(false);

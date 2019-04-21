@@ -30,6 +30,7 @@ import frc.robot.subsystems.Drivetrain;
 import frc.robot.subsystems.DustPan;
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Elevator.Setpoint;
+import frc.robot.subsystems.Intake.IntakeWheelState;
 import frc.robot.subsystems.PPintake.ArmState;
 import frc.robot.subsystems.PPintake.PPState;
 import frc.robot.subsystems.Hand;
@@ -132,6 +133,7 @@ public class Robot extends TimedRobot {
 
     //Set all system wide variables
     activeSide = (Hand.getInstance().hasBall()) ? Side.BALL : Side.PANEL;
+
     respectPerimeter = false;
     isClimbing = false;
     autoPlace = false;
@@ -140,12 +142,15 @@ public class Robot extends TimedRobot {
 
     mInitCalled = false;
 
-    Ramsete.getInstance().start();
+    // Ramsete.getInstance().start();
 
     //Import all autonomous paths from filesystem (time intensive)
     autonPaths = PathLoader.loadPaths();
     autoChooser.setDefaultOption("LEFT CARGO", FieldSide.LEFT);
     autoChooser.addOption("RIGHT CARGO", FieldSide.RIGHT);
+    SmartDashboard.putData(autoChooser);
+
+    autonCommand = new CargoShip(FieldSide.RIGHT);
     
     
     // autonCommand = new PIDTurn(180, 0);
@@ -182,6 +187,7 @@ public class Robot extends TimedRobot {
       VisionHelper.setActiveCam(limePanel);
     }
 
+
     // System.out.println(pdp.getCurrent(RobotMap.DustpanMap.kIntake - 1));
 
     // if(Elevator.getInstance().getSwitch()){
@@ -195,6 +201,7 @@ public class Robot extends TimedRobot {
     // System.out.println(Elevator.getInstance().getPosition());
     // SmartDashboard.putNumber("ElevatorPosition", Elevator.getInstance().getPosition());
     // VisionHelper.debugMessage();
+    // limePanel.setCamMode(CAM_MODE.VISION);
     // SmartDashboard.putNumber("TEET", (SmartDashboard.getNumber("VisionDriveGain", 0)));
     // // VisionHelper.throttleCorrection();
     // System.out.println(Hand.getInstance().getSensorVoltage());
@@ -207,22 +214,23 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
 
-    autonCommand = new CargoShip(autoChooser.getSelected());
+    // autonCommand = new CargoShip(FieldSide.RIGHT);
+    // autonCommand = new a
 
-    Drivetrain.getInstance().zeroSensor();
-
-
-
-    Drivetrain.getInstance().setBrakeMode(false);
-    Drivetrain.getInstance().zeroSensor();
-    Drivetrain.getInstance().zeroGyro();
-    Drivetrain.getInstance().startOdometery(0.02);
-    Elevator.getInstance().checkNeedsZero();
-    limePanel.setLED(LED_STATE.OFF);
-    limeBall.setLED(LED_STATE.OFF);
+    // Drivetrain.getInstance().zeroSensor();
 
 
-    // teleopInit(); //Just start teleop in sandstorm
+
+    // Drivetrain.getInstance().setBrakeMode(false);
+    // Drivetrain.getInstance().zeroSensor();
+    // Drivetrain.getInstance().zeroGyro();
+    // Drivetrain.getInstance().startOdometery(0.02);
+    // Elevator.getInstance().checkNeedsZero();
+    // limePanel.setLED(LED_STATE.OFF);
+    // limeBall.setLED(LED_STATE.OFF);
+
+
+    teleopInit(); //Just start teleop in sandstorm
     
     // Elevator.getInstance().setPosition(Setpoint.STOW);
 
@@ -230,7 +238,7 @@ public class Robot extends TimedRobot {
 
     // Ramsete.getInstance().start();
 
-    autonCommand.start();
+    // autonCommand.start();
 
     Scheduler.getInstance().run();
 
@@ -253,19 +261,20 @@ public class Robot extends TimedRobot {
     // VisionHelper.doDriveIn();
     ///
     // teleopPeriodic();
-    // teleopPeriodic();
+    teleopPeriodic();
+
     Scheduler.getInstance().run();
 
-    if(Math.abs(OI.getInstance().getForward()) > 0.2){
-      autonCommand.cancel();
-      mAutoCancelled = true;
-    }
+    // if(Math.abs(OI.getInstance().getForward()) > 0.2){
+    //   autonCommand.cancel();
+    //   mAutoCancelled = true;
+    // }
 
-    if(mAutoCancelled){
-      if(mInitCalled){
-        teleopPeriodic();
-      }
-    }
+    // if(mAutoCancelled){
+    //   if(mInitCalled){
+    //     teleopPeriodic();
+    //   }
+    // }
 
     // System.out.println(Drivetrain.getInstance().getRobotPos().getHeading());
 
@@ -275,8 +284,8 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopInit() {
 
-    Ramsete.getInstance().stop();
-    Drivetrain.getInstance().stopOdometery();
+    // Ramsete.getInstance().stop();
+    // Drivetrain.getInstance().stopOdometery();
     // autonCommand.cancel();
 
     limePanel.setUSBCam(true);
@@ -291,6 +300,7 @@ public class Robot extends TimedRobot {
 
       
     PPintake.getInstance().setPP(PPState.HOLDING);
+    Intake.getInstance().intake(IntakeWheelState.CLEAR);
     
     // autonCommand.cancel();
     mZeroElevatorCommand.start();

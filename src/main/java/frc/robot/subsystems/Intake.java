@@ -19,7 +19,8 @@ public class Intake extends Subsystem{
     public static enum IntakeWheelState{
         ON,
         OFF,
-        UNJAM
+        UNJAM,
+        CLEAR
     }
 
     private static final double kIntakePwr = 0.75;
@@ -42,6 +43,8 @@ public class Intake extends Subsystem{
     private Intake(){
         mPiston = new Solenoid(RobotMap.IntakeMap.kPiston);
         mIntake = CTREFactory.createVictor(RobotMap.IntakeMap.kIntake);
+
+        mIntake.configOpenloopRamp(0.3);
 
         mIntake.setInverted(true);
 
@@ -86,8 +89,10 @@ public class Intake extends Subsystem{
     public void intake(IntakeWheelState state){
         if (state == IntakeWheelState.ON){
             intake(true);
-        }else if (state == IntakeWheelState.UNJAM){
+        }else if (state == IntakeWheelState.CLEAR){
             setRaw(-0.25);
+        }else if (state == IntakeWheelState.UNJAM){
+            setRaw(-1);
         }else{
             intake(false);
         }

@@ -16,7 +16,7 @@ public class Unjam extends CommandGroup {
 
     public Unjam() {
         addParallel(DustPan.getInstance().intakeCommand(DustpanIntakeState.UNJAM));
-        addParallel(Elevator.getInstance().jogElevatorCommand(Setpoint.FUEL_LOW));
+        addParallel(Elevator.getInstance().jogElevatorCommand(Setpoint.HATCH_MID));
         addParallel(DustPan.getInstance().deployCommand(true));
         addParallel(Intake.getInstance().deployCommand(true));
         addParallel(Intake.getInstance().intakeCommand(IntakeWheelState.UNJAM));
@@ -32,7 +32,7 @@ public class Unjam extends CommandGroup {
         DustPan.getInstance().intake(false);
         DustPan.getInstance().deploy(false);
         Intake.getInstance().deploy(false);
-        Intake.getInstance().intake(false);
+        Intake.getInstance().intake(IntakeWheelState.CLEAR);;
         PPintake.getInstance().setPP(PPState.OFF);
         Hand.getInstance().set(HandState.OFF);
     }

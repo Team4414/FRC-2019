@@ -30,8 +30,8 @@ public class VisionHelper{
     // private static final double kTurnBallIGain = 0.0125;
     private static final double kDerivativeGain = -0.2; //-0.2
 
-    public static final double kDriveGain = 1.1;
-    private static final double kDriveDerivGain = 0;//-1.4
+    public static final double kDriveGain = 0.05; //1/(1/1.5d - 1/2d)
+    private static final double kDriveDerivGain = -0.4;//-1.4
     private static final double kSkewGain = 0;
 
     private static final double kHasTargetRollerThreshold = 0.8;
@@ -86,19 +86,22 @@ public class VisionHelper{
             }
         }else{
             if (mActiveCam.hasTarget()){
-                distRoller.add(1 / mActiveCam.tArea());
+                // distRoller.add(1 / mActiveCam.tArea() - 1/2d);
+                distRoller.add(mActiveCam.tY());
                 mDistPastError = mDistError;
-                mDistError = distRoller.getAverage();
+                mDistError = (-distRoller.getAverage());
             }else{
                 return 0;
             }
         }
 
-        return Math.max(-0.8, Math.min(-0.2, -((mDistPastError * kDriveGain) + ((mDistPastError - mDistError) * kDriveDerivGain))));
+        // return Math.max(-0.8, Math.min(-0.2, ((mDistPastError * kDriveGain) + ((mDistPastError - mDistError) * kDriveDerivGain) + 0.2)));
+        return ((mDistPastError * kDriveGain) + ((mDistPastError - mDistError) * kDriveDerivGain));
     }
 
     public static void debugMessage(){
-        SmartDashboard.putNumber("OUTPUT VEL", Math.max(-0.8, Math.min(-0.2, (mDistPastError * kDriveGain) + ((mDistPastError - mDistError) * kDriveDerivGain))));
+        getDriveSignal();
+        SmartDashboard.putNumber("OUTPUT VEL",  Math.max(-0.8, -((mDistPastError * kDriveGain) + ((mDistPastError - mDistError) * kDriveDerivGain) + 0.2)));
         
         SmartDashboard.putNumber("Unbounded Output Vel", -(mDistPastError * kDriveGain) + ((mDistPastError - mDistError) * kDriveDerivGain));
     }
