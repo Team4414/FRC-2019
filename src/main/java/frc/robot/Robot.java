@@ -49,7 +49,7 @@ import frc.util.Limelight.TARGET_MODE;
 import jaci.pathfinder.Trajectory;
 
 
-// !!!!!!!!!!! This code is intended to run 4414 2019 offseason "zippy" bot !!!!!!!!!!
+// !!!!!!!!!!! This is modified for 4414's offseason zippy !!!!!!!!!!
 public class Robot extends TimedRobot {
 
   public static enum Side {
