@@ -39,8 +39,8 @@ public class Elevator extends Subsystem implements ILoggable {
     private static final double kP = 0.5 * mConversionFactor; //0.5
     private static final double kI = 0; 
     private static final double kD = 0; //1.5
-    private static final double kF = 0.06 * mConversionFactor; //0.06
-    private static final double kArbFF = 0.1; //0.1944 1780
+    private static final double kF = 0.07 * mConversionFactor; //0.06
+    private static final double kArbFF = 0.1238; //0.1
 
     private static final int kMMacceleration = (int) (45000); //45000
     private static final int kMMvelocity = (int) (9000); //17000
