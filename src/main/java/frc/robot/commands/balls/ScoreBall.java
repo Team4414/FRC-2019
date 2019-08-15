@@ -22,8 +22,10 @@ public class ScoreBall extends CommandGroup{
             protected boolean isFinished() {
                 if (Robot.wantsToCargoOnScore){
                     Elevator.getInstance().setPosition(Setpoint.CARGO_SHIP);
+                    return Elevator.getInstance().isAtSetpoint();
+                }else{
+                    return true;
                 }
-                return Elevator.getInstance().isAtSetpoint();
             }
         });
         addSequential(Elevator.getInstance().lockElevatorCommand(true));
@@ -35,7 +37,7 @@ public class ScoreBall extends CommandGroup{
                 return true;
             }
         });
-        addSequential(Hand.getInstance().setArmCommand(HandArmState.EXTENDED));
+        // addSequential(Hand.getInstance().setArmCommand(HandArmState.EXTENDED));
         // addSequential(new WaitCommand(0.2));
         addSequential(Hand.getInstance().setHandCommand(HandState.DROP));
     }
@@ -49,8 +51,8 @@ public class ScoreBall extends CommandGroup{
     @Override
     public synchronized void cancel() {
         Hand.getInstance().set(HandState.HOLDING);
-        Hand.getInstance().setArm(HandArmState.RETRACTED);
-        Elevator.getInstance().lockElevator(true);
+        // Hand.getInstance().setArm(HandArmState.RETRACTED);
+        // Elevator.getInstance().lockElevator(true);
         // new ReGrabBall().start();
         new WaitForClaw().start();
         super.cancel();

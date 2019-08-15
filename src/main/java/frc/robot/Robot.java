@@ -200,7 +200,7 @@ public class Robot extends TimedRobot {
 
     // System.out.println(Robot.pdp.getCurrent(RobotMap.PPintakeMap.kPP - 1));
     // System.out.println(limeBall.getSkew());
-    // System.out.println(Elevator.getInstance().getPosition());
+    System.out.println(Elevator.getInstance().getPosition());
     // SmartDashboard.putNumber("ElevatorPosition", Elevator.getInstance().getPosition());
     // VisionHelper.debugMessage();
     // limePanel.setCamMode(CAM_MODE.VISION);

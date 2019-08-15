@@ -95,8 +95,8 @@ public class Elevator extends Subsystem implements ILoggable {
     private Elevator(){
           
         heightSetpoints.put(Setpoint.BOTTOM,     -400);
-        heightSetpoints.put(Setpoint.STOW,       1200); 
-        heightSetpoints.put(Setpoint.PANEL_GRAB,  850); //19 79
+        heightSetpoints.put(Setpoint.STOW,       2000); 
+        heightSetpoints.put(Setpoint.PANEL_GRAB,  2000); //19 79
         heightSetpoints.put(Setpoint.FLOOR_INTAKE, 0);
         heightSetpoints.put(Setpoint.CARGO_SHIP, 33000);
         heightSetpoints.put(Setpoint.FUEL_STATION, 33000);
