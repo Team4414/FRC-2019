@@ -2,6 +2,7 @@ package frc.robot.commands.balls;
 
 import edu.wpi.first.wpilibj.command.Command;
 import edu.wpi.first.wpilibj.command.CommandGroup;
+import edu.wpi.first.wpilibj.command.WaitCommand;
 import frc.robot.Robot;
 import frc.robot.Robot.Side;
 import frc.robot.commands.elevator.SafeElevatorMove;
@@ -16,12 +17,14 @@ import frc.util.Limelight.LED_STATE;
 public class IntakeBallSequence extends CommandGroup {
 
     public IntakeBallSequence() {
-        addSequential(new SafeElevatorMove(Setpoint.STOW));
+        addSequential(new SafeElevatorMove(Setpoint.BOTTOM));
         addSequential(Elevator.getInstance().lockElevatorCommand(true));
         addSequential(Intake.getInstance().intakeCommand(IntakeWheelState.ON));
         addSequential(Intake.getInstance().deployCommand(true));
         addSequential(Hand.getInstance().setHandCommand(HandState.INTAKING));
+        // addSequential(new WaitCommand(0.75));
         addSequential(new WaitForBall());
+        // addSequential(new WaitCommand(0.25));
     }
 
     @Override
@@ -54,8 +57,9 @@ public class IntakeBallSequence extends CommandGroup {
 
             addSequential(Robot.limePanel.setLEDCommand(LED_STATE.BLINK));
             addSequential(Robot.limeBall.setLEDCommand(LED_STATE.BLINK));
-            addSequential(Hand.getInstance().setHandCommand(HandState.HOLDING)); 
+            addSequential(Hand.getInstance().setHandCommand(HandState.OFF)); 
             addSequential(Elevator.getInstance().lockElevatorCommand(false));
+            addSequential(new WaitForBall());
             addSequential(new SafeElevatorMove(Setpoint.FUEL_LOW));
             addSequential(Intake.getInstance().deployCommand(false));
             addSequential(Intake.getInstance().intakeCommand(IntakeWheelState.CLEAR));

@@ -34,7 +34,7 @@ public class OI {
     private static final int kTurnNubID = 1;
     private static final int kXboxID = 2;
 
-    private static final int kTurnAxis = 0;
+    private static final int kTurnAxis = 4;
     private static final int kThrottleAxis = 1;
 
     private static final int kNubTopButton = 11;
@@ -43,6 +43,7 @@ public class OI {
     private Joystick throttleNub;
     private Joystick turnNub;
     private XboxController xbox;
+    private XboxController driveXbox;
 
     private Trigger jogLow;
     private Trigger jogMid;
@@ -69,6 +70,7 @@ public class OI {
         throttleNub = new Joystick(kThrottleNubID);
         turnNub = new Joystick(kTurnNubID);
         xbox = new XboxController(kXboxID);
+        driveXbox = new XboxController(3);
 
         //-------------------- Trigger Setup ------------------
 
@@ -180,7 +182,8 @@ public class OI {
         
             @Override
             public boolean get() {
-                return turnNub.getRawButton(kNubTopButton);
+                // return turnNub.getRawButton(kNubTopButton);
+                return (driveXbox.getRawAxis(3) > 0.8);
             }
 
         };
@@ -259,7 +262,7 @@ public class OI {
         jogLow.whenActive(new JogElevator(Position.LOW));
         jogMid.whenActive(new JogElevator(Position.MIDDLE));
         jogTop.whenActive(new JogElevator(Position.HIGH));
-        jogCrg.whenActive(new JogElevator(Position.MIDDLE, true));
+        jogCrg.whenActive(new JogElevator(Position.CARGO, false));
 
         reZero.whenActive(new ZeroElevator(true));
 
@@ -328,15 +331,16 @@ public class OI {
     }
 
     public double getLeft(){
-        return turnNub.getRawAxis(kTurnAxis);
+        return driveXbox.getRawAxis(kTurnAxis) * 0.6;
     }
 
     public double getForward(){
-        return -throttleNub.getRawAxis(kThrottleAxis) * 1.25d;
+        return driveXbox.getRawAxis(kThrottleAxis) * 0.7d;
     }
 
     public boolean getQuickTurn(){
-        return throttleNub.getRawButton(kNubBotButton);
+        // return throttleNub.getRawButton(kNubBotButton);
+        return driveXbox.getRawButton(6);
     }
 
     public XboxController getXbox(){
@@ -348,7 +352,8 @@ public class OI {
     }
 
     public boolean getVision(){
-        return throttleNub.getRawButton(kNubTopButton);
+        // return throttleNub.getRawButton(kNubTopButton);
+        return driveXbox.getRawButton(5);
     }
 
     public boolean getStationButton(){

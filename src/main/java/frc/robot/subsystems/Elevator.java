@@ -31,6 +31,9 @@ public class Elevator extends Subsystem implements ILoggable {
             instance = new Elevator();
         return instance;
     }
+    //7878
+    //35869
+    //63000
 
     
     // private static final double mConversionFactor = 17419d / 37797d;
@@ -45,7 +48,7 @@ public class Elevator extends Subsystem implements ILoggable {
     private static final int kMMacceleration = (int) (45000); //45000
     private static final int kMMvelocity = (int) (9000); //17000
 
-    private static final int kTopLimit = (int) (73000); //72387
+    private static final int kTopLimit = (int) (71250); //72387
 
     private static final int kElevatorTolerance = (int) (1000);
     private static final int kDropForPanelClearDistance = (int) (700);
@@ -68,6 +71,7 @@ public class Elevator extends Subsystem implements ILoggable {
         SECOND,
         MIDDLE,
         HIGH,
+        CARGO,
     }
 
     public static enum Setpoint{
@@ -95,16 +99,16 @@ public class Elevator extends Subsystem implements ILoggable {
     private Elevator(){
           
         heightSetpoints.put(Setpoint.BOTTOM,     -400);
-        heightSetpoints.put(Setpoint.STOW,       2000); 
+        heightSetpoints.put(Setpoint.STOW,       0); 
         heightSetpoints.put(Setpoint.PANEL_GRAB,  2000); //19 79
         heightSetpoints.put(Setpoint.FLOOR_INTAKE, 0);
-        heightSetpoints.put(Setpoint.CARGO_SHIP, 33000);
+        heightSetpoints.put(Setpoint.CARGO_SHIP, 19333);
         heightSetpoints.put(Setpoint.FUEL_STATION, 33000);
-        heightSetpoints.put(Setpoint.FUEL_LOW,   19475);
+        heightSetpoints.put(Setpoint.FUEL_LOW,   7878);
         heightSetpoints.put(Setpoint.HATCH_MID,  29932);
-        heightSetpoints.put(Setpoint.FUEL_MID,   47573); //41300
+        heightSetpoints.put(Setpoint.FUEL_MID,   34869); //41300
         heightSetpoints.put(Setpoint.HATCH_HIGH, 57182);
-        heightSetpoints.put(Setpoint.FUEL_HIGH,   72900); //69500
+        heightSetpoints.put(Setpoint.FUEL_HIGH,   63000); //69500
         heightSetpoints.put(Setpoint.FINGER_CLR, 5695);
 
         kHandThreshold = heightSetpoints.get(Setpoint.FUEL_LOW);
@@ -250,6 +254,8 @@ public class Elevator extends Subsystem implements ILoggable {
                 case HIGH:
                     mSetpoint = Setpoint.FUEL_HIGH;
                     break;
+                case CARGO:
+                    mSetpoint = Setpoint.CARGO_SHIP;
             }
         }else{
             switch(pos){

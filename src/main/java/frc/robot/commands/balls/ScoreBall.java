@@ -54,7 +54,7 @@ public class ScoreBall extends CommandGroup{
         // Hand.getInstance().setArm(HandArmState.RETRACTED);
         // Elevator.getInstance().lockElevator(true);
         // new ReGrabBall().start();
-        new WaitForClaw().start();
+        // new WaitForClaw().start();
         super.cancel();
     }
 

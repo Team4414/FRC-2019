@@ -122,6 +122,8 @@ public class Robot extends TimedRobot {
     limeBall.setLED(LED_STATE.ON);
     limeBall.setCamMode(CAM_MODE.DRIVER);
 
+    Elevator.getInstance().zero();
+
     OI.getInstance(); //OI goes last, needs subsystems to be instantiated first.
 
 
@@ -147,12 +149,12 @@ public class Robot extends TimedRobot {
     // Ramsete.getInstance().start();
 
     //Import all autonomous paths from filesystem (time intensive)
-    autonPaths = PathLoader.loadPaths();
-    autoChooser.setDefaultOption("LEFT CARGO", FieldSide.LEFT);
-    autoChooser.addOption("RIGHT CARGO", FieldSide.RIGHT);
-    SmartDashboard.putData(autoChooser);
+    // // autonPaths = PathLoader.loadPaths();
+    // autoChooser.setDefaultOption("LEFT CARGO", FieldSide.LEFT);
+    // autoChooser.addOption("RIGHT CARGO", FieldSide.RIGHT);
+    // SmartDashboard.putData(autoChooser);
 
-    autonCommand = new CargoShip(FieldSide.RIGHT);
+    // autonCommand = new CargoShip(FieldSide.RIGHT);
     
     
     // autonCommand = new PIDTurn(180, 0);
@@ -180,14 +182,16 @@ public class Robot extends TimedRobot {
 
   @Override
   public void robotPeriodic() {
-    if(Hand.getInstance().hasBall()){
-      // if (true){
-      activeSide = Side.BALL;
-      VisionHelper.setActiveCam(limeBall);
-    }else{
-      activeSide = Side.PANEL;
-      VisionHelper.setActiveCam(limePanel);
-    }
+    // if(Hand.getInstance().hasBall()){
+    //   // if (true){
+    //   activeSide = Side.BALL;
+    //   VisionHelper.setActiveCam(limeBall);
+    // }else{
+    //   activeSide = Side.PANEL;
+    //   VisionHelper.setActiveCam(limePanel);
+    // }
+
+    activeSide = Side.BALL;
 
 
     // System.out.println(pdp.getCurrent(RobotMap.DustpanMap.kIntake - 1));
@@ -200,13 +204,16 @@ public class Robot extends TimedRobot {
 
     // System.out.println(Robot.pdp.getCurrent(RobotMap.PPintakeMap.kPP - 1));
     // System.out.println(limeBall.getSkew());
-    System.out.println(Elevator.getInstance().getPosition());
+    // System.out.println(Elevator.getInstance().getPosition());
+    // System.out.println(Hand.getInstance().getSensorVoltage());
     // SmartDashboard.putNumber("ElevatorPosition", Elevator.getInstance().getPosition());
     // VisionHelper.debugMessage();
     // limePanel.setCamMode(CAM_MODE.VISION);
     // SmartDashboard.putNumber("TEET", (SmartDashboard.getNumber("VisionDriveGain", 0)));
     // // VisionHelper.throttleCorrection();
     // System.out.println(Hand.getInstance().getSensorVoltage());
+    // System.out.println(Elevator.getInstance().getPosition());
+    // System.out.println(Elevator.getInstance().getSwitch());
 
     // VisionHelper.kDriveGain = SmartDashboard.getNumber("VisionDriveGain", 0);
   }
@@ -329,6 +336,8 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic(){
 
+    System.out.println(pdp.getCurrent(5));
+
 
     if (Timer.getMatchTime() < 30){
       SignalLEDS.getInstance().set(LightPattern.RED_STROBE);
@@ -380,7 +389,7 @@ public class Robot extends TimedRobot {
           //vision button is released: cancel autoscore and start manual drive
 
           VisionHelper.getActiveCam().setLED(LED_STATE.OFF);
-          VisionHelper.getActiveCam().setCamMode(CAM_MODE.VISION);
+          VisionHelper.getActiveCam().setCamMode(CAM_MODE.DRIVER);
 
           if (mAutoDriveInCommand.isRunning()){
             mAutoDriveInCommand.cancel();
