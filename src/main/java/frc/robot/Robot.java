@@ -48,6 +48,8 @@ import frc.util.Limelight.LED_STATE;
 import frc.util.Limelight.TARGET_MODE;
 import jaci.pathfinder.Trajectory;
 
+
+// !!!!!!!!!!! This is modified for 4414's offseason zippy !!!!!!!!!!
 public class Robot extends TimedRobot {
 
   public static enum Side {
@@ -198,7 +200,7 @@ public class Robot extends TimedRobot {
 
     // System.out.println(Robot.pdp.getCurrent(RobotMap.PPintakeMap.kPP - 1));
     // System.out.println(limeBall.getSkew());
-    // System.out.println(Elevator.getInstance().getPosition());
+    System.out.println(Elevator.getInstance().getPosition());
     // SmartDashboard.putNumber("ElevatorPosition", Elevator.getInstance().getPosition());
     // VisionHelper.debugMessage();
     // limePanel.setCamMode(CAM_MODE.VISION);
