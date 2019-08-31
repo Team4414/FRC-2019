@@ -31,9 +31,6 @@ public class Elevator extends Subsystem implements ILoggable {
             instance = new Elevator();
         return instance;
     }
-    //7878
-    //35869
-    //63000
 
     
     // private static final double mConversionFactor = 17419d / 37797d;

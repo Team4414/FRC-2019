@@ -113,8 +113,6 @@ public class Robot extends TimedRobot {
     Drivetrain.getInstance().zeroSensor();
     Climber.getInstance();
 
-    // PeriodicLogger.getInstance().addLoggable(Elevator.getInstance());
-
     limePanel.setUSBCam(true);
     limePanel.setLED(LED_STATE.ON);
     limePanel.setCamMode(CAM_MODE.DRIVER);
@@ -133,7 +131,6 @@ public class Robot extends TimedRobot {
     mDriveCommand = new DriveManual();
     mAutoScoreCommand = new AutoScoreCommand();
     mAutoDriveInCommand = new AutoDriveIn();
-    // mScorePanel = new ScorePanel();
 
     //Set all system wide variables
     activeSide = (Hand.getInstance().hasBall()) ? Side.BALL : Side.PANEL;
@@ -145,157 +142,33 @@ public class Robot extends TimedRobot {
     wantsToCargoOnScore = false;
 
     mInitCalled = false;
-
-    // Ramsete.getInstance().start();
-
-    //Import all autonomous paths from filesystem (time intensive)
-    // // autonPaths = PathLoader.loadPaths();
-    // autoChooser.setDefaultOption("LEFT CARGO", FieldSide.LEFT);
-    // autoChooser.addOption("RIGHT CARGO", FieldSide.RIGHT);
-    // SmartDashboard.putData(autoChooser);
-
-    // autonCommand = new CargoShip(FieldSide.RIGHT);
-    
-    
-    // autonCommand = new PIDTurn(180, 0);
-
-    // autonCommand = Te;
-
-    //select the autonomous command
-    //in competition this will likely be done in autonomousInit()
-    // mFieldSideChooser = new SendableChooser<FieldSide>();
-    // mFieldSideChooser.setDefaultOption("LeftSide", FieldSide.LEFT);
-    // mFieldSideChooser.addOption("RightSide", FieldSide.RIGHT);
-    // autonCommand = new TestAutons(FieldSide.RIGHT);
-
-    // PeriodicLogger.getInstance();
-
-    // PeriodicLogger.getInstance().addLoggable(Drivetrain.getInstance());
-    // PeriodicLogger.getInstance().addLoggable(Ramsete.getInstance());
-
-    // PeriodicLogger.getInstance().start();
-    
-    // autonCommand = new PIDTurn(90, 10);
-    
-    // SmartDashboard.putNumber("VisionDriveGain", 0);
   }
 
   @Override
   public void robotPeriodic() {
-    // if(Hand.getInstance().hasBall()){
-    //   // if (true){
-    //   activeSide = Side.BALL;
-    //   VisionHelper.setActiveCam(limeBall);
-    // }else{
-    //   activeSide = Side.PANEL;
-    //   VisionHelper.setActiveCam(limePanel);
-    // }
 
+    //Override active side to ball always
     activeSide = Side.BALL;
-
-
-    // System.out.println(pdp.getCurrent(RobotMap.DustpanMap.kIntake - 1));
-
-    // if(Elevator.getInstance().getSwitch()){
-    //   Elevator.getInstance().zero();
-    // }
-
-
-
-    // System.out.println(Robot.pdp.getCurrent(RobotMap.PPintakeMap.kPP - 1));
-    // System.out.println(limeBall.getSkew());
-    // System.out.println(Elevator.getInstance().getPosition());
-    // System.out.println(Hand.getInstance().getSensorVoltage());
-    // SmartDashboard.putNumber("ElevatorPosition", Elevator.getInstance().getPosition());
-    // VisionHelper.debugMessage();
-    // limePanel.setCamMode(CAM_MODE.VISION);
-    // SmartDashboard.putNumber("TEET", (SmartDashboard.getNumber("VisionDriveGain", 0)));
-    // // VisionHelper.throttleCorrection();
-    // System.out.println(Hand.getInstance().getSensorVoltage());
-    // System.out.println(Elevator.getInstance().getPosition());
-    // System.out.println(Elevator.getInstance().getSwitch());
-
-    // VisionHelper.kDriveGain = SmartDashboard.getNumber("VisionDriveGain", 0);
   }
-
-  // double dder;
 
   @Override
   public void autonomousInit() {
 
-    // autonCommand = new CargoShip(FieldSide.RIGHT);
-    // autonCommand = new a
-
-    // Drivetrain.getInstance().zeroSensor();
-
-
-
-    // Drivetrain.getInstance().setBrakeMode(false);
-    // Drivetrain.getInstance().zeroSensor();
-    // Drivetrain.getInstance().zeroGyro();
-    // Drivetrain.getInstance().startOdometery(0.02);
-    // Elevator.getInstance().checkNeedsZero();
-    // limePanel.setLED(LED_STATE.OFF);
-    // limeBall.setLED(LED_STATE.OFF);
-
-
     teleopInit(); //Just start teleop in sandstorm
     
-    // Elevator.getInstance().setPosition(Setpoint.STOW);
-
-    //Start the selected autonomous command.
-
-    // Ramsete.getInstance().start();
-
-    // autonCommand.start();
 
     Scheduler.getInstance().run();
-
-    // VisionHelper.doDriveIn();
-    
-    // dder = 0.10;
-    // teleopInit();
-    // Drivetrain.getInstance().configureForVelocityMode();
   }
 
   @Override
   public void autonomousPeriodic() {
-
-    
-    // Elevator.getInstance().setPosition(2000);
-    // dder += 0.001;
-    // System.out.println(dder);
-
-
-    // VisionHelper.doDriveIn();
-    ///
-    // teleopPeriodic();
     teleopPeriodic();
 
     Scheduler.getInstance().run();
-
-    // if(Math.abs(OI.getInstance().getForward()) > 0.2){
-    //   autonCommand.cancel();
-    //   mAutoCancelled = true;
-    // }
-
-    // if(mAutoCancelled){
-    //   if(mInitCalled){
-    //     teleopPeriodic();
-    //   }
-    // }
-
-    // System.out.println(Drivetrain.getInstance().getRobotPos().getHeading());
-
-    // System.out.println(Drivetrain.getInstance().getLeftMaster().getClosedLoopError() + "\t\t\t" + Drivetrain.getInstance().getRightMaster().getClosedLoopError());
   }
 
   @Override
   public void teleopInit() {
-
-    // Ramsete.getInstance().stop();
-    // Drivetrain.getInstance().stopOdometery();
-    // autonCommand.cancel();
 
     limePanel.setUSBCam(true);
     limePanel.setLED(LED_STATE.OFF);
@@ -322,8 +195,6 @@ public class Robot extends TimedRobot {
     
 
     Elevator.getInstance().checkNeedsZero();
-    // Elevator.getInstance().zero();
-    // Elevator.getInstance().setRaw(0);
 
     mInitCalled = true;
   }
@@ -495,10 +366,6 @@ public class Robot extends TimedRobot {
     Elevator.getInstance().setPosition(0);
     Drivetrain.getInstance().setBrakeMode(false);
     Drivetrain.getInstance().stopOdometery();
-
-    // PeriodicLogger.getInstance().stop();
-    // PeriodicLogger.getInstance().allToCSV();
-    // PeriodicLogger.getInstance().clearAll();
 
     Ramsete.getInstance().stop();
   }
