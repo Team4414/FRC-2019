@@ -16,6 +16,7 @@ import frc.robot.Constants;
 import frc.robot.Robot;
 import frc.robot.RobotMap;
 import frc.robot.Robot.Side;
+import frc.robot.commands.balls.ScoreBall;
 import frc.util.LimitSwitch;
 import frc.util.LimitSwitch.Travel;
 import frc.util.logging.ILoggable;
@@ -45,7 +46,7 @@ public class Elevator extends Subsystem implements ILoggable {
     private static final int kMMacceleration = (int) (45000); //45000
     private static final int kMMvelocity = (int) (9000); //17000
 
-    private static final int kTopLimit = (int) (73000); //72387
+    private static final int kTopLimit = (int) (71166); //72387
 
     private static final int kElevatorTolerance = (int) (1000);
     private static final int kDropForPanelClearDistance = (int) (700);
@@ -100,11 +101,11 @@ public class Elevator extends Subsystem implements ILoggable {
         heightSetpoints.put(Setpoint.FLOOR_INTAKE, 0);
         heightSetpoints.put(Setpoint.CARGO_SHIP, 33000);
         heightSetpoints.put(Setpoint.FUEL_STATION, 33000);
-        heightSetpoints.put(Setpoint.FUEL_LOW,   19475);
+        heightSetpoints.put(Setpoint.FUEL_LOW,   22000);
         heightSetpoints.put(Setpoint.HATCH_MID,  29932);
         heightSetpoints.put(Setpoint.FUEL_MID,   47573); //41300
         heightSetpoints.put(Setpoint.HATCH_HIGH, 57182);
-        heightSetpoints.put(Setpoint.FUEL_HIGH,   72900); //69500
+        heightSetpoints.put(Setpoint.FUEL_HIGH,   71000); //69500
         heightSetpoints.put(Setpoint.FINGER_CLR, 5695);
 
         kHandThreshold = heightSetpoints.get(Setpoint.FUEL_LOW);
@@ -162,6 +163,8 @@ public class Elevator extends Subsystem implements ILoggable {
         if (mNeedsZero)
             return false;
         if (mLockElevator)
+            return false;
+        if (!ScoreBall.elevatorSafe())
             return false;
         mMaster.set(ControlMode.MotionMagic, (position) + mZeroOffset, DemandType.ArbitraryFeedForward, kArbFF);
         return true;

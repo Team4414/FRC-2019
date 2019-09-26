@@ -189,6 +189,8 @@ public class Robot extends TimedRobot {
       VisionHelper.setActiveCam(limePanel);
     }
 
+    // activeSide = Side.BALL;
+
 
     // System.out.println(pdp.getCurrent(RobotMap.DustpanMap.kIntake - 1));
 
@@ -200,13 +202,13 @@ public class Robot extends TimedRobot {
 
     // System.out.println(Robot.pdp.getCurrent(RobotMap.PPintakeMap.kPP - 1));
     // System.out.println(limeBall.getSkew());
-    System.out.println(Elevator.getInstance().getPosition());
+    // System.out.println(Elevator.getInstance().getPosition());
     // SmartDashboard.putNumber("ElevatorPosition", Elevator.getInstance().getPosition());
     // VisionHelper.debugMessage();
     // limePanel.setCamMode(CAM_MODE.VISION);
     // SmartDashboard.putNumber("TEET", (SmartDashboard.getNumber("VisionDriveGain", 0)));
     // // VisionHelper.throttleCorrection();
-    // System.out.println(Hand.getInstance().getSensorVoltage());
+    System.out.println(Elevator.getInstance().getPosition());
 
     // VisionHelper.kDriveGain = SmartDashboard.getNumber("VisionDriveGain", 0);
   }

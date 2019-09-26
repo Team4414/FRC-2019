@@ -15,6 +15,9 @@ import frc.robot.subsystems.Hand.HandState;
 
 public class ScoreBall extends CommandGroup{
 
+    public static double lockoutInitTime = 0;
+    public static final double kLockOutTime = 1;
+
     public ScoreBall(){
         addSequential(new Command(){
         
@@ -37,13 +40,29 @@ public class ScoreBall extends CommandGroup{
                 return true;
             }
         });
-        // addSequential(Hand.getInstance().setArmCommand(HandArmState.EXTENDED));
-        // addSequential(new WaitCommand(0.2));
+        addSequential(Hand.getInstance().setArmCommand(HandArmState.EXTENDED));
+        addSequential(new WaitCommand(0.2));
         addSequential(Hand.getInstance().setHandCommand(HandState.DROP));
+        addSequential(new Command(){
+        
+            @Override
+            protected boolean isFinished() {
+                lockoutInitTime = Timer.getFPGATimestamp();
+                return true;
+            }
+        });
+    }
+
+    public static boolean elevatorSafe(){
+        if (Timer.getFPGATimestamp() <= kLockOutTime + lockoutInitTime){
+            return false;
+        }
+        return true;
     }
 
     @Override
     protected void end() {
+        // lockoutInitTime = Timer.getFPGATimestamp();
         super.end();
     }
 
@@ -51,17 +70,17 @@ public class ScoreBall extends CommandGroup{
     @Override
     public synchronized void cancel() {
         Hand.getInstance().set(HandState.HOLDING);
-        // Hand.getInstance().setArm(HandArmState.RETRACTED);
-        // Elevator.getInstance().lockElevator(true);
-        // new ReGrabBall().start();
-        new WaitForClaw().start();
+        Hand.getInstance().setArm(HandArmState.RETRACTED);
+        Elevator.getInstance().lockElevator(false);
+        // new WaitForClaw().start();
+        lockoutInitTime = Timer.getFPGATimestamp();
         super.cancel();
     }
 
     private class WaitForClaw extends CommandGroup{
 
         public WaitForClaw(){
-            // addSequential(new WaitCommand(1));
+            addSequential(new WaitCommand(1));
             addSequential(Elevator.getInstance().lockElevatorCommand(false));
         }
 
