@@ -268,7 +268,7 @@ public class Robot extends TimedRobot {
     // VisionHelper.doDriveIn();
     ///
     // teleopPeriodic();
-    // teleopPeriodic();
+    teleopPeriodic();
     // Elevator.getInstance().setPosition(10000, count);
     // System.out.println("COUNT IS: " + count);
     // count += 0.0001;

@@ -16,7 +16,7 @@ import frc.robot.subsystems.Hand.HandState;
 public class ScoreBall extends CommandGroup{
 
     public static double lockoutInitTime = 0;
-    public static final double kLockOutTime = 1;
+    public static final double kLockOutTime = 0.675;
 
     public ScoreBall(){
         addSequential(new Command(){
